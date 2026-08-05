@@ -5,7 +5,8 @@ import { supabase } from '../supabaseClient'
 const secciones = [
   { to: '', label: 'Resumen', end: true },
   { to: '/cuentas', label: 'Plan de cuentas' },
-  { to: '/comprobantes', label: 'Ventas y compras' },
+  { to: '/ventas', label: 'Ventas' },
+  { to: '/compras', label: 'Compras' },
   { to: '/inventario', label: 'Inventario' },
   { to: '/cuentas-por-cobrar', label: 'Cuentas por cobrar' },
   { to: '/asientos', label: 'Asientos contables' },
