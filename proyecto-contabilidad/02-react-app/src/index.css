@@ -1,0 +1,907 @@
+/* =========================================================
+   MiContaBol — Sistema de diseño
+   Paleta oficial v1: coral + azul marino, estilo Stripe/Linear/Notion.
+   ========================================================= */
+
+:root {
+  --color-coral: #F2555A;
+  --color-coral-hover: #E6474D;
+  --color-navy: #1F3A5F;
+  --color-navy-light: #2E5C8A;
+  --color-bg: #FFFFFF;
+  --color-bg-secondary: #F7F9FC;
+  --color-border: #E6ECF3;
+  --color-text: #253046;
+  --color-text-secondary: #64748B;
+  --color-text-disabled: #A3AFBF;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+  /* Escala de dos niveles: superficies grandes más redondeadas
+     (moderno), controles algo menos (para que un input no quede
+     como pastilla). */
+  --radius-lg: 16px;
+  --radius: 12px;
+  --shadow-card: 0 1px 2px rgba(31, 58, 95, 0.05), 0 4px 12px rgba(31, 58, 95, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+}
+
+body,
+input,
+select,
+button,
+table {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* Tipografía con jerarquía clara: título / subtítulo / texto */
+h1,
+h2,
+h3 {
+  color: var(--color-navy);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+h1 {
+  font-size: 2.5rem; /* 40px */
+  margin: 0 0 0.5rem;
+}
+
+h2 {
+  font-size: 1.125rem; /* 18px */
+  margin: 1.75rem 0 0.75rem;
+}
+
+h3 {
+  font-size: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+
+p {
+  font-size: 1rem; /* 16px */
+  line-height: 1.5;
+}
+
+/* Los enlaces de navegación van en azul marino: el coral se
+   reserva para acciones. Un enlace suelto en coral compite con
+   los botones y le quita fuerza al color de marca. */
+a {
+  color: var(--color-navy);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Enlaces dentro de listas de panel y tablas: mismo criterio */
+.panel-lista a,
+tbody a {
+  color: var(--color-navy);
+}
+
+/* El contenido de cada página vive dentro de <main>: le damos
+   tratamiento de tarjeta, apoyado en el fondo gris claro del body. */
+main {
+  display: block;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+}
+
+label {
+  font-size: 0.82rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+/* Inputs y selects (no checkboxes, esos se dejan con su estilo nativo).
+   Radio de 12px, igual que botones y tarjetas — consistencia total. */
+input:not([type='checkbox']),
+select {
+  font-size: 0.9rem;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.7rem;
+}
+
+input:not([type='checkbox']):focus,
+select:focus {
+  border-color: var(--color-coral);
+  outline: none;
+}
+
+input[type='checkbox'] {
+  accent-color: var(--color-coral);
+}
+
+/* Botones: la app ya distingue en el código entre acciones principales
+   (type="submit" o sin type, casi siempre la acción central de la
+   pantalla) y acciones secundarias (type="button" explícito: cancelar,
+   editar, quitar, agregar línea). Aprovechamos esa convención. */
+button {
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+button:not([type='button']) {
+  background: #FFFFFF;
+  color: var(--color-coral);
+  border-color: var(--color-coral);
+}
+
+button:not([type='button']):hover:not(:disabled) {
+  background: rgba(242, 85, 90, 0.06);
+}
+
+/* Reservado para 1-2 CTAs "joya" por pantalla, como mucho — el coral
+   sólido debe sentirse especial, no ser el estilo por defecto. */
+button.btn-hero {
+  background: var(--color-coral);
+  color: #FFFFFF;
+  border-color: var(--color-coral);
+}
+
+button.btn-hero:hover:not(:disabled) {
+  background: var(--color-coral-hover);
+  border-color: var(--color-coral-hover);
+}
+
+button[type='button'] {
+  background: var(--color-bg);
+  color: var(--color-navy);
+  border-color: var(--color-navy);
+}
+
+button[type='button']:hover:not(:disabled) {
+  background: var(--color-bg-secondary);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-coral);
+  outline-offset: 2px;
+}
+
+/* Tablas */
+thead tr {
+  background: var(--color-bg-secondary);
+}
+
+th {
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+tbody tr:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.nav-chip {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-chip:hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-navy);
+  text-decoration: none;
+}
+
+/* =========================================================
+   Layout con sidebar
+   ========================================================= */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  width: 200px; /* ~15% más angosto que antes */
+  flex-shrink: 0;
+  background: var(--color-navy);
+  color: #FFFFFF;
+  padding: 1.5rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0;
+  padding: 2rem;
+  background: var(--color-bg-secondary);
+}
+
+.sidebar-empresa-chip {
+  padding: 0.45rem 0.7rem;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  color: #C7D2E0;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.sidebar-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.3rem 0;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.87rem;
+  color: #C7D2E0;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+/* Estado activo: relleno coral con texto blanco. Es un solo
+   elemento a la vez y ocupa poca superficie, así que el coral
+   sigue leyéndose como acento, no como pintura. */
+.sidebar-link.active {
+  background: var(--color-coral);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.sidebar-link.active:hover {
+  background: var(--color-coral-hover);
+}
+
+.sidebar-link-sub {
+  padding-left: 2.35rem;
+  font-size: 0.83rem;
+}
+
+button.sidebar-group-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: #C7D2E0;
+  font-weight: 500;
+  font-size: 0.87rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button.sidebar-group-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+}
+
+.sidebar-subnav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  margin: 0.15rem 0 0.25rem;
+}
+
+@media (max-width: 780px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .app-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .app-content {
+    padding: 1.25rem;
+  }
+}
+
+/* =========================================================
+   Dashboard (Inicio): KPIs, gráfico, listas
+   ========================================================= */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+}
+
+.stat-card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.15rem;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 16px rgba(31, 58, 95, 0.09);
+  transform: translateY(-2px);
+}
+
+.stat-label {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  margin: 0 0 0.35rem;
+}
+
+.stat-value {
+  color: var(--color-navy);
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.stat-delta-up {
+  color: var(--color-success);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0.3rem 0 0;
+}
+
+.stat-delta-down {
+  color: var(--color-error);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0.3rem 0 0;
+}
+
+.dashboard-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 780px) {
+  .dashboard-two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Responsive general */
+@media (max-width: 640px) {
+  main {
+    padding: 1.1rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   Login (layout partido: imagen + formulario)
+   ========================================================= */
+.auth-split {
+  display: flex;
+  min-height: 100vh;
+}
+
+.auth-image-panel {
+  flex: 1;
+  background: linear-gradient(180deg, rgba(31, 58, 95, 0.15) 0%, rgba(22, 40, 63, 0.55) 55%, rgba(15, 26, 41, 0.88) 100%),
+    url('/login-hero.jpg') center/cover no-repeat;
+  color: #FFFFFF;
+  display: flex;
+  align-items: flex-end;
+  padding: 3rem;
+  position: relative;
+}
+
+.auth-image-panel-text {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #FFFFFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-form-panel::before {
+  content: '';
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: rgba(242, 85, 90, 0.05);
+  border: 1px solid rgba(242, 85, 90, 0.14);
+  bottom: -150px;
+  right: -150px;
+}
+
+@media (max-width: 780px) {
+  .auth-image-panel {
+    display: none;
+  }
+}
+
+/* --- Panel inteligente de módulo --- */
+.panel-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.panel-card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.1rem 1.25rem;
+}
+
+.panel-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+}
+
+.panel-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.9rem;
+}
+
+.panel-lista li:last-child {
+  border-bottom: none;
+}
+
+.chip-estado {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* =========================================================
+   Landing page
+   ========================================================= */
+.landing-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.landing-header {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-border);
+  background: #FFFFFF;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.landing-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- HERO con foto + dashboard flotando encima --- */
+.landing-hero {
+  position: relative;
+  padding: 4rem 0 4.5rem;
+  background:
+    linear-gradient(105deg, rgba(31, 58, 95, 0.94) 0%, rgba(31, 58, 95, 0.86) 45%, rgba(22, 40, 63, 0.62) 100%),
+    url('/login-hero.jpg') center 30% / cover no-repeat;
+}
+
+.landing-hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.landing-h1 {
+  font-size: 2.9rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+
+.landing-hero .landing-subtitle {
+  color: #D5DEEA;
+}
+
+.landing-subtitle {
+  font-size: 1.08rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* --- Franja de confianza --- */
+.trust-strip {
+  background: var(--color-navy);
+  padding: 1rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.trust-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  color: #C7D2E0;
+  font-size: 0.88rem;
+}
+
+.trust-items span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* --- Secciones con ritmo alternado --- */
+.landing-section {
+  padding: 3.2rem 0;
+}
+
+.landing-section.bg-tint {
+  background: #F1F5FA;
+}
+
+.landing-section.bg-gris {
+  background: var(--color-bg-secondary);
+}
+
+.landing-h2 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.landing-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.landing-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.landing-grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+}
+
+.landing-card {
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.landing-card:hover {
+  box-shadow: 0 6px 20px rgba(31, 58, 95, 0.1);
+  transform: translateY(-3px);
+}
+
+/* --- Tarjetas de rubro (con foto opcional) --- */
+.rubro-card {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: #FFFFFF;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.rubro-card:hover {
+  box-shadow: 0 6px 20px rgba(31, 58, 95, 0.1);
+  transform: translateY(-3px);
+}
+
+/* Sin foto: degradado de marca con el emoji grande al centro. */
+.rubro-foto {
+  position: relative;
+  height: 150px;
+  background: linear-gradient(140deg, var(--color-navy-light) 0%, var(--color-navy) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.6rem;
+}
+
+/* Con foto: la imagen manda, el emoji baja a un chip en la esquina
+   para no taparla, y un degradado oscuro abajo funde con el texto. */
+.rubro-foto.con-foto {
+  background-size: cover;
+  background-position: center;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.75rem;
+}
+
+.rubro-foto.con-foto::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(31, 58, 95, 0.1) 0%, rgba(31, 58, 95, 0) 45%, rgba(31, 58, 95, 0.45) 100%);
+  pointer-events: none;
+}
+
+.rubro-chip {
+  position: relative;
+  z-index: 1;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 3px 12px rgba(15, 26, 41, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.rubro-cuerpo {
+  padding: 1rem 1.15rem 1.25rem;
+}
+
+/* --- Lista problema / solución --- */
+.lista-check {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  font-size: 1rem;
+}
+
+.lista-check li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  line-height: 1.4;
+}
+
+/* --- Dashboard "vivo" --- */
+.live-dashboard {
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 45px rgba(15, 26, 41, 0.28);
+  padding: 1.15rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.live-tabs {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0.9rem;
+}
+
+.live-tab {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-border);
+  transition: background-color 0.3s ease;
+}
+
+.live-tab.on {
+  background: var(--color-coral);
+}
+
+.live-panel {
+  animation: fadeSlide 0.45s ease;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.live-label {
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.live-value {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--color-navy);
+  margin: 0.1rem 0 0;
+  letter-spacing: -0.01em;
+}
+
+.live-delta {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin: 0.2rem 0 0;
+}
+
+.live-mini-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.live-mini {
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+}
+
+/* --- Botón grande, solo para la landing --- */
+button.btn-lg {
+  padding: 0.95rem 2rem;
+  font-size: 1rem;
+}
+
+/* --- CTA y footer --- */
+.landing-cta {
+  background: var(--color-navy);
+  padding: 3.2rem 0;
+}
+
+.landing-footer {
+  background: var(--color-navy);
+  padding: 2.5rem 0 1.75rem;
+}
+
+.landing-footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 2rem;
+}
+
+.landing-footer-heading {
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.landing-footer a {
+  display: block;
+  color: #93A5C4;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.landing-footer a:hover {
+  color: #FFFFFF;
+}
+
+@media (max-width: 780px) {
+  .landing-hero-grid,
+  .landing-grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .landing-h1 {
+    font-size: 2rem;
+  }
+  .landing-grid-3,
+  .landing-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .landing-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Responsive general */
+@media (max-width: 640px) {
+  main {
+    padding: 1.1rem;
+  }
+  h1 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
