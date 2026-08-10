@@ -39,6 +39,7 @@ import MetodosPago from './pages/MetodosPago'
 import CuentasPorPagar from './pages/CuentasPorPagar'
 import Caja from './pages/Caja'
 import Bancos from './pages/Bancos'
+import Personal from './pages/Personal'
 import Conciliacion from './pages/Conciliacion'
 import AnalisisCosto from './pages/AnalisisCosto'
 import Asientos from './pages/Asientos'
@@ -158,6 +159,14 @@ export default function App() {
             />
             <Route path="cuentas-por-pagar" element={<CuentasPorPagar />} />
             <Route path="caja" element={<Caja />} />
+            <Route
+              path="personal"
+              element={
+                <RequiereRol>
+                  <Personal />
+                </RequiereRol>
+              }
+            />
             <Route
               path="bancos"
               element={
