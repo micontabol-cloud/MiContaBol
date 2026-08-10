@@ -10,6 +10,7 @@ import {
   Truck,
   Wallet,
   Landmark,
+  UsersRound,
   BookOpen,
   BarChart3,
   CreditCard,
@@ -220,6 +221,15 @@ function LayoutInterno() {
               Formas de pago
             </NavLink>
           )}
+          {puedeConfigurar(rol) && (
+            <NavLink
+              to={`/empresas/${id}/personal`}
+              className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+            >
+              <UsersRound {...ICONO} />
+              Personal
+            </NavLink>
+          )}
           {esAdmin(rol) && (
             <NavLink
               to={`/empresas/${id}/perfil-empresa`}
@@ -229,6 +239,17 @@ function LayoutInterno() {
               Mi negocio
             </NavLink>
           )}
+
+          <div className="sidebar-divider" />
+
+          <NavLink to="/perfil" className="sidebar-link">
+            <UserRound {...ICONO} />
+            Mi perfil
+          </NavLink>
+          <NavLink to="/suscripcion" className="sidebar-link">
+            <Sparkles {...ICONO} />
+            Mi plan
+          </NavLink>
         </nav>
 
         <Link to="/empresas" style={{ color: '#93A5C4', fontSize: '0.8rem', marginTop: 'auto' }}>
