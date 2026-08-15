@@ -17,6 +17,8 @@ export default function NuevaCompraProducto() {
   const [nombreProveedor, setNombreProveedor] = useState('')
   const [concepto, setConcepto] = useState('')
   const [metodos, setMetodos] = useState([])
+  const [cuentasBanco, setCuentasBanco] = useState([])
+  const [cuentaDestino, setCuentaDestino] = useState('')
   const [metodoId, setMetodoId] = useState('')
   const [empresa, setEmpresa] = useState(null)
   const [lineas, setLineas] = useState([
@@ -29,7 +31,14 @@ export default function NuevaCompraProducto() {
     async function cargar() {
       await supabase.rpc('crear_metodos_pago_default', { p_empresa_id: empresaId })
 
-      const [{ data: prods }, { data: cts }, { data: conVenc }, { data: mets }, { data: emp }] = await Promise.all([
+      const [
+        { data: prods },
+        { data: cts },
+        { data: conVenc },
+        { data: mets },
+        { data: emp },
+        { data: bancos },
+      ] = await Promise.all([
         supabase.from('vista_stock').select('*').eq('empresa_id', empresaId).eq('activo', true).order('nombre_completo'),
         supabase
           .from('plan_cuentas')
@@ -52,11 +61,13 @@ export default function NuevaCompraProducto() {
           .in('uso', ['pago', 'ambos'])
           .order('orden'),
         supabase.from('empresas').select('*').eq('id', empresaId).single(),
+        supabase.rpc('saldos_bancarios', { p_empresa_id: empresaId }),
       ])
       setProductos(prods || [])
       setControlanVenc(new Set((conVenc || []).map((p) => p.id)))
       setMetodos(mets || [])
       setEmpresa(emp)
+      setCuentasBanco((bancos || []).filter((b) => b.activo))
       if (mets && mets.length > 0) setMetodoId((actual) => actual || mets[0].id)
       setCuentas((cts || []).filter((c) => c.tipo === 'activo' || c.tipo === 'pasivo'))
     }
@@ -94,6 +105,11 @@ export default function NuevaCompraProducto() {
 
   const metodo = metodos.find((m) => m.id === metodoId)
   const esCredito = !!metodo?.es_credito
+
+  const cuentaMetodo = metodo?.cuenta_id || ''
+  const cuentaEfectiva = cuentaDestino || cuentaMetodo
+  const metodoEsBancario = cuentasBanco.some((b) => b.cuenta_id === cuentaMetodo)
+  const puedeElegirBanco = !esCredito && cuentasBanco.length > 1 && (metodoEsBancario || !cuentaMetodo)
   const cuentaPorId = new Map(cuentas.map((c) => [c.id, c]))
 
   // Vista previa del asiento, explicado en lenguaje de comerciante.
@@ -101,7 +117,7 @@ export default function NuevaCompraProducto() {
     if (total <= 0 || !metodo) return null
 
     const cuentaInv = cuentaPorId.get(empresa?.cuenta_inventario_id)
-    const cuentaPago = esCredito ? cuentaPorId.get(empresa?.cuenta_cxp_id) : cuentaPorId.get(metodo.cuenta_id)
+    const cuentaPago = esCredito ? cuentaPorId.get(empresa?.cuenta_cxp_id) : cuentaPorId.get(cuentaEfectiva)
 
     const faltantes = []
     if (!cuentaInv) faltantes.push('Inventario')
@@ -145,8 +161,10 @@ export default function NuevaCompraProducto() {
       setError('Una compra fiada necesita saber quién es el proveedor, para poder pagarle después.')
       return
     }
-    if (!esCredito && !metodo.cuenta_id) {
-      setError(`El método "${metodo.nombre}" todavía no tiene una cuenta asignada. Configúralo en Formas de pago.`)
+    if (!esCredito && !cuentaEfectiva) {
+      setError(
+        `Falta definir de dónde sale el dinero de "${metodo.nombre}". Ve a Formas de pago en el menú y asígnale su cuenta.`
+      )
       return
     }
 
@@ -169,7 +187,7 @@ export default function NuevaCompraProducto() {
       p_proveedor: nombreProveedor || null,
       p_proveedor_id: proveedorId,
       p_concepto: concepto || null,
-      p_cuenta_pago_id: esCredito ? null : metodo.cuenta_id,
+      p_cuenta_pago_id: esCredito ? null : cuentaEfectiva,
       p_es_credito: esCredito,
       p_lineas: lineasPayload,
     })
@@ -216,7 +234,32 @@ export default function NuevaCompraProducto() {
           <input value={concepto} onChange={(e) => setConcepto(e.target.value)} style={{ width: '100%' }} />
         </label>
 
-        <MetodoPagoSelector metodos={metodos} valor={metodoId} onChange={setMetodoId} etiqueta="¿Cómo pagas?" />
+        <MetodoPagoSelector
+          metodos={metodos}
+          valor={metodoId}
+          onChange={(id) => {
+            setMetodoId(id)
+            setCuentaDestino('')
+          }}
+          etiqueta="¿Cómo pagas?"
+        />
+
+        {puedeElegirBanco && (
+          <label>
+            ¿De qué cuenta sale?
+            <br />
+            <select value={cuentaEfectiva} onChange={(e) => setCuentaDestino(e.target.value)} style={{ minWidth: 260 }}>
+              {!cuentaMetodo && <option value="">-- Selecciona --</option>}
+              {cuentasBanco.map((b) => (
+                <option key={b.id} value={b.cuenta_id}>
+                  {b.banco}
+                  {b.alias ? ` · ${b.alias}` : ''}
+                  {b.numero ? ` (${String(b.numero).slice(-4)})` : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
 
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>

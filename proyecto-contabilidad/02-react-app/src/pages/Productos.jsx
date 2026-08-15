@@ -58,6 +58,7 @@ export default function Productos() {
   const [cuentaCxp, setCuentaCxp] = useState('')
   const [guardandoConfig, setGuardandoConfig] = useState(false)
   const [autoconfigurando, setAutoconfigurando] = useState(false)
+  const [mostrarTecnico, setMostrarTecnico] = useState(false)
   const [uso, setUso] = useState(null)
   const [eliminando, setEliminando] = useState(null)
   const [motivoEliminar, setMotivoEliminar] = useState('')
@@ -268,6 +269,22 @@ export default function Productos() {
     cargar()
   }
 
+  // Avisos de configuraciones que rompen la contabilidad sin dar error
+  const cuentaDe = (id) => cuentas.find((c) => c.id === id)
+  const advertencias = []
+
+  const cxc = cuentaDe(cuentaCxc)
+  if (cxc && /banco|caja/i.test(cxc.nombre)) {
+    advertencias.push(
+      `"Cuentas por cobrar" apunta a ${cxc.nombre}. Al vender fiado, el sistema va a creer que el dinero ya entró ahí. Debería apuntar a una cuenta de clientes por cobrar.`
+    )
+  }
+
+  const inv = cuentaDe(cuentaInventario)
+  if (inv && /banco|caja/i.test(inv.nombre)) {
+    advertencias.push(`"Inventario" apunta a ${inv.nombre}, que es una cuenta de dinero, no de mercadería.`)
+  }
+
   const cuentasIngreso = cuentas.filter((c) => c.tipo === 'ingreso')
   const cuentasGasto = cuentas.filter((c) => c.tipo === 'gasto')
   const cuentasActivo = cuentas.filter((c) => c.tipo === 'activo')
@@ -356,9 +373,82 @@ export default function Productos() {
         style={{ margin: '1rem 0', border: '1px solid #E6ECF3', borderRadius: 12, padding: '0.75rem' }}
       >
         <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#1F3A5F' }}>
-          Configuración de cuentas {configCompleta ? '✅' : '⚠️ (falta configurar)'}
+          Cómo se registra tu contabilidad {configCompleta ? '✅' : '⚠️ (falta configurar)'}
         </summary>
-        <form onSubmit={guardarConfig} style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.75rem', alignItems: 'flex-end' }}>
+
+        <div style={{ padding: '0.9rem 0 0' }}>
+          <p style={{ margin: '0 0 0.9rem', fontSize: '0.92rem', color: '#64748B', lineHeight: 1.55 }}>
+            Esto ya quedó configurado solo al crear tu negocio. Normalmente no hay nada que cambiar aquí.
+          </p>
+
+          <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {[
+              { ok: !!empresa?.cuenta_ventas_id, texto: 'Tus ventas se registran como ingreso' },
+              { ok: !!empresa?.cuenta_costo_ventas_id, texto: 'El costo de lo vendido descuenta de tu ganancia' },
+              { ok: !!empresa?.cuenta_inventario_id, texto: 'Tu mercadería se controla como bien tuyo' },
+              { ok: !!empresa?.cuenta_cxc_id, texto: 'Lo que te deben queda registrado aparte' },
+              { ok: !!empresa?.cuenta_cxp_id, texto: 'Lo que debes a proveedores queda registrado aparte' },
+            ].map((f, i) => (
+              <li key={i} style={{ display: 'flex', gap: '0.5rem', fontSize: '0.92rem', alignItems: 'flex-start' }}>
+                <span style={{ color: f.ok ? '#22C55E' : '#F59E0B', fontWeight: 700 }}>{f.ok ? '✓' : '!'}</span>
+                <span style={{ color: f.ok ? '#253046' : '#8a5a00' }}>{f.texto}</span>
+              </li>
+            ))}
+          </ul>
+
+          {advertencias.length > 0 && (
+            <div
+              style={{
+                background: 'rgba(239, 68, 68, 0.07)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                borderRadius: 12,
+                padding: '0.85rem 1rem',
+                marginBottom: '1rem',
+              }}
+            >
+              <p style={{ margin: '0 0 0.4rem', fontWeight: 700, color: '#B91C1C' }}>Revisa esto</p>
+              {advertencias.map((a, i) => (
+                <p key={i} style={{ margin: 0, fontSize: '0.88rem', color: '#64748B', lineHeight: 1.5 }}>
+                  {a}
+                </p>
+              ))}
+            </div>
+          )}
+
+          <p
+            style={{
+              background: '#F7F9FC',
+              border: '1px solid #E6ECF3',
+              borderRadius: 12,
+              padding: '0.8rem 0.95rem',
+              margin: '0 0 1rem',
+              fontSize: '0.9rem',
+              lineHeight: 1.55,
+            }}
+          >
+            <strong>¿Dónde entra el dinero de cada venta?</strong> Eso se decide en{' '}
+            <Link to={`/empresas/${empresaId}/formas-de-pago`}>Formas de pago</Link>: ahí eliges que Efectivo vaya a
+            Caja, QR y Tarjeta a tu banco, y así.
+          </p>
+
+          {!mostrarTecnico && (
+            <button type="button" onClick={() => setMostrarTecnico(true)} style={{ fontSize: '0.85rem' }}>
+              Ver y cambiar las cuentas contables
+            </button>
+          )}
+        </div>
+        <form
+          onSubmit={guardarConfig}
+          style={{
+            display: mostrarTecnico ? 'flex' : 'none',
+            flexWrap: 'wrap',
+            gap: '0.75rem',
+            marginTop: '0.75rem',
+            paddingTop: '1rem',
+            borderTop: '1px solid #E6ECF3',
+            alignItems: 'flex-end',
+          }}
+        >
           <label>
             Cuenta de ventas
             <br />

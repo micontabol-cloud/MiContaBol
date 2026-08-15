@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 
 const USOS = [
@@ -92,11 +92,61 @@ export default function MetodosPago() {
     <main style={{ maxWidth: 800, fontFamily: 'sans-serif' }}>
       <h1>Formas de cobro y pago</h1>
       <p style={{ color: '#64748B', marginTop: '-0.5rem' }}>
-        Cuando registras una venta eliges "Efectivo" o "QR" — nunca una cuenta contable. Aquí defines a qué cuenta
-        va cada forma, una sola vez.
+        Cuando registras una venta eliges "Efectivo" o "QR" — nunca una cuenta contable. Aquí defines dónde entra el
+        dinero de cada forma, una sola vez.
       </p>
 
+      <div
+        style={{
+          background: '#F7F9FC',
+          border: '1px solid #E6ECF3',
+          borderRadius: 14,
+          padding: '1rem 1.15rem',
+          margin: '1.25rem 0',
+          fontSize: '0.92rem',
+          lineHeight: 1.6,
+        }}
+      >
+        <p style={{ margin: '0 0 0.5rem', fontWeight: 600, color: '#1F3A5F' }}>Cómo suele configurarse</p>
+        <ul style={{ margin: 0, paddingLeft: '1.1rem', color: '#64748B' }}>
+          <li>
+            <strong>Efectivo</strong> → tu caja, porque el billete queda en el negocio
+          </li>
+          <li>
+            <strong>QR y transferencia</strong> → la cuenta bancaria donde te llega
+          </li>
+          <li>
+            <strong>Tarjeta</strong> → la cuenta donde te deposita el banco
+          </li>
+          <li>
+            <strong>Fiado</strong> → no lleva cuenta: el sistema lo manda solo a cuentas por cobrar
+          </li>
+        </ul>
+        <p style={{ margin: '0.7rem 0 0', color: '#64748B' }}>
+          Si tienes varias cuentas bancarias, apunta cada forma a la que corresponda: es lo que permite conciliar
+          después.
+        </p>
+      </div>
+
       {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+
+      {cuentas.filter((c) => /banco/i.test(c.nombre)).length === 0 && (
+        <p
+          style={{
+            background: 'rgba(59, 130, 246, 0.08)',
+            border: '1px solid rgba(59, 130, 246, 0.3)',
+            borderRadius: 12,
+            padding: '0.8rem 0.95rem',
+            fontSize: '0.9rem',
+            color: '#1e40af',
+            lineHeight: 1.5,
+          }}
+        >
+          Todavía no tienes cuentas bancarias registradas. Si cobras por QR, transferencia o tarjeta,{' '}
+          <Link to={`/empresas/${empresaId}/bancos`}>agrégalas en Bancos</Link> y vuelve aquí: aparecerán en la lista
+          para elegirlas.
+        </p>
+      )}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -136,6 +186,33 @@ export default function MetodosPago() {
                       ⚠️ sin configurar
                     </span>
                   )}
+                  {(() => {
+                    if (m.es_credito || !m.cuenta_id) return null
+                    const c = cuentas.find((x) => x.id === m.cuenta_id)
+                    if (!c) return null
+
+                    // Efectivo en el banco, o QR en caja, casi siempre es un error
+                    const esEfectivo = /efectivo/i.test(m.nombre)
+                    const esDigital = /qr|transfer|tarjeta|banco/i.test(m.nombre)
+                    const cuentaEsCaja = /caja/i.test(c.nombre)
+                    const cuentaEsBanco = /banco/i.test(c.nombre)
+
+                    if (esEfectivo && cuentaEsBanco) {
+                      return (
+                        <span style={{ color: '#F59E0B', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
+                          ⚠️ el efectivo suele ir a caja, no al banco
+                        </span>
+                      )
+                    }
+                    if (esDigital && cuentaEsCaja) {
+                      return (
+                        <span style={{ color: '#F59E0B', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
+                          ⚠️ esto llega al banco, no a la caja
+                        </span>
+                      )
+                    }
+                    return null
+                  })()}
                 </td>
                 <td style={{ padding: '6px 8px', color: '#64748B', fontSize: '0.85rem' }}>
                   {USOS.find((u) => u.valor === m.uso)?.etiqueta}

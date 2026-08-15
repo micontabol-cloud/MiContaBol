@@ -46,6 +46,8 @@ export default function NuevaVentaProducto() {
   const [productos, setProductos] = useState([])
   const [cuentas, setCuentas] = useState([])
   const [metodos, setMetodos] = useState([])
+  const [cuentasBanco, setCuentasBanco] = useState([])
+  const [cuentaDestino, setCuentaDestino] = useState('')
   const [empresa, setEmpresa] = useState(null)
   const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10))
   const [clienteId, setClienteId] = useState(null)
@@ -68,7 +70,7 @@ export default function NuevaVentaProducto() {
       // cuentas de Caja y Bancos.
       await supabase.rpc('crear_metodos_pago_default', { p_empresa_id: empresaId })
 
-      const [{ data: prods }, { data: cts }, { data: mets }, { data: emp }] = await Promise.all([
+      const [{ data: prods }, { data: cts }, { data: mets }, { data: emp }, { data: bancos }] = await Promise.all([
         supabase.from('vista_stock').select('*').eq('empresa_id', empresaId).eq('activo', true).order('nombre_completo'),
         supabase
           .from('plan_cuentas')
@@ -85,12 +87,14 @@ export default function NuevaVentaProducto() {
           .in('uso', ['cobro', 'ambos'])
           .order('orden'),
         supabase.from('empresas').select('*').eq('id', empresaId).single(),
+        supabase.rpc('saldos_bancarios', { p_empresa_id: empresaId }),
       ])
 
       setProductos(prods || [])
       setCuentas(cts || [])
       setMetodos(mets || [])
       setEmpresa(emp)
+      setCuentasBanco((bancos || []).filter((b) => b.activo))
       if (mets && mets.length > 0) setMetodoId((actual) => actual || mets[0].id)
     }
     cargar()
@@ -174,6 +178,14 @@ export default function NuevaVentaProducto() {
   const metodo = metodos.find((m) => m.id === metodoId)
   const esCredito = !!metodo?.es_credito
 
+  // El método define a dónde entra el dinero, pero si hay varias
+  // cuentas bancarias el vendedor puede necesitar cambiarla: el QR de
+  // hoy puede llegar a un banco distinto al de siempre.
+  const cuentaMetodo = metodo?.cuenta_id || ''
+  const cuentaEfectiva = cuentaDestino || cuentaMetodo
+  const metodoEsBancario = cuentasBanco.some((b) => b.cuenta_id === cuentaMetodo)
+  const puedeElegirBanco = !esCredito && cuentasBanco.length > 1 && (metodoEsBancario || !cuentaMetodo)
+
   const bruto = lineas.reduce(
     (sum, l) => sum + (parseFloat(l.cantidad) || 0) * (parseFloat(l.precio_unitario) || 0),
     0
@@ -192,7 +204,7 @@ export default function NuevaVentaProducto() {
   const preview = useMemo(() => {
     if (total <= 0) return null
 
-    const cuentaCobro = esCredito ? cuentaPorId.get(empresa?.cuenta_cxc_id) : cuentaPorId.get(metodo?.cuenta_id)
+    const cuentaCobro = esCredito ? cuentaPorId.get(empresa?.cuenta_cxc_id) : cuentaPorId.get(cuentaEfectiva)
     const cuentaVentas = cuentaPorId.get(
       esOtroIngreso ? empresa?.cuenta_otros_ingresos_id : empresa?.cuenta_ventas_id
     )
@@ -201,7 +213,13 @@ export default function NuevaVentaProducto() {
     const cuentaInv = cuentaPorId.get(empresa?.cuenta_inventario_id)
 
     const faltantes = []
-    if (!cuentaCobro) faltantes.push(esCredito ? 'Cuentas por Cobrar' : `la cuenta de "${metodo?.nombre}"`)
+    if (!cuentaCobro) {
+      faltantes.push(
+        esCredito
+          ? 'la cuenta de Cuentas por Cobrar'
+          : `dónde entra el dinero de "${metodo?.nombre}" — se configura en Formas de pago`
+      )
+    }
     if (!cuentaVentas) faltantes.push(esOtroIngreso ? 'Otros Ingresos' : 'Ventas')
     if (descuentoNum > 0 && !cuentaDescuentos) faltantes.push('Descuentos en Ventas')
     if (!cuentaCosto) faltantes.push('Costo de Ventas')
@@ -265,7 +283,7 @@ export default function NuevaVentaProducto() {
           ? `Falta configurar: ${faltantes.join(', ')}. Ve a Inventario → Productos → Configuración de cuentas.`
           : null,
     }
-  }, [total, bruto, descuentoNum, costoTotal, esCredito, esOtroIngreso, metodo, empresa, cuentaPorId, nombreCliente])
+  }, [total, bruto, descuentoNum, costoTotal, esCredito, esOtroIngreso, metodo, cuentaEfectiva, empresa, cuentaPorId, nombreCliente])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -279,8 +297,10 @@ export default function NuevaVentaProducto() {
       setError('Una venta fiada necesita saber quién es el cliente, para poder cobrarle después.')
       return
     }
-    if (!esCredito && !metodo.cuenta_id) {
-      setError(`El método "${metodo.nombre}" todavía no tiene una cuenta asignada. Configúralo en Productos.`)
+    if (!esCredito && !cuentaEfectiva) {
+      setError(
+        `Falta definir dónde entra el dinero de "${metodo.nombre}". Ve a Formas de pago en el menú y asígnale su cuenta.`
+      )
       return
     }
 
@@ -302,7 +322,7 @@ export default function NuevaVentaProducto() {
       p_cliente_id: clienteId,
       p_concepto: concepto || null,
       p_es_credito: esCredito,
-      p_cuenta_cobro_id: esCredito ? null : metodo.cuenta_id,
+      p_cuenta_cobro_id: esCredito ? null : cuentaEfectiva,
       p_lineas: lineasPayload,
       p_descuento: descuentoNum,
       p_cuenta_ingreso_id: esOtroIngreso ? empresa?.cuenta_otros_ingresos_id : empresa?.cuenta_ventas_id,
@@ -488,7 +508,61 @@ export default function NuevaVentaProducto() {
           </div>
         </div>
 
-        <MetodoPagoSelector metodos={metodos} valor={metodoId} onChange={setMetodoId} etiqueta="¿Cómo te pagan?" />
+        <MetodoPagoSelector
+          metodos={metodos}
+          valor={metodoId}
+          onChange={(id) => {
+            setMetodoId(id)
+            setCuentaDestino('')
+          }}
+          etiqueta="¿Cómo te pagan?"
+        />
+
+        {puedeElegirBanco && (
+          <label>
+            ¿A qué cuenta entra?
+            <br />
+            <select value={cuentaEfectiva} onChange={(e) => setCuentaDestino(e.target.value)} style={{ minWidth: 260 }}>
+              {!cuentaMetodo && <option value="">-- Selecciona --</option>}
+              {cuentasBanco.map((b) => (
+                <option key={b.id} value={b.cuenta_id}>
+                  {b.banco}
+                  {b.alias ? ` · ${b.alias}` : ''}
+                  {b.numero ? ` (${String(b.numero).slice(-4)})` : ''}
+                </option>
+              ))}
+            </select>
+            <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+              Viene la de siempre. Cámbiala solo si este cobro llegó a otra cuenta.
+            </span>
+          </label>
+        )}
+
+        {!esCredito && !cuentaEfectiva && (
+          <p
+            style={{
+              background: 'rgba(245, 158, 11, 0.1)',
+              border: '1px solid rgba(245, 158, 11, 0.4)',
+              borderRadius: 12,
+              padding: '0.8rem 0.95rem',
+              margin: 0,
+              fontSize: '0.9rem',
+              color: '#8a5a00',
+              lineHeight: 1.5,
+            }}
+          >
+            Falta definir dónde entra el dinero de <strong>{metodo?.nombre}</strong>.{' '}
+            <Link to={`/empresas/${empresaId}/formas-de-pago`}>Configúralo en Formas de pago</Link> — se hace una
+            sola vez.
+            {cuentasBanco.length === 0 && (
+              <>
+                {' '}
+                Si cobras por QR o transferencia, primero{' '}
+                <Link to={`/empresas/${empresaId}/bancos`}>agrega tu cuenta bancaria</Link>.
+              </>
+            )}
+          </p>
+        )}
 
         <div>
           <p style={{ margin: '0 0 0.3rem', fontSize: '0.85rem', color: '#64748B' }}>
