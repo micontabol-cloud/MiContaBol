@@ -302,6 +302,59 @@ export default function CatalogoPublico() {
         )}
       </main>
 
+      {/* Quién atiende */}
+      {datos.responsable_nombre && (
+        <section style={{ background: t.superficie, borderTop: `1px solid ${t.borde}`, padding: '1.75rem 1.25rem' }}>
+          <div
+            style={{
+              maxWidth: 900,
+              margin: '0 auto',
+              display: 'flex',
+              gap: '1rem',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            {datos.responsable_foto ? (
+              <img
+                src={datos.responsable_foto}
+                alt={datos.responsable_nombre}
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: `2px solid ${marca}`,
+                }}
+              />
+            ) : (
+              <div
+                style={{
+                  width: 64,
+                  height: 64,
+                  borderRadius: '50%',
+                  background: marca,
+                  color: '#FFFFFF',
+                  display: 'grid',
+                  placeItems: 'center',
+                  fontSize: '1.5rem',
+                  fontWeight: 700,
+                }}
+              >
+                {datos.responsable_nombre.charAt(0).toUpperCase()}
+              </div>
+            )}
+
+            <div>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: t.textoSuave }}>Te atiende</p>
+              <p style={{ margin: '0.1rem 0 0', fontWeight: 700, fontSize: '1.05rem' }}>
+                {datos.responsable_nombre}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Contacto */}
       {(datos.direccion || datos.horarios || datos.instagram || datos.facebook || datos.whatsapp) && (
         <section style={{ background: t.superficie, borderTop: `1px solid ${t.borde}`, padding: '2rem 1.25rem' }}>

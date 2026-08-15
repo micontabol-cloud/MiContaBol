@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Users, CreditCard, Package } from 'lucide-react'
 import { supabase } from '../supabaseClient'
+import VisorImagen from '../components/VisorImagen'
 
 const COLORES_SUGERIDOS = [
   '#1F3A5F', '#0F766E', '#7C2D92', '#B45309',
@@ -26,6 +27,7 @@ export default function PerfilEmpresa() {
   const [subiendo, setSubiendo] = useState(false)
   const [error, setError] = useState(null)
   const [aviso, setAviso] = useState(null)
+  const [logoAmpliado, setLogoAmpliado] = useState(false)
 
   const [form, setForm] = useState({
     nombre: '',
@@ -128,19 +130,27 @@ export default function PerfilEmpresa() {
       <h2>Logo</h2>
       <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
         {empresa?.logo_url ? (
-          <img
-            src={empresa.logo_url}
-            alt="Logo"
-            style={{
-              height: 90,
-              maxWidth: 200,
-              objectFit: 'contain',
-              background: '#FFFFFF',
-              border: '1px solid #E6ECF3',
-              borderRadius: 12,
-              padding: '0.5rem',
-            }}
-          />
+          <button
+            type="button"
+            onClick={() => setLogoAmpliado(true)}
+            title="Ver más grande"
+            style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'zoom-in' }}
+          >
+            <img
+              src={empresa.logo_url}
+              alt="Logo"
+              style={{
+                height: 90,
+                maxWidth: 200,
+                objectFit: 'contain',
+                background: '#FFFFFF',
+                border: '1px solid #E6ECF3',
+                borderRadius: 12,
+                padding: '0.5rem',
+                display: 'block',
+              }}
+            />
+          </button>
         ) : (
           <div
             style={{
@@ -358,6 +368,9 @@ export default function PerfilEmpresa() {
           </p>
         </Link>
       </div>
+      {logoAmpliado && (
+        <VisorImagen url={empresa?.logo_url} alt={form.nombre} onCerrar={() => setLogoAmpliado(false)} />
+      )}
     </main>
   )
 }

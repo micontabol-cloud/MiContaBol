@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import BoliMascot from '../components/BoliMascot'
+import VisorImagen from '../components/VisorImagen'
 
 export default function Perfil() {
   const { session } = useAuth()
@@ -16,6 +17,7 @@ export default function Perfil() {
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
   const [fechaNacimiento, setFechaNacimiento] = useState('')
+  const [ampliada, setAmpliada] = useState(false)
 
   async function cargar() {
     setCargando(true)
@@ -108,11 +110,25 @@ export default function Perfil() {
 
       <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap', margin: '1.5rem 0' }}>
         {perfil?.avatar_url ? (
-          <img
-            src={perfil.avatar_url}
-            alt=""
-            style={{ width: 92, height: 92, borderRadius: '50%', objectFit: 'cover', border: '1px solid #E6ECF3' }}
-          />
+          <button
+            type="button"
+            onClick={() => setAmpliada(true)}
+            title="Ver más grande"
+            style={{ padding: 0, border: 'none', background: 'transparent', borderRadius: '50%', cursor: 'zoom-in' }}
+          >
+            <img
+              src={perfil.avatar_url}
+              alt="Tu foto de perfil"
+              style={{
+                width: 92,
+                height: 92,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: '1px solid #E6ECF3',
+                display: 'block',
+              }}
+            />
+          </button>
         ) : (
           <div
             style={{
@@ -210,6 +226,9 @@ export default function Perfil() {
         Solo tú puedes ver estos datos. Ni los otros miembros de tus empresas ni el soporte de MiContaBol tienen
         acceso a tu fecha de nacimiento.
       </p>
+      {ampliada && (
+        <VisorImagen url={perfil?.avatar_url} alt={nombre || 'Tu foto de perfil'} onCerrar={() => setAmpliada(false)} />
+      )}
     </main>
   )
 }

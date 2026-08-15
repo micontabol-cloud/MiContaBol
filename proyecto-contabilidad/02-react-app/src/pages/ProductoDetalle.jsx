@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import VisorImagen from '../components/VisorImagen'
 
 export default function ProductoDetalle() {
   const { id: empresaId, productoId } = useParams()
@@ -26,6 +27,7 @@ export default function ProductoDetalle() {
   const [edControlaVenc, setEdControlaVenc] = useState(false)
   const [edCodigoBarras, setEdCodigoBarras] = useState('')
   const [edObservaciones, setEdObservaciones] = useState('')
+  const [fotoAmpliada, setFotoAmpliada] = useState(false)
   const [guardando, setGuardando] = useState(false)
 
   const [varNombre, setVarNombre] = useState('')
@@ -318,11 +320,25 @@ export default function ProductoDetalle() {
         <div>
           <h2 style={{ marginTop: 0 }}>Foto</h2>
           {producto.imagen_url ? (
-            <img
-              src={producto.imagen_url}
-              alt={producto.nombre}
-              style={{ width: 180, height: 180, objectFit: 'cover', borderRadius: 12, border: '1px solid #E6ECF3' }}
-            />
+            <button
+              type="button"
+              onClick={() => setFotoAmpliada(true)}
+              title="Ver más grande"
+              style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'zoom-in' }}
+            >
+              <img
+                src={producto.imagen_url}
+                alt={producto.nombre}
+                style={{
+                  width: 180,
+                  height: 180,
+                  objectFit: 'cover',
+                  borderRadius: 12,
+                  border: '1px solid #E6ECF3',
+                  display: 'block',
+                }}
+              />
+            </button>
           ) : (
             <div
               style={{
@@ -788,6 +804,9 @@ export default function ProductoDetalle() {
         </div>
       </section>
 
+      {fotoAmpliada && (
+        <VisorImagen url={producto.imagen_url} alt={producto.nombre} onCerrar={() => setFotoAmpliada(false)} />
+      )}
     </main>
   )
 }

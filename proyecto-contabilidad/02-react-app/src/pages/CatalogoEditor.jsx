@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Copy, ExternalLink, Check, QrCode, ArrowUp, ArrowDown, CopyPlus } from 'lucide-react'
+import { Copy, ExternalLink, Check, QrCode, ArrowUp, ArrowDown, CopyPlus, Pencil, Trash2 } from 'lucide-react'
 import QRCode from 'qrcode'
 import { supabase } from '../supabaseClient'
 import BoliMascot from '../components/BoliMascot'
@@ -24,6 +24,11 @@ export default function CatalogoEditor() {
   const [whatsapp, setWhatsapp] = useState('')
   const [subiendoPortada, setSubiendoPortada] = useState(false)
   const [duplicando, setDuplicando] = useState(false)
+  const [editandoDatos, setEditandoDatos] = useState(false)
+  const [datos, setDatos] = useState({})
+  const [guardandoDatos, setGuardandoDatos] = useState(false)
+  const [confirmarBorrar, setConfirmarBorrar] = useState(false)
+  const [borrando, setBorrando] = useState(false)
   const [editandoEnlace, setEditandoEnlace] = useState(false)
   const [nuevoSlug, setNuevoSlug] = useState('')
   const [guardandoSlug, setGuardandoSlug] = useState(false)
@@ -227,6 +232,59 @@ export default function CatalogoEditor() {
     ])
   }
 
+  function abrirEdicion() {
+    setDatos({
+      nombre: catalogo.nombre,
+      descripcion: catalogo.descripcion || '',
+      tipo: catalogo.tipo,
+      fecha_inicio: catalogo.fecha_inicio || '',
+      fecha_fin: catalogo.fecha_fin || '',
+    })
+    setEditandoDatos(true)
+    setError(null)
+  }
+
+  async function guardarDatos(e) {
+    e.preventDefault()
+
+    if (!datos.nombre.trim()) {
+      setError('El catálogo necesita un nombre.')
+      return
+    }
+
+    setError(null)
+    setGuardandoDatos(true)
+
+    const { error } = await supabase
+      .from('catalogos')
+      .update({
+        nombre: datos.nombre.trim(),
+        descripcion: datos.descripcion.trim() || null,
+        tipo: datos.tipo,
+        fecha_inicio: datos.fecha_inicio || null,
+        fecha_fin: datos.fecha_fin || null,
+      })
+      .eq('id', catalogoId)
+
+    setGuardandoDatos(false)
+    if (error) return setError(error.message)
+
+    setEditandoDatos(false)
+    cargar()
+  }
+
+  async function borrarCatalogo() {
+    setError(null)
+    setBorrando(true)
+
+    const { error } = await supabase.from('catalogos').delete().eq('id', catalogoId)
+
+    setBorrando(false)
+    if (error) return setError(error.message)
+
+    window.location.href = `/empresas/${empresaId}/catalogos`
+  }
+
   async function duplicar() {
     const nombre = window.prompt('Nombre del nuevo catálogo:', `${catalogo.nombre} (copia)`)
     if (!nombre) return
@@ -287,6 +345,14 @@ export default function CatalogoEditor() {
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
         <button
           type="button"
+          onClick={() => (editandoDatos ? setEditandoDatos(false) : abrirEdicion())}
+          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+        >
+          <Pencil size={16} strokeWidth={1.8} />
+          Editar
+        </button>
+        <button
+          type="button"
           onClick={duplicar}
           disabled={duplicando}
           style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
@@ -308,6 +374,89 @@ export default function CatalogoEditor() {
       </div>
 
       {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+
+      {editandoDatos && (
+        <form
+          onSubmit={guardarDatos}
+          style={{
+            background: '#F7F9FC',
+            border: '1px solid #E6ECF3',
+            borderRadius: 16,
+            padding: '1.15rem',
+            margin: '1.25rem 0',
+          }}
+        >
+          <p style={{ margin: '0 0 0.85rem', fontWeight: 600, color: '#1F3A5F' }}>Datos del catálogo</p>
+
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+            <label>
+              Nombre
+              <br />
+              <input
+                required
+                value={datos.nombre}
+                onChange={(e) => setDatos({ ...datos, nombre: e.target.value })}
+                style={{ width: 230 }}
+              />
+            </label>
+            <label>
+              Tipo
+              <br />
+              <select value={datos.tipo} onChange={(e) => setDatos({ ...datos, tipo: e.target.value })}>
+                <option value="catalogo">Catálogo</option>
+                <option value="oferta">Oferta por tiempo limitado</option>
+                <option value="liquidacion">Liquidación</option>
+                <option value="lista_precios">Lista de precios</option>
+              </select>
+            </label>
+            <label>
+              Empieza el
+              <br />
+              <input
+                type="date"
+                value={datos.fecha_inicio}
+                onChange={(e) => setDatos({ ...datos, fecha_inicio: e.target.value })}
+              />
+            </label>
+            <label>
+              Termina el
+              <br />
+              <input
+                type="date"
+                value={datos.fecha_fin}
+                onChange={(e) => setDatos({ ...datos, fecha_fin: e.target.value })}
+              />
+            </label>
+          </div>
+
+          <label style={{ display: 'block', marginTop: '0.85rem' }}>
+            Descripción (se ve arriba en el catálogo)
+            <br />
+            <textarea
+              value={datos.descripcion}
+              onChange={(e) => setDatos({ ...datos, descripcion: e.target.value })}
+              rows={2}
+              placeholder="ej. Liquidación de temporada, hasta agotar stock"
+              style={{ width: '100%', maxWidth: 560, fontFamily: 'inherit', fontSize: '1rem', padding: '0.6rem 0.75rem' }}
+            />
+          </label>
+
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.9rem', flexWrap: 'wrap' }}>
+            <button className="btn-hero" type="submit" disabled={guardandoDatos}>
+              Guardar cambios
+            </button>
+            <button type="button" onClick={() => setEditandoDatos(false)}>
+              Cancelar
+            </button>
+          </div>
+
+          {catalogo.publicado && (
+            <p style={{ margin: '0.75rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
+              El catálogo está publicado: los cambios se ven de inmediato en el enlace.
+            </p>
+          )}
+        </form>
+      )}
 
       {/* Enlace para compartir */}
       {catalogo.publicado && (
@@ -643,6 +792,22 @@ export default function CatalogoEditor() {
           />
           Mostrar precios (desmárcalo si prefieres que te consulten)
         </label>
+
+        <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+          <input
+            type="checkbox"
+            checked={catalogo.mostrar_responsable}
+            onChange={(e) => actualizarCatalogo({ mostrar_responsable: e.target.checked })}
+            style={{ marginTop: '0.2rem' }}
+          />
+          <span>
+            Mostrar quién atiende, con tu foto y nombre de perfil
+            <span style={{ display: 'block', fontSize: '0.82rem', color: '#A3AFBF', marginTop: '0.15rem' }}>
+              En un negocio chico, ver la cara de quien atiende da confianza. Ten en cuenta que el catálogo es
+              público: tu foto la verá cualquiera que abra el enlace.
+            </span>
+          </span>
+        </label>
       </div>
 
       {/* Elegir productos */}
@@ -762,6 +927,69 @@ export default function CatalogoEditor() {
         Deja el precio del catálogo vacío para usar el precio normal. Si pones uno menor, el catálogo muestra el
         precio tachado y el porcentaje de descuento. Usa las flechas para poner arriba lo que más quieras vender.
       </p>
+
+      {/* Eliminar */}
+      <section style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid #E6ECF3' }}>
+        <h2>Eliminar este catálogo</h2>
+
+        {!confirmarBorrar ? (
+          <>
+            <p style={{ color: '#64748B', fontSize: '0.92rem', marginTop: '-0.5rem', lineHeight: 1.55 }}>
+              {catalogo.publicado ? (
+                <>
+                  Está publicado: al borrarlo, <strong>el enlace deja de funcionar</strong> para quien ya lo tenga
+                  guardado, y se pierden sus estadísticas de visitas.
+                  {' '}
+                  Si solo quieres que deje de verse, desmarca "Publicado" arriba: así conservas todo y puedes
+                  volver a publicarlo cuando quieras.
+                </>
+              ) : (
+                <>Se borra el catálogo con sus productos elegidos y sus estadísticas. No se puede deshacer.</>
+              )}
+            </p>
+            <button
+              type="button"
+              onClick={() => setConfirmarBorrar(true)}
+              style={{ color: '#EF4444', borderColor: '#EF4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+            >
+              <Trash2 size={16} strokeWidth={1.8} />
+              Eliminar catálogo
+            </button>
+          </>
+        ) : (
+          <div
+            style={{
+              background: 'rgba(239, 68, 68, 0.06)',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: 14,
+              padding: '1.15rem',
+            }}
+          >
+            <p style={{ margin: '0 0 0.7rem', fontWeight: 600, color: '#B91C1C' }}>
+              ¿Eliminar «{catalogo.nombre}»?
+            </p>
+            <p style={{ margin: '0 0 0.9rem', fontSize: '0.9rem', color: '#64748B' }}>
+              Se pierden los {incluidos.length} productos elegidos con sus precios especiales
+              {stats?.total_visitas > 0 && `, y las ${stats.total_visitas} visitas registradas`}. Tus productos no se
+              tocan: solo se borra el catálogo.
+            </p>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={borrarCatalogo}
+                disabled={borrando}
+                style={{ background: '#EF4444', borderColor: '#EF4444', color: '#FFFFFF' }}
+              >
+                {borrando ? 'Eliminando...' : 'Sí, eliminar'}
+              </button>
+              <button type="button" onClick={() => setConfirmarBorrar(false)}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
+
     </main>
   )
 }
