@@ -34,7 +34,8 @@ export default function BuscadorProductos({ productos, onElegir, placeholder = '
           p.nombre_completo.toLowerCase().includes(q) ||
           (p.codigo || '').toLowerCase().includes(q) ||
           (p.codigo_barras || '').toLowerCase().includes(q) ||
-          (p.observaciones || '').toLowerCase().includes(q)
+          (p.observaciones || '').toLowerCase().includes(q) ||
+          (p.categoria_nombre || '').toLowerCase().includes(q)
       )
       // Lo que tiene stock primero: de nada sirve ofrecer lo agotado
       .sort((a, b) => (Number(b.stock_actual) > 0) - (Number(a.stock_actual) > 0))
@@ -161,9 +162,35 @@ export default function BuscadorProductos({ productos, onElegir, placeholder = '
                     <span style={{ display: 'block', fontWeight: 600, color: '#253046', fontSize: '0.92rem' }}>
                       {p.nombre_completo}
                     </span>
-                    <span style={{ display: 'block', color: '#A3AFBF', fontSize: '0.78rem' }}>
-                      {p.codigo}
-                      {p.observaciones && ` · ${p.observaciones}`}
+                    <span
+                      style={{
+                        display: 'flex',
+                        gap: '0.4rem',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        color: '#A3AFBF',
+                        fontSize: '0.78rem',
+                        marginTop: '0.1rem',
+                      }}
+                    >
+                      {p.categoria_nombre && (
+                        <span
+                          style={{
+                            background: '#F7F9FC',
+                            border: '1px solid #E6ECF3',
+                            borderRadius: 999,
+                            padding: '0.05rem 0.45rem',
+                            color: '#64748B',
+                            fontWeight: 600,
+                          }}
+                        >
+                          {p.categoria_nombre}
+                        </span>
+                      )}
+                      <span>
+                        {p.codigo}
+                        {p.observaciones && ` · ${p.observaciones}`}
+                      </span>
                     </span>
                   </span>
 
