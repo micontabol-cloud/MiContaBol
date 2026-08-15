@@ -5,6 +5,7 @@ import QRCode from 'qrcode'
 import { supabase } from '../supabaseClient'
 import BoliMascot from '../components/BoliMascot'
 import { TEMAS } from '../lib/temasCatalogo'
+import SelectorImagen from '../components/SelectorImagen'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(2)}`
 
@@ -22,7 +23,6 @@ export default function CatalogoEditor() {
   const [busqueda, setBusqueda] = useState('')
   const [guardandoWhatsapp, setGuardandoWhatsapp] = useState(false)
   const [whatsapp, setWhatsapp] = useState('')
-  const [subiendoPortada, setSubiendoPortada] = useState(false)
   const [duplicando, setDuplicando] = useState(false)
   const [editandoDatos, setEditandoDatos] = useState(false)
   const [datos, setDatos] = useState({})
@@ -180,28 +180,6 @@ export default function CatalogoEditor() {
 
     setCatalogo((prev) => ({ ...prev, slug: limpio }))
     setEditandoEnlace(false)
-  }
-
-  async function subirPortada(e) {
-    const archivo = e.target.files?.[0]
-    if (!archivo) return
-
-    setError(null)
-    setSubiendoPortada(true)
-
-    const ext = archivo.name.split('.').pop()
-    const ruta = `marca/${empresaId}/portada-${catalogoId}-${Date.now()}.${ext}`
-
-    const { error: errSubida } = await supabase.storage.from('productos').upload(ruta, archivo, { upsert: true })
-
-    if (errSubida) {
-      setSubiendoPortada(false)
-      return setError(`No se pudo subir la portada: ${errSubida.message}`)
-    }
-
-    const { data } = supabase.storage.from('productos').getPublicUrl(ruta)
-    await actualizarCatalogo({ portada_url: data.publicUrl })
-    setSubiendoPortada(false)
   }
 
   async function moverProducto(s, direccion) {
@@ -687,47 +665,16 @@ export default function CatalogoEditor() {
       </p>
 
       <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-        <div>
-          <p style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', fontWeight: 600, color: '#1F3A5F' }}>
-            Foto de portada
-          </p>
-          {catalogo.portada_url ? (
-            <div
-              style={{
-                width: 220,
-                height: 110,
-                borderRadius: 12,
-                background: `url(${catalogo.portada_url}) center/cover`,
-                border: '1px solid #E6ECF3',
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: 220,
-                height: 110,
-                borderRadius: 12,
-                background: '#F7F9FC',
-                border: '1px dashed #E6ECF3',
-                display: 'grid',
-                placeItems: 'center',
-                color: '#A3AFBF',
-                fontSize: '0.85rem',
-              }}
-            >
-              Sin portada
-            </div>
-          )}
-          <div style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <input type="file" accept="image/*" onChange={subirPortada} disabled={subiendoPortada} style={{ fontSize: '0.78rem' }} />
-            {subiendoPortada && <span style={{ fontSize: '0.82rem', color: '#64748B' }}>Subiendo...</span>}
-            {catalogo.portada_url && (
-              <button type="button" onClick={() => actualizarCatalogo({ portada_url: null })} style={{ alignSelf: 'flex-start' }}>
-                Quitar portada
-              </button>
-            )}
-          </div>
-        </div>
+        <SelectorImagen
+          etiqueta="Foto de portada"
+          valor={catalogo.portada_url}
+          onCambiar={(url) => actualizarCatalogo({ portada_url: url })}
+          empresaId={empresaId}
+          uso="portada"
+          carpeta={`marca/${empresaId}`}
+          nombreSugerido={`Portada de ${catalogo.nombre}`}
+          alto={110}
+        />
 
         <div style={{ flex: 1, minWidth: 240 }}>
           <p style={{ margin: '0 0 0.4rem', fontSize: '0.85rem', fontWeight: 600, color: '#1F3A5F' }}>Tema</p>

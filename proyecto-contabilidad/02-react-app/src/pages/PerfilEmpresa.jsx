@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { Users, CreditCard, Package } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import VisorImagen from '../components/VisorImagen'
+import SelectorImagen from '../components/SelectorImagen'
 
 const COLORES_SUGERIDOS = [
   '#1F3A5F', '#0F766E', '#7C2D92', '#B45309',
@@ -71,28 +72,6 @@ export default function PerfilEmpresa() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId])
 
-  async function subirLogo(e) {
-    const archivo = e.target.files?.[0]
-    if (!archivo) return
-
-    setError(null)
-    setSubiendo(true)
-
-    const ext = archivo.name.split('.').pop()
-    const ruta = `marca/${empresaId}/logo-${Date.now()}.${ext}`
-    const { error: errSubida } = await supabase.storage.from('productos').upload(ruta, archivo, { upsert: true })
-
-    if (errSubida) {
-      setSubiendo(false)
-      return setError(`No se pudo subir el logo: ${errSubida.message}`)
-    }
-
-    const { data } = supabase.storage.from('productos').getPublicUrl(ruta)
-    await supabase.from('empresas').update({ logo_url: data.publicUrl }).eq('id', empresaId)
-    setSubiendo(false)
-    cargar()
-  }
-
   async function guardar(e) {
     e.preventDefault()
     setError(null)
@@ -127,67 +106,37 @@ export default function PerfilEmpresa() {
       {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
 
       {/* Logo */}
-      <h2>Logo</h2>
-      <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        {empresa?.logo_url ? (
-          <button
-            type="button"
-            onClick={() => setLogoAmpliado(true)}
-            title="Ver más grande"
-            style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'zoom-in' }}
-          >
-            <img
-              src={empresa.logo_url}
-              alt="Logo"
-              style={{
-                height: 90,
-                maxWidth: 200,
-                objectFit: 'contain',
-                background: '#FFFFFF',
-                border: '1px solid #E6ECF3',
-                borderRadius: 12,
-                padding: '0.5rem',
-                display: 'block',
-              }}
-            />
-          </button>
-        ) : (
-          <div
-            style={{
-              width: 140,
-              height: 90,
-              borderRadius: 12,
-              background: '#F7F9FC',
-              border: '1px dashed #E6ECF3',
-              display: 'grid',
-              placeItems: 'center',
-              color: '#A3AFBF',
-              fontSize: '0.85rem',
-            }}
-          >
-            Sin logo
-          </div>
-        )}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <input type="file" accept="image/*" onChange={subirLogo} disabled={subiendo} style={{ fontSize: '0.8rem' }} />
-          {subiendo && <span style={{ fontSize: '0.85rem', color: '#64748B' }}>Subiendo...</span>}
-          {empresa?.logo_url && (
-            <button
-              type="button"
-              onClick={async () => {
-                await supabase.from('empresas').update({ logo_url: null }).eq('id', empresaId)
-                cargar()
-              }}
-              style={{ alignSelf: 'flex-start' }}
-            >
-              Quitar logo
-            </button>
-          )}
-          <span style={{ fontSize: '0.8rem', color: '#A3AFBF', maxWidth: 240 }}>
-            Se ve mejor con fondo transparente (PNG).
-          </span>
-        </div>
-      </div>
+      <SelectorImagen
+        etiqueta="Logo"
+        valor={empresa?.logo_url}
+        onCambiar={async (url) => {
+          await supabase.from('empresas').update({ logo_url: url }).eq('id', empresaId)
+          cargar()
+        }}
+        empresaId={empresaId}
+        uso="logo"
+        carpeta={`marca/${empresaId}`}
+        nombreSugerido="Logo"
+        alto={100}
+      />
+
+      {empresa?.logo_url && (
+        <button
+          type="button"
+          onClick={() => setLogoAmpliado(true)}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#64748B',
+            padding: 0,
+            fontSize: '0.82rem',
+            textDecoration: 'underline',
+            marginTop: '0.5rem',
+          }}
+        >
+          Ver en grande
+        </button>
+      )}
 
       <form onSubmit={guardar}>
         {/* Datos */}

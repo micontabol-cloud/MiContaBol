@@ -4,13 +4,13 @@ import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import BoliMascot from '../components/BoliMascot'
 import VisorImagen from '../components/VisorImagen'
+import SelectorImagen from '../components/SelectorImagen'
 
 export default function Perfil() {
   const { session } = useAuth()
   const [perfil, setPerfil] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [guardando, setGuardando] = useState(false)
-  const [subiendo, setSubiendo] = useState(false)
   const [error, setError] = useState(null)
   const [aviso, setAviso] = useState(null)
 
@@ -35,35 +35,6 @@ export default function Perfil() {
   useEffect(() => {
     cargar()
   }, [])
-
-  async function subirAvatar(e) {
-    const archivo = e.target.files?.[0]
-    if (!archivo) return
-
-    setError(null)
-    setSubiendo(true)
-
-    const ext = archivo.name.split('.').pop()
-    const ruta = `perfiles/${session.user.id}/avatar-${Date.now()}.${ext}`
-
-    const { error: errSubida } = await supabase.storage.from('productos').upload(ruta, archivo, { upsert: true })
-
-    if (errSubida) {
-      setSubiendo(false)
-      return setError(`No se pudo subir la foto: ${errSubida.message}`)
-    }
-
-    const { data } = supabase.storage.from('productos').getPublicUrl(ruta)
-    await supabase.rpc('guardar_mi_perfil', {
-      p_nombre: nombre || null,
-      p_telefono: telefono || null,
-      p_fecha_nacimiento: fechaNacimiento || null,
-      p_avatar_url: data.publicUrl,
-    })
-
-    setSubiendo(false)
-    cargar()
-  }
 
   async function guardar(e) {
     e.preventDefault()
@@ -108,51 +79,48 @@ export default function Perfil() {
       {error && <p style={{ color: '#EF4444' }}>{error}</p>}
       {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
 
-      <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap', margin: '1.5rem 0' }}>
-        {perfil?.avatar_url ? (
-          <button
-            type="button"
-            onClick={() => setAmpliada(true)}
-            title="Ver más grande"
-            style={{ padding: 0, border: 'none', background: 'transparent', borderRadius: '50%', cursor: 'zoom-in' }}
-          >
-            <img
-              src={perfil.avatar_url}
-              alt="Tu foto de perfil"
-              style={{
-                width: 92,
-                height: 92,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: '1px solid #E6ECF3',
-                display: 'block',
-              }}
-            />
-          </button>
-        ) : (
-          <div
-            style={{
-              width: 92,
-              height: 92,
-              borderRadius: '50%',
-              background: '#F7F9FC',
-              border: '1px dashed #E6ECF3',
-              display: 'grid',
-              placeItems: 'center',
-              color: '#A3AFBF',
-              fontSize: '1.8rem',
-              fontWeight: 700,
+      <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap', margin: '1.5rem 0' }}>
+        <div>
+          <SelectorImagen
+            etiqueta="Tu foto"
+            valor={perfil?.avatar_url}
+            onCambiar={async (url) => {
+              await supabase.rpc('guardar_mi_perfil', {
+                p_nombre: nombre || null,
+                p_telefono: telefono || null,
+                p_fecha_nacimiento: fechaNacimiento || null,
+                p_avatar_url: url,
+              })
+              cargar()
             }}
-          >
-            {(nombre || session?.user?.email || '?').charAt(0).toUpperCase()}
-          </div>
-        )}
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-          <input type="file" accept="image/*" onChange={subirAvatar} disabled={subiendo} style={{ fontSize: '0.8rem' }} />
-          {subiendo && <span style={{ fontSize: '0.85rem', color: '#64748B' }}>Subiendo...</span>}
-          <span style={{ fontSize: '0.85rem', color: '#A3AFBF' }}>{session?.user?.email}</span>
+            uso="perfil"
+            carpeta={`perfiles/${session?.user?.id}`}
+            nombreSugerido={nombre || 'Mi foto'}
+            alto={110}
+            redondo
+          />
+          {perfil?.avatar_url && (
+            <button
+              type="button"
+              onClick={() => setAmpliada(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#64748B',
+                padding: 0,
+                fontSize: '0.82rem',
+                textDecoration: 'underline',
+                marginTop: '0.5rem',
+              }}
+            >
+              Ver en grande
+            </button>
+          )}
         </div>
+
+        <p style={{ fontSize: '0.85rem', color: '#A3AFBF', margin: 0, alignSelf: 'center' }}>
+          {session?.user?.email}
+        </p>
       </div>
 
       <form onSubmit={guardar} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>

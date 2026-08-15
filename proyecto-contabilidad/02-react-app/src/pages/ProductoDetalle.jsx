@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import VisorImagen from '../components/VisorImagen'
+import SelectorImagen from '../components/SelectorImagen'
 
 export default function ProductoDetalle() {
   const { id: empresaId, productoId } = useParams()
@@ -17,7 +18,6 @@ export default function ProductoDetalle() {
   const [error, setError] = useState(null)
   const [aviso, setAviso] = useState(null)
 
-  const [subiendo, setSubiendo] = useState(false)
 
   const [edNombre, setEdNombre] = useState('')
   const [edCosto, setEdCosto] = useState('')
@@ -121,42 +121,6 @@ export default function ProductoDetalle() {
     )
     const i = campos.indexOf(document.activeElement)
     if (i >= 0 && i < campos.length - 1) campos[i + 1].focus()
-  }
-
-  async function subirFoto(e) {
-    const archivo = e.target.files?.[0]
-    if (!archivo) return
-
-    setError(null)
-    setSubiendo(true)
-
-    const ext = archivo.name.split('.').pop()
-    const ruta = `${empresaId}/${productoId}-${Date.now()}.${ext}`
-
-    const { error: errSubida } = await supabase.storage.from('productos').upload(ruta, archivo, { upsert: true })
-
-    if (errSubida) {
-      setSubiendo(false)
-      setError(`No se pudo subir la foto: ${errSubida.message}`)
-      return
-    }
-
-    const { data } = supabase.storage.from('productos').getPublicUrl(ruta)
-    const { error: errUpdate } = await supabase
-      .from('productos')
-      .update({ imagen_url: data.publicUrl })
-      .eq('id', productoId)
-
-    setSubiendo(false)
-    if (errUpdate) return setError(errUpdate.message)
-    cargar()
-  }
-
-  async function quitarFoto() {
-    setError(null)
-    const { error } = await supabase.from('productos').update({ imagen_url: null }).eq('id', productoId)
-    if (error) return setError(error.message)
-    cargar()
   }
 
   async function guardarProducto(e) {
@@ -318,56 +282,37 @@ export default function ProductoDetalle() {
 
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
         <div>
-          <h2 style={{ marginTop: 0 }}>Foto</h2>
-          {producto.imagen_url ? (
+          <SelectorImagen
+            etiqueta="Foto"
+            valor={producto.imagen_url}
+            onCambiar={async (url) => {
+              await supabase.from('productos').update({ imagen_url: url }).eq('id', productoId)
+              cargar()
+            }}
+            empresaId={empresaId}
+            uso="producto"
+            carpeta={`${empresaId}`}
+            nombreSugerido={producto.nombre}
+            alto={170}
+          />
+
+          {producto.imagen_url && (
             <button
               type="button"
               onClick={() => setFotoAmpliada(true)}
-              title="Ver más grande"
-              style={{ padding: 0, border: 'none', background: 'transparent', cursor: 'zoom-in' }}
-            >
-              <img
-                src={producto.imagen_url}
-                alt={producto.nombre}
-                style={{
-                  width: 180,
-                  height: 180,
-                  objectFit: 'cover',
-                  borderRadius: 12,
-                  border: '1px solid #E6ECF3',
-                  display: 'block',
-                }}
-              />
-            </button>
-          ) : (
-            <div
               style={{
-                width: 180,
-                height: 180,
-                borderRadius: 12,
-                background: '#F7F9FC',
-                border: '1px dashed #E6ECF3',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#A3AFBF',
-                fontSize: '0.85rem',
+                background: 'transparent',
+                border: 'none',
+                color: '#64748B',
+                padding: 0,
+                fontSize: '0.82rem',
+                textDecoration: 'underline',
+                marginTop: '0.5rem',
               }}
             >
-              Sin foto
-            </div>
+              Ver en grande
+            </button>
           )}
-          <div style={{ marginTop: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ fontSize: '0.8rem' }}>
-              <input type="file" accept="image/*" onChange={subirFoto} disabled={subiendo} style={{ fontSize: '0.75rem' }} />
-            </label>
-            {subiendo && <span style={{ fontSize: '0.8rem', color: '#64748B' }}>Subiendo...</span>}
-            {producto.imagen_url && (
-              <button type="button" onClick={quitarFoto} style={{ alignSelf: 'flex-start' }}>
-                Quitar foto
-              </button>
-            )}
-          </div>
         </div>
 
         <form onSubmit={guardarProducto} style={{ flex: 1, minWidth: 260 }}>
