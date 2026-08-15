@@ -382,15 +382,47 @@ export default function NuevaVentaProducto() {
                       <option value="">-- Selecciona --</option>
                       {productos.map((p) => {
                         const clave = `${p.producto_id}|${p.variante_id || ''}`
+                        const etiquetas = [p.categoria_nombre, p.observaciones].filter(Boolean).join(' · ')
                         return (
                           <option key={clave} value={clave}>
-                            {p.codigo} — {p.nombre_completo} (stock: {Number(p.stock_actual).toFixed(2)})
+                            {p.nombre_completo}
+                            {etiquetas && ` [${etiquetas}]`} — stock {Number(p.stock_actual).toFixed(0)}
                           </option>
                         )
                       })}
                     </select>
+
+                    {prod && (prod.categoria_nombre || prod.observaciones) && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          gap: '0.35rem',
+                          flexWrap: 'wrap',
+                          marginTop: '0.25rem',
+                          fontSize: '0.78rem',
+                        }}
+                      >
+                        {prod.categoria_nombre && (
+                          <span
+                            style={{
+                              background: '#F7F9FC',
+                              border: '1px solid #E6ECF3',
+                              borderRadius: 999,
+                              padding: '0.05rem 0.45rem',
+                              color: '#64748B',
+                              fontWeight: 600,
+                            }}
+                          >
+                            {prod.categoria_nombre}
+                          </span>
+                        )}
+                        {prod.observaciones && (
+                          <span style={{ color: '#A3AFBF', alignSelf: 'center' }}>{prod.observaciones}</span>
+                        )}
+                      </div>
+                    )}
                   </td>
-                  <td style={{ padding: '4px 8px' }}>
+                  <td style={{ padding: '4px 8px', verticalAlign: 'top' }}>
                     <input
                       type="number"
                       step="0.001"

@@ -238,9 +238,11 @@ export default function NuevaCompraProducto() {
                       <option value="">-- Selecciona --</option>
                       {productos.map((p) => {
                         const clave = `${p.producto_id}|${p.variante_id || ''}`
+                        const etiquetas = [p.categoria_nombre, p.observaciones].filter(Boolean).join(' · ')
                         return (
                           <option key={clave} value={clave}>
-                            {p.codigo} — {p.nombre_completo}
+                            {p.nombre_completo}
+                            {etiquetas && ` [${etiquetas}]`}
                           </option>
                         )
                       })}
