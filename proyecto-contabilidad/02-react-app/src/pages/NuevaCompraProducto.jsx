@@ -109,7 +109,8 @@ export default function NuevaCompraProducto() {
   const cuentaMetodo = metodo?.cuenta_id || ''
   const cuentaEfectiva = cuentaDestino || cuentaMetodo
   const metodoEsBancario = cuentasBanco.some((b) => b.cuenta_id === cuentaMetodo)
-  const puedeElegirBanco = !esCredito && cuentasBanco.length > 1 && (metodoEsBancario || !cuentaMetodo)
+  const puedeElegirBanco =
+    !esCredito && cuentasBanco.length > 0 && (!cuentaMetodo || (metodoEsBancario && cuentasBanco.length > 1))
   const cuentaPorId = new Map(cuentas.map((c) => [c.id, c]))
 
   // Vista previa del asiento, explicado en lenguaje de comerciante.
@@ -144,7 +145,7 @@ export default function NuevaCompraProducto() {
       ],
       aviso:
         faltantes.length > 0
-          ? `Falta configurar: ${faltantes.join(', ')}. Ve a Productos → Configuración de cuentas.`
+          ? `Falta configurar: ${faltantes.join(', ')}.`
           : null,
     }
   })()
@@ -245,11 +246,23 @@ export default function NuevaCompraProducto() {
         />
 
         {puedeElegirBanco && (
-          <label>
+          <label
+            style={
+              !cuentaMetodo
+                ? {
+                    display: 'block',
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    borderRadius: 12,
+                    padding: '0.9rem 1rem',
+                  }
+                : undefined
+            }
+          >
             ¿De qué cuenta sale?
             <br />
             <select value={cuentaEfectiva} onChange={(e) => setCuentaDestino(e.target.value)} style={{ minWidth: 260 }}>
-              {!cuentaMetodo && <option value="">-- Selecciona --</option>}
+              {!cuentaMetodo && <option value="">-- Elige la cuenta --</option>}
               {cuentasBanco.map((b) => (
                 <option key={b.id} value={b.cuenta_id}>
                   {b.banco}
@@ -258,6 +271,11 @@ export default function NuevaCompraProducto() {
                 </option>
               ))}
             </select>
+            {!cuentaMetodo && (
+              <span style={{ display: 'block', fontSize: '0.82rem', color: '#8a5a00', marginTop: '0.35rem' }}>
+                Es la primera vez que pagas por {metodo?.nombre}. Elige de dónde sale el dinero.
+              </span>
+            )}
           </label>
         )}
 

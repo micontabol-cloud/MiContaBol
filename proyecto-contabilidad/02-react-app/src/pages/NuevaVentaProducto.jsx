@@ -48,6 +48,7 @@ export default function NuevaVentaProducto() {
   const [metodos, setMetodos] = useState([])
   const [cuentasBanco, setCuentasBanco] = useState([])
   const [cuentaDestino, setCuentaDestino] = useState('')
+  const [guardandoPredeterminada, setGuardandoPredeterminada] = useState(false)
   const [empresa, setEmpresa] = useState(null)
   const [fecha, setFecha] = useState(() => new Date().toISOString().slice(0, 10))
   const [clienteId, setClienteId] = useState(null)
@@ -184,7 +185,11 @@ export default function NuevaVentaProducto() {
   const cuentaMetodo = metodo?.cuenta_id || ''
   const cuentaEfectiva = cuentaDestino || cuentaMetodo
   const metodoEsBancario = cuentasBanco.some((b) => b.cuenta_id === cuentaMetodo)
-  const puedeElegirBanco = !esCredito && cuentasBanco.length > 1 && (metodoEsBancario || !cuentaMetodo)
+  // Si el método ya tiene su cuenta y solo hay una bancaria, no hay nada
+  // que decidir. Pero si falta configurarlo, hay que poder elegir aquí
+  // mismo: mandarlo a otra pantalla en media venta no es opción.
+  const puedeElegirBanco =
+    !esCredito && cuentasBanco.length > 0 && (!cuentaMetodo || (metodoEsBancario && cuentasBanco.length > 1))
 
   const bruto = lineas.reduce(
     (sum, l) => sum + (parseFloat(l.cantidad) || 0) * (parseFloat(l.precio_unitario) || 0),
@@ -280,7 +285,7 @@ export default function NuevaVentaProducto() {
       ganancia: total - costoTotal,
       aviso:
         faltantes.length > 0
-          ? `Falta configurar: ${faltantes.join(', ')}. Ve a Inventario → Productos → Configuración de cuentas.`
+          ? `Falta configurar: ${faltantes.join(', ')}.`
           : null,
     }
   }, [total, bruto, descuentoNum, costoTotal, esCredito, esOtroIngreso, metodo, cuentaEfectiva, empresa, cuentaPorId, nombreCliente])
@@ -519,23 +524,58 @@ export default function NuevaVentaProducto() {
         />
 
         {puedeElegirBanco && (
-          <label>
-            ¿A qué cuenta entra?
-            <br />
-            <select value={cuentaEfectiva} onChange={(e) => setCuentaDestino(e.target.value)} style={{ minWidth: 260 }}>
-              {!cuentaMetodo && <option value="">-- Selecciona --</option>}
-              {cuentasBanco.map((b) => (
-                <option key={b.id} value={b.cuenta_id}>
-                  {b.banco}
-                  {b.alias ? ` · ${b.alias}` : ''}
-                  {b.numero ? ` (${String(b.numero).slice(-4)})` : ''}
-                </option>
-              ))}
-            </select>
-            <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
-              Viene la de siempre. Cámbiala solo si este cobro llegó a otra cuenta.
-            </span>
-          </label>
+          <div
+            style={
+              !cuentaMetodo
+                ? {
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    borderRadius: 12,
+                    padding: '0.9rem 1rem',
+                  }
+                : undefined
+            }
+          >
+            <label>
+              ¿A qué cuenta entra?
+              <br />
+              <select
+                value={cuentaEfectiva}
+                onChange={(e) => setCuentaDestino(e.target.value)}
+                style={{ minWidth: 260 }}
+              >
+                {!cuentaMetodo && <option value="">-- Elige la cuenta --</option>}
+                {cuentasBanco.map((b) => (
+                  <option key={b.id} value={b.cuenta_id}>
+                    {b.banco}
+                    {b.alias ? ` · ${b.alias}` : ''}
+                    {b.numero ? ` (${String(b.numero).slice(-4)})` : ''}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            {cuentaMetodo ? (
+              <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.25rem' }}>
+                Viene la de siempre. Cámbiala solo si este cobro llegó a otra cuenta.
+              </span>
+            ) : (
+              <span style={{ display: 'block', fontSize: '0.82rem', color: '#8a5a00', marginTop: '0.35rem' }}>
+                Es la primera vez que cobras por {metodo?.nombre}. Elige dónde te llega el dinero.
+              </span>
+            )}
+
+            {cuentaEfectiva && cuentaEfectiva !== cuentaMetodo && (
+              <button
+                type="button"
+                onClick={fijarPredeterminada}
+                disabled={guardandoPredeterminada}
+                style={{ fontSize: '0.82rem', marginTop: '0.6rem' }}
+              >
+                {guardandoPredeterminada ? 'Guardando...' : `Usar siempre esta cuenta para ${metodo?.nombre}`}
+              </button>
+            )}
+          </div>
         )}
 
         {!esCredito && !cuentaEfectiva && (
@@ -551,14 +591,17 @@ export default function NuevaVentaProducto() {
               lineHeight: 1.5,
             }}
           >
-            Falta definir dónde entra el dinero de <strong>{metodo?.nombre}</strong>.{' '}
-            <Link to={`/empresas/${empresaId}/formas-de-pago`}>Configúralo en Formas de pago</Link> — se hace una
-            sola vez.
-            {cuentasBanco.length === 0 && (
+            {cuentasBanco.length === 0 ? (
               <>
-                {' '}
-                Si cobras por QR o transferencia, primero{' '}
-                <Link to={`/empresas/${empresaId}/bancos`}>agrega tu cuenta bancaria</Link>.
+                Para cobrar por <strong>{metodo?.nombre}</strong> necesitas registrar la cuenta donde te llega el
+                dinero. <Link to={`/empresas/${empresaId}/bancos`}>Agrégala en Bancos</Link> y vuelve — toma un
+                minuto.
+              </>
+            ) : (
+              <>
+                Elige arriba a qué cuenta entra el dinero de <strong>{metodo?.nombre}</strong>. También puedes
+                dejarlo fijo en{' '}
+                <Link to={`/empresas/${empresaId}/formas-de-pago`}>Formas de pago</Link>.
               </>
             )}
           </p>
