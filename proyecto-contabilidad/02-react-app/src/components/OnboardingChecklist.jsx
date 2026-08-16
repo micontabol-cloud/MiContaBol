@@ -27,6 +27,7 @@ export default function OnboardingChecklist({ empresa, onOcultar }) {
           .from('comprobantes')
           .select('*', { count: 'exact', head: true })
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'venta'),
         supabase.from('clientes').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId),
         supabase.from('cuentas_bancarias').select('*', { count: 'exact', head: true }).eq('empresa_id', empresaId),
@@ -36,6 +37,7 @@ export default function OnboardingChecklist({ empresa, onOcultar }) {
           .from('comprobantes')
           .select('*', { count: 'exact', head: true })
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'compra'),
       ])
 
