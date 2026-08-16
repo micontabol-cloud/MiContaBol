@@ -20,6 +20,7 @@ export default function Compras() {
           .from('comprobantes')
           .select('*, comprobante_items(id)')
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'compra')
           .order('fecha', { ascending: false })
           .order('numero_interno', { ascending: false }),

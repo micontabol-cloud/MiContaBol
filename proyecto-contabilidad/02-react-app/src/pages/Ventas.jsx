@@ -37,6 +37,7 @@ export default function Ventas() {
           .select('cantidad, precio_unitario, producto_id, productos(nombre), comprobantes!inner(fecha, tipo, empresa_id)')
           .eq('comprobantes.empresa_id', empresaId)
           .eq('comprobantes.tipo', 'venta')
+          .is('comprobantes.anulado_at', null)
           .gte('comprobantes.fecha', inicioMes),
       ])
 
@@ -65,8 +66,12 @@ export default function Ventas() {
     return new Date(h.getFullYear(), h.getMonth(), 1).toISOString().slice(0, 10)
   })()
 
-  const ventasHoy = ventas.filter((v) => v.fecha === hoyStr)
-  const ventasMes = ventas.filter((v) => v.fecha >= inicioMesStr)
+  // Las anuladas se muestran en la lista pero no cuentan en ningún
+  // total: una venta anulada no vendió nada.
+  const vigentes = ventas.filter((v) => !v.anulado_at)
+
+  const ventasHoy = vigentes.filter((v) => v.fecha === hoyStr)
+  const ventasMes = vigentes.filter((v) => v.fecha >= inicioMesStr)
   const totalHoy = ventasHoy.reduce((s, v) => s + Number(v.monto_total), 0)
   const totalMes = ventasMes.reduce((s, v) => s + Number(v.monto_total), 0)
   const totalPorCobrar = porCobrar.reduce((s, c) => s + Number(c.saldo_pendiente), 0)

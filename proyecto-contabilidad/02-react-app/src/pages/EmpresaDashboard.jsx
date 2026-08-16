@@ -64,6 +64,7 @@ export default function EmpresaDashboard() {
           .from('comprobantes')
           .select('cliente_proveedor')
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'venta')
           .not('cliente_proveedor', 'is', null),
         supabase.from('vista_balance_comprobacion').select('nombre, saldo').eq('empresa_id', empresaId),
@@ -71,6 +72,7 @@ export default function EmpresaDashboard() {
           .from('comprobantes')
           .select('*')
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'venta')
           .order('fecha', { ascending: false })
           .order('numero_interno', { ascending: false })
@@ -80,6 +82,7 @@ export default function EmpresaDashboard() {
           .from('comprobantes')
           .select('fecha, monto_total')
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'venta')
           .gte('fecha', seisMesesAtras),
         supabase
@@ -93,12 +96,14 @@ export default function EmpresaDashboard() {
           .from('comprobantes')
           .select('monto_total')
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'venta')
           .eq('fecha', hoy.toISOString().slice(0, 10)),
         supabase
           .from('comprobantes')
           .select('*', { count: 'exact', head: true })
           .eq('empresa_id', empresaId)
+          .is('anulado_at', null)
           .eq('tipo', 'venta'),
       ])
 

@@ -37,6 +37,7 @@ export default function AnalisisCosto() {
         .from('comprobantes')
         .select('id, comprobante_items(producto_id, cantidad, costo_unitario)')
         .eq('empresa_id', empresaId)
+        .is('anulado_at', null)
         .eq('tipo', 'venta')
 
       if (errVentas) {

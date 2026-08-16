@@ -13,6 +13,7 @@ export default function Comprobantes() {
         .from('comprobantes')
         .select('*')
         .eq('empresa_id', empresaId)
+        .is('anulado_at', null)
         .order('fecha', { ascending: false })
 
       if (!error) setComprobantes(data)
