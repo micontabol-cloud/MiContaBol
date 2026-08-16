@@ -17,6 +17,8 @@ export default function Ventas() {
   const [motivo, setMotivo] = useState('')
   const [procesando, setProcesando] = useState(false)
   const [aviso, setAviso] = useState(null)
+  const [verAnulacion, setVerAnulacion] = useState(null)
+  const [detalleAnulacion, setDetalleAnulacion] = useState({})
 
   useEffect(() => {
     async function cargar() {
@@ -110,6 +112,20 @@ export default function Ventas() {
         </>
       ),
     })
+  }
+
+  async function verDetalleAnulacion(v) {
+    if (verAnulacion === v.id) {
+      setVerAnulacion(null)
+      return
+    }
+
+    setVerAnulacion(v.id)
+
+    if (!detalleAnulacion[v.id]) {
+      const { data } = await supabase.rpc('detalle_anulacion', { p_comprobante_id: v.id })
+      setDetalleAnulacion((prev) => ({ ...prev, [v.id]: data }))
+    }
   }
 
   async function abrirAnulacion(v) {
@@ -294,9 +310,21 @@ export default function Ventas() {
                   <td style={{ padding: '4px 8px' }}>{v.cliente_proveedor || '—'}</td>
                   <td style={{ padding: '4px 8px' }}>
                     {v.anulado_at ? (
-                      <span className="chip-estado" style={{ background: 'rgba(239,68,68,0.1)', color: '#B91C1C' }}>
-                        Anulada
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => verDetalleAnulacion(v)}
+                        className="chip-estado"
+                        title="Ver por qué se anuló"
+                        style={{
+                          background: 'rgba(239,68,68,0.1)',
+                          color: '#B91C1C',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '0.15rem 0.6rem',
+                        }}
+                      >
+                        Anulada ⌄
+                      </button>
                     ) : (
                       <>
                         {v.comprobante_items?.length > 0 ? 'Productos' : 'Simple'}
@@ -332,6 +360,29 @@ export default function Ventas() {
                     )}
                   </td>
                 </tr>
+
+                {verAnulacion === v.id && v.anulado_at && (
+                  <tr>
+                    <td colSpan={6} style={{ padding: '0.85rem 1rem', background: '#F7F9FC' }}>
+                      {detalleAnulacion[v.id] ? (
+                        <div style={{ fontSize: '0.9rem', lineHeight: 1.6 }}>
+                          <p style={{ margin: 0 }}>
+                            <strong>Motivo:</strong> {detalleAnulacion[v.id].motivo}
+                          </p>
+                          <p style={{ margin: 0, color: '#64748B' }}>
+                            Anulada por <strong>{detalleAnulacion[v.id].por_nombre || detalleAnulacion[v.id].por_email}</strong>{' '}
+                            el {new Date(detalleAnulacion[v.id].fecha).toLocaleString('es-BO')}
+                          </p>
+                          <p style={{ margin: '0.3rem 0 0', color: '#A3AFBF', fontSize: '0.85rem' }}>
+                            Los productos volvieron al inventario y se generó el asiento que cancela esta venta.
+                          </p>
+                        </div>
+                      ) : (
+                        <p style={{ margin: 0, color: '#64748B' }}>Cargando...</p>
+                      )}
+                    </td>
+                  </tr>
+                )}
 
                 {anulando === v.id && (
                   <tr>

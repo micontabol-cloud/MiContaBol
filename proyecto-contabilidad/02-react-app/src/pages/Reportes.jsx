@@ -12,6 +12,7 @@ export default function Reportes() {
   const [topProductos, setTopProductos] = useState([])
   const [campanas, setCampanas] = useState([])
   const [inventario, setInventario] = useState({ costo: 0, venta: 0 })
+  const [anulaciones, setAnulaciones] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
 
@@ -27,6 +28,17 @@ export default function Reportes() {
       ])
 
       supabase.rpc('resumen_campanas', { p_empresa_id: empresaId }).then(({ data }) => setCampanas(data || []))
+
+      // Últimos 90 días: suficiente para ver un patrón sin ruido viejo
+      const hace90 = new Date()
+      hace90.setDate(hace90.getDate() - 90)
+      supabase
+        .rpc('reporte_anulaciones', {
+          p_empresa_id: empresaId,
+          p_desde: hace90.toISOString().slice(0, 10),
+          p_hasta: new Date().toISOString().slice(0, 10),
+        })
+        .then(({ data }) => setAnulaciones(data))
 
       supabase
         .from('vista_stock')
@@ -271,6 +283,103 @@ export default function Reportes() {
             </>
           )}
         </section>
+
+        {anulaciones?.cantidad > 0 && (
+          <section className="panel-card">
+            <h3>Ventas anuladas (últimos 90 días)</h3>
+
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
+              <div>
+                <p className="stat-label">Anuladas</p>
+                <p style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#1F3A5F' }}>
+                  {anulaciones.cantidad}
+                </p>
+              </div>
+              <div>
+                <p className="stat-label">Monto</p>
+                <p style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: '#1F3A5F' }}>
+                  {fmt(anulaciones.monto)}
+                </p>
+              </div>
+              <div>
+                <p className="stat-label">Del total de ventas</p>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: '1.4rem',
+                    fontWeight: 800,
+                    color: anulaciones.porcentaje > 10 ? '#EF4444' : '#1F3A5F',
+                  }}
+                >
+                  {anulaciones.porcentaje}%
+                </p>
+              </div>
+            </div>
+
+            {anulaciones.porcentaje > 10 && (
+              <p
+                style={{
+                  background: 'rgba(245, 158, 11, 0.1)',
+                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                  borderRadius: 10,
+                  padding: '0.7rem 0.85rem',
+                  fontSize: '0.88rem',
+                  color: '#8a5a00',
+                  margin: '0 0 0.9rem',
+                  lineHeight: 1.5,
+                }}
+              >
+                Más de una de cada diez ventas se anuló. Vale la pena revisar los motivos: puede ser falta de
+                práctica con el sistema, o algo que conviene mirar de cerca.
+              </p>
+            )}
+
+            {anulaciones.por_persona.length > 1 && (
+              <>
+                <p style={{ margin: '0 0 0.4rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}>
+                  Quién anuló
+                </p>
+                <ul className="panel-lista" style={{ marginBottom: '0.9rem' }}>
+                  {anulaciones.por_persona.map((p, i) => (
+                    <li key={i}>
+                      <span>{p.persona}</span>
+                      <span>
+                        {p.cantidad} {p.cantidad === 1 ? 'venta' : 'ventas'} · {fmt(p.monto)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+
+            <p style={{ margin: '0 0 0.4rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}>
+              Últimas anulaciones
+            </p>
+            <div style={{ maxHeight: 260, overflowY: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                <tbody>
+                  {anulaciones.detalle.slice(0, 15).map((a) => (
+                    <tr key={a.id} style={{ borderBottom: '1px solid #F7F9FC' }}>
+                      <td style={{ padding: '5px 4px', whiteSpace: 'nowrap' }}>{a.numero}</td>
+                      <td style={{ padding: '5px 4px' }}>
+                        {a.motivo}
+                        <span style={{ display: 'block', color: '#A3AFBF', fontSize: '0.78rem' }}>
+                          {a.anulado_por} ·{' '}
+                          {a.dias_despues === 0
+                            ? 'el mismo día'
+                            : `${a.dias_despues} ${a.dias_despues === 1 ? 'día' : 'días'} después`}
+                        </span>
+                      </td>
+                      <td style={{ padding: '5px 4px', textAlign: 'right', whiteSpace: 'nowrap' }}>
+                        {fmt(a.monto)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
         <section className="panel-card">
           <h3>Reportes contables</h3>
