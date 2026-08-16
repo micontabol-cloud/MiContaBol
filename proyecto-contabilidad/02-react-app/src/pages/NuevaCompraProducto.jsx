@@ -150,6 +150,21 @@ export default function NuevaCompraProducto() {
     }
   })()
 
+  // Enter dentro de un formulario lo envía. Como aquí eso registra la
+  // venta de verdad, Enter pasa al siguiente campo y solo el botón
+  // confirma.
+  function manejarEnter(e) {
+    if (e.key !== 'Enter') return
+    if (e.target.tagName === 'TEXTAREA') return
+    e.preventDefault()
+
+    const campos = Array.from(e.currentTarget.querySelectorAll('input, select')).filter(
+      (el) => !el.disabled && el.type !== 'checkbox' && el.type !== 'file'
+    )
+    const i = campos.indexOf(document.activeElement)
+    if (i >= 0 && i < campos.length - 1) campos[i + 1].focus()
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
@@ -210,7 +225,11 @@ export default function NuevaCompraProducto() {
       </p>
       <h1>Nueva compra de inventario</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <form
+        onSubmit={handleSubmit}
+        onKeyDown={manejarEnter}
+        style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+      >
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <label>
             Fecha

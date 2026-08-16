@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import PanelModulo from '../components/PanelModulo'
@@ -12,6 +12,11 @@ export default function Ventas() {
   const [topProductos, setTopProductos] = useState([])
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
+  const [anulando, setAnulando] = useState(null)
+  const [permisoAnular, setPermisoAnular] = useState(null)
+  const [motivo, setMotivo] = useState('')
+  const [procesando, setProcesando] = useState(false)
+  const [aviso, setAviso] = useState(null)
 
   useEffect(() => {
     async function cargar() {
@@ -102,9 +107,43 @@ export default function Ventas() {
     })
   }
 
+  async function abrirAnulacion(v) {
+    if (anulando === v.id) {
+      setAnulando(null)
+      return
+    }
+
+    setError(null)
+    setMotivo('')
+    setAnulando(v.id)
+
+    const { data } = await supabase.rpc('puede_anular_comprobante', { p_comprobante_id: v.id })
+    setPermisoAnular(data)
+  }
+
+  async function anular(v) {
+    setError(null)
+    setProcesando(true)
+
+    const { data, error } = await supabase.rpc('anular_comprobante', {
+      p_comprobante_id: v.id,
+      p_motivo: motivo,
+    })
+
+    setProcesando(false)
+    if (error) return setError(error.message)
+
+    setAnulando(null)
+    setAviso(
+      `Venta N° ${data.numero} anulada. Se devolvieron ${data.stock_devuelto} productos al inventario y se generó el asiento de reversión.`
+    )
+    setTimeout(() => setAviso(null), 8000)
+    cargar()
+  }
+
   if (cargando) {
     return (
-      <main style={{ maxWidth: 1000, fontFamily: 'sans-serif' }}>
+      <main style={{ maxWidth: 900, fontFamily: 'sans-serif' }}>
         <p>Cargando...</p>
       </main>
     )
@@ -206,6 +245,20 @@ export default function Ventas() {
       <h2 style={{ marginTop: '2rem' }}>Todas las ventas</h2>
 
       {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {aviso && (
+        <p
+          style={{
+            background: 'rgba(34, 197, 94, 0.08)',
+            border: '1px solid rgba(34, 197, 94, 0.3)',
+            borderRadius: 12,
+            padding: '0.75rem 0.95rem',
+            color: '#15803D',
+            fontSize: '0.92rem',
+          }}
+        >
+          {aviso}
+        </p>
+      )}
 
       {ventas.length === 0 ? (
         <p style={{ color: '#64748B' }}>Todavía no hay ventas registradas.</p>
@@ -219,20 +272,109 @@ export default function Ventas() {
                 <th style={{ padding: '4px 8px' }}>Cliente</th>
                 <th style={{ padding: '4px 8px' }}>Tipo</th>
                 <th style={{ padding: '4px 8px', textAlign: 'right' }}>Monto</th>
+                <th style={{ padding: '4px 8px' }}></th>
               </tr>
             </thead>
             <tbody>
               {ventas.map((v) => (
-                <tr key={v.id} style={{ borderBottom: '1px solid #E6ECF3' }}>
+                <Fragment key={v.id}>
+                <tr
+                  style={{
+                    borderBottom: '1px solid #E6ECF3',
+                    opacity: v.anulado_at ? 0.55 : 1,
+                  }}
+                >
                   <td style={{ padding: '4px 8px' }}>{v.numero_interno}</td>
                   <td style={{ padding: '4px 8px' }}>{v.fecha}</td>
                   <td style={{ padding: '4px 8px' }}>{v.cliente_proveedor || '—'}</td>
                   <td style={{ padding: '4px 8px' }}>
-                    {v.comprobante_items?.length > 0 ? 'Productos' : 'Simple'}
-                    {v.es_credito && ' · Fiado'}
+                    {v.anulado_at ? (
+                      <span className="chip-estado" style={{ background: 'rgba(239,68,68,0.1)', color: '#B91C1C' }}>
+                        Anulada
+                      </span>
+                    ) : (
+                      <>
+                        {v.comprobante_items?.length > 0 ? 'Productos' : 'Simple'}
+                        {v.es_credito && ' · Fiado'}
+                      </>
+                    )}
                   </td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right' }}>{Number(v.monto_total).toFixed(2)}</td>
+                  <td
+                    style={{
+                      padding: '4px 8px',
+                      textAlign: 'right',
+                      textDecoration: v.anulado_at ? 'line-through' : 'none',
+                    }}
+                  >
+                    {Number(v.monto_total).toFixed(2)}
+                  </td>
+                  <td style={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
+                    {!v.anulado_at && (
+                      <button
+                        type="button"
+                        onClick={() => abrirAnulacion(v)}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#EF4444',
+                          padding: 0,
+                          fontSize: '0.85rem',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        Anular
+                      </button>
+                    )}
+                  </td>
                 </tr>
+
+                {anulando === v.id && (
+                  <tr>
+                    <td colSpan={6} style={{ padding: '0.9rem 1rem', background: 'rgba(239, 68, 68, 0.05)' }}>
+                      {permisoAnular && !permisoAnular.puede ? (
+                        <p style={{ margin: 0, color: '#B91C1C', fontSize: '0.9rem' }}>{permisoAnular.motivo}</p>
+                      ) : (
+                        <>
+                          <p style={{ margin: '0 0 0.5rem', fontWeight: 600, color: '#B91C1C' }}>
+                            Anular la venta N° {v.numero_interno}
+                          </p>
+                          <p style={{ margin: '0 0 0.75rem', fontSize: '0.88rem', color: '#64748B', lineHeight: 1.5 }}>
+                            La venta no se borra: queda marcada como anulada, los productos vuelven a tu inventario y
+                            se genera un asiento que la cancela. Todo queda rastreable.
+                          </p>
+                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                            <label style={{ fontSize: '0.85rem' }}>
+                              ¿Por qué la anulas?
+                              <br />
+                              <input
+                                value={motivo}
+                                onChange={(e) => setMotivo(e.target.value)}
+                                placeholder="ej. Se registró por error"
+                                style={{ width: 280 }}
+                              />
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => anular(v)}
+                              disabled={procesando || motivo.trim().length < 3}
+                              style={
+                                motivo.trim().length >= 3
+                                  ? { background: '#EF4444', borderColor: '#EF4444', color: '#FFFFFF' }
+                                  : undefined
+                              }
+                            >
+                              {procesando ? 'Anulando...' : 'Confirmar anulación'}
+                            </button>
+                            <button type="button" onClick={() => setAnulando(null)}>
+                              Cancelar
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>

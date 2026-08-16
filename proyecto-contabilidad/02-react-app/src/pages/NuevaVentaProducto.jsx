@@ -195,8 +195,11 @@ export default function NuevaVentaProducto() {
     (sum, l) => sum + (parseFloat(l.cantidad) || 0) * (parseFloat(l.precio_unitario) || 0),
     0
   )
+
+  const descLineas = lineas.reduce((sum, l) => sum + (parseFloat(l.descuento) || 0), 0)
   const descuentoNum = Math.min(parseFloat(descuento) || 0, bruto)
-  const total = bruto - descuentoNum
+  const total = Math.max(0, bruto - descLineas - descuentoNum)
+  const descuentoTotal = descLineas + descuentoNum
 
   const costoTotal = lineas.reduce((sum, l) => {
     const item = productos.find((p) => `${p.producto_id}|${p.variante_id || ''}` === l.clave)
@@ -226,7 +229,7 @@ export default function NuevaVentaProducto() {
       )
     }
     if (!cuentaVentas) faltantes.push(esOtroIngreso ? 'Otros Ingresos' : 'Ventas')
-    if (descuentoNum > 0 && !cuentaDescuentos) faltantes.push('Descuentos en Ventas')
+    if (descuentoTotal > 0 && !cuentaDescuentos) faltantes.push('la cuenta de Descuentos en Ventas')
     if (!cuentaCosto) faltantes.push('Costo de Ventas')
     if (!cuentaInv) faltantes.push('Inventario')
 
@@ -240,13 +243,13 @@ export default function NuevaVentaProducto() {
         debe: total,
         haber: 0,
       },
-      ...(descuentoNum > 0
+      ...(descuentoTotal > 0
         ? [
             {
               icono: '🏷️',
-              frase: `Le hiciste Bs ${descuentoNum.toFixed(2)} de descuento — queda registrado aparte.`,
+              frase: `Le hiciste Bs ${descuentoTotal.toFixed(2)} de descuento — queda registrado aparte.`,
               cuenta: cuentaDescuentos,
-              debe: descuentoNum,
+              debe: descuentoTotal,
               haber: 0,
             },
           ]
@@ -288,7 +291,22 @@ export default function NuevaVentaProducto() {
           ? `Falta configurar: ${faltantes.join(', ')}.`
           : null,
     }
-  }, [total, bruto, descuentoNum, costoTotal, esCredito, esOtroIngreso, metodo, cuentaEfectiva, empresa, cuentaPorId, nombreCliente])
+  }, [total, bruto, descuentoTotal, costoTotal, esCredito, esOtroIngreso, metodo, cuentaEfectiva, empresa, cuentaPorId, nombreCliente])
+
+  // Enter dentro de un formulario lo envía. Como aquí eso registra la
+  // venta de verdad, Enter pasa al siguiente campo y solo el botón
+  // confirma.
+  function manejarEnter(e) {
+    if (e.key !== 'Enter') return
+    if (e.target.tagName === 'TEXTAREA') return
+    e.preventDefault()
+
+    const campos = Array.from(e.currentTarget.querySelectorAll('input, select')).filter(
+      (el) => !el.disabled && el.type !== 'checkbox' && el.type !== 'file'
+    )
+    const i = campos.indexOf(document.activeElement)
+    if (i >= 0 && i < campos.length - 1) campos[i + 1].focus()
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -318,6 +336,7 @@ export default function NuevaVentaProducto() {
         variante_id: l.variante_id || null,
         cantidad: parseFloat(l.cantidad) || 0,
         precio_unitario: parseFloat(l.precio_unitario) || 0,
+        descuento: parseFloat(l.descuento) || 0,
       }))
 
     const { error } = await supabase.rpc('vender_productos', {
@@ -350,7 +369,11 @@ export default function NuevaVentaProducto() {
       </p>
       <h1>Nueva venta</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      <form
+        onSubmit={handleSubmit}
+        onKeyDown={manejarEnter}
+        style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}
+      >
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
           <label>
             Fecha
@@ -392,14 +415,17 @@ export default function NuevaVentaProducto() {
               <th style={{ padding: '4px 8px' }}>Producto</th>
               <th style={{ padding: '4px 8px' }}>Cantidad</th>
               <th style={{ padding: '4px 8px' }}>Precio</th>
-              <th style={{ padding: '4px 8px' }}>Subtotal</th>
+              <th style={{ padding: '4px 8px' }}>Desc.</th>
+              <th style={{ padding: '4px 8px', textAlign: 'right' }}>Subtotal</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             {lineas.map((l, i) => {
               const prod = productos.find((p) => `${p.producto_id}|${p.variante_id || ''}` === l.clave)
-              const subtotal = (parseFloat(l.cantidad) || 0) * (parseFloat(l.precio_unitario) || 0)
+              const brutoLinea = (parseFloat(l.cantidad) || 0) * (parseFloat(l.precio_unitario) || 0)
+              const descLinea = parseFloat(l.descuento) || 0
+              const subtotal = Math.max(0, brutoLinea - descLinea)
               return (
                 <tr key={i}>
                   <td style={{ padding: '4px 8px' }}>
@@ -468,7 +494,33 @@ export default function NuevaVentaProducto() {
                       style={{ width: 90 }}
                     />
                   </td>
-                  <td style={{ padding: '4px 8px' }}>{subtotal.toFixed(2)}</td>
+                  <td style={{ padding: '4px 8px' }}>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      max={brutoLinea}
+                      value={l.descuento}
+                      onChange={(e) => actualizarLinea(i, 'descuento', e.target.value)}
+                      placeholder="0"
+                      style={{ width: 75, textAlign: 'right' }}
+                    />
+                  </td>
+                  <td style={{ padding: '4px 8px', textAlign: 'right' }}>
+                    {descLinea > 0 && (
+                      <span
+                        style={{
+                          display: 'block',
+                          fontSize: '0.78rem',
+                          color: '#A3AFBF',
+                          textDecoration: 'line-through',
+                        }}
+                      >
+                        {brutoLinea.toFixed(2)}
+                      </span>
+                    )}
+                    <span style={{ fontWeight: descLinea > 0 ? 700 : 400 }}>{subtotal.toFixed(2)}</span>
+                  </td>
                   <td style={{ padding: '4px 8px' }}>
                     {lineas.length > 1 && (
                       <button type="button" onClick={() => quitarLinea(i)}>
@@ -488,7 +540,7 @@ export default function NuevaVentaProducto() {
 
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-end', flexWrap: 'wrap' }}>
           <label>
-            Descuento (opcional)
+            Descuento general (opcional)
             <br />
             <input
               type="number"
@@ -502,10 +554,16 @@ export default function NuevaVentaProducto() {
             />
           </label>
           <div>
-            {descuentoNum > 0 && (
-              <p style={{ margin: 0, color: '#64748B', fontSize: '0.85rem' }}>
-                Subtotal Bs {bruto.toFixed(2)} − descuento Bs {descuentoNum.toFixed(2)}
-              </p>
+            {descuentoTotal > 0 && (
+              <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 400, color: '#64748B' }}>
+                Bruto Bs {bruto.toFixed(2)} · descuentos Bs {descuentoTotal.toFixed(2)}
+                {descLineas > 0 && descuentoNum > 0 && (
+                  <span style={{ color: '#A3AFBF' }}>
+                    {' '}
+                    (Bs {descLineas.toFixed(2)} por producto + Bs {descuentoNum.toFixed(2)} general)
+                  </span>
+                )}
+              </span>
             )}
             <p style={{ fontWeight: 700, fontSize: '1.3rem', color: '#1F3A5F', margin: 0 }}>
               Total: Bs {total.toFixed(2)}
