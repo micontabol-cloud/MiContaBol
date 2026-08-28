@@ -6,6 +6,7 @@ import { supabase } from '../supabaseClient'
 import BoliMascot from '../components/BoliMascot'
 import { TEMAS } from '../lib/temasCatalogo'
 import SelectorImagen from '../components/SelectorImagen'
+import { enlaceCatalogo, prefijoCatalogo, esVistaPrevia, tieneUrlConfigurada } from '../lib/urls'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(2)}`
 
@@ -36,6 +37,7 @@ export default function CatalogoEditor() {
 
   async function cargar() {
     setCargando(true)
+
     const [cRes, iRes, sRes, eRes] = await Promise.all([
       supabase.from('catalogos').select('*').eq('id', catalogoId).single(),
       supabase.from('catalogo_items').select('*').eq('catalogo_id', catalogoId),
@@ -50,7 +52,8 @@ export default function CatalogoEditor() {
     setEmpresa(eRes.data)
     setWhatsapp(eRes.data?.whatsapp || '')
 
-    const { data: st } = await supabase.rpc('estadisticas_catalogo', { p_catalogo_id: catalogoId })
+    // Trae el catálogo completo con las consultas de cada producto
+    const { data: st } = await supabase.rpc('catalogo_con_visitas', { p_catalogo_id: catalogoId })
     setStats(st)
 
     setCargando(false)
@@ -62,6 +65,7 @@ export default function CatalogoEditor() {
   }, [catalogoId])
 
   const clave = (s) => `${s.producto_id}|${s.variante_id || ''}`
+
   const itemPorClave = useMemo(
     () => new Map(items.map((i) => [`${i.producto_id}|${i.variante_id || ''}`, i])),
     [items]
@@ -103,8 +107,8 @@ export default function CatalogoEditor() {
   async function ponerPrecioEspecial(s, valor) {
     const item = itemPorClave.get(clave(s))
     if (!item) return
-    const precio = valor === '' ? null : parseFloat(valor)
 
+    const precio = valor === '' ? null : parseFloat(valor)
     setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, precio_especial: precio } : i)))
     await supabase.from('catalogo_items').update({ precio_especial: precio }).eq('id', item.id)
   }
@@ -122,7 +126,7 @@ export default function CatalogoEditor() {
     setEmpresa((prev) => ({ ...prev, whatsapp }))
   }
 
-  const enlace = catalogo ? `${window.location.origin}/c/${catalogo.slug}` : ''
+  const enlace = catalogo ? enlaceCatalogo(catalogo.slug) : ''
 
   useEffect(() => {
     if (!catalogo?.publicado || !enlace) {
@@ -321,33 +325,33 @@ export default function CatalogoEditor() {
         </div>
 
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-        <button
-          type="button"
-          onClick={() => (editandoDatos ? setEditandoDatos(false) : abrirEdicion())}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-        >
-          <Pencil size={16} strokeWidth={1.8} />
-          Editar
-        </button>
-        <button
-          type="button"
-          onClick={duplicar}
-          disabled={duplicando}
-          style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
-        >
-          <CopyPlus size={16} strokeWidth={1.8} />
-          Duplicar
-        </button>
-        <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.92rem' }}>
-          <input
-            type="checkbox"
-            checked={catalogo.publicado}
-            onChange={(e) => actualizarCatalogo({ publicado: e.target.checked })}
-          />
-          <strong style={{ color: catalogo.publicado ? '#22C55E' : '#64748B' }}>
-            {catalogo.publicado ? 'Publicado' : 'Sin publicar'}
-          </strong>
-        </label>
+          <button
+            type="button"
+            onClick={() => (editandoDatos ? setEditandoDatos(false) : abrirEdicion())}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <Pencil size={16} strokeWidth={1.8} />
+            Editar
+          </button>
+          <button
+            type="button"
+            onClick={duplicar}
+            disabled={duplicando}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+          >
+            <CopyPlus size={16} strokeWidth={1.8} />
+            Duplicar
+          </button>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.92rem' }}>
+            <input
+              type="checkbox"
+              checked={catalogo.publicado}
+              onChange={(e) => actualizarCatalogo({ publicado: e.target.checked })}
+            />
+            <strong style={{ color: catalogo.publicado ? '#22C55E' : '#64748B' }}>
+              {catalogo.publicado ? 'Publicado' : 'Sin publicar'}
+            </strong>
+          </label>
         </div>
       </div>
 
@@ -448,10 +452,11 @@ export default function CatalogoEditor() {
           }}
         >
           <p style={{ margin: '0 0 0.6rem', fontWeight: 600, color: '#15803D' }}>Tu catálogo está en vivo</p>
+
           {editandoEnlace ? (
             <div style={{ marginBottom: '0.75rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', flexWrap: 'wrap' }}>
-                <span style={{ color: '#64748B', fontSize: '0.85rem' }}>{window.location.origin}/c/</span>
+                <span style={{ color: '#64748B', fontSize: '0.85rem' }}>{prefijoCatalogo()}</span>
                 <input
                   value={nuevoSlug}
                   onChange={(e) => setNuevoSlug(e.target.value)}
@@ -512,6 +517,25 @@ export default function CatalogoEditor() {
               </button>
             </>
           )}
+
+          {esVistaPrevia() && !tieneUrlConfigurada() && (
+            <div
+              style={{
+                background: 'rgba(239, 68, 68, 0.07)',
+                border: '1px solid rgba(239, 68, 68, 0.35)',
+                borderRadius: 12,
+                padding: '0.85rem 1rem',
+                marginBottom: '0.85rem',
+                fontSize: '0.88rem',
+                color: '#B91C1C',
+                lineHeight: 1.5,
+              }}
+            >
+              <strong>Este enlace no le va a servir a tus clientes.</strong> Estás entrando desde una dirección de
+              prueba. Entra a tu dirección principal y copia el enlace desde ahí.
+            </div>
+          )}
+
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button className="btn-hero" type="button" onClick={compartirWhatsapp}>
               Compartir por WhatsApp
@@ -623,11 +647,12 @@ export default function CatalogoEditor() {
         </p>
       )}
 
-      {/* Estadísticas */}
+      {/* Cómo va: el catálogo completo con las consultas de cada producto */}
       {catalogo.publicado && stats && (
         <>
           <h2>Cómo va</h2>
-          <div className="stat-grid" style={{ marginBottom: '1rem' }}>
+
+          <div className="stat-grid" style={{ marginBottom: '1.25rem' }}>
             <div className="stat-card destacada-ventas">
               <p className="stat-label">Visitas totales</p>
               <p className="stat-value">{stats.total_visitas}</p>
@@ -636,22 +661,129 @@ export default function CatalogoEditor() {
               <p className="stat-label">Últimos 7 días</p>
               <p className="stat-value">{stats.visitas_semana}</p>
             </div>
+            <div className="stat-card destacada-utilidad">
+              <p className="stat-label">Consultas por WhatsApp</p>
+              <p className="stat-value" style={{ color: stats.total_consultas > 0 ? '#22C55E' : undefined }}>
+                {stats.total_consultas}
+              </p>
+            </div>
           </div>
 
-          {stats.productos_mas_vistos?.length > 0 && (
-            <section className="panel-card" style={{ marginBottom: '1.5rem' }}>
-              <h3>Lo que más miran</h3>
-              <ul className="panel-lista">
-                {stats.productos_mas_vistos.map((p, i) => (
-                  <li key={i}>
-                    <span>{p.nombre}</span>
-                    <span style={{ color: '#64748B' }}>{p.vistas} {p.vistas === 1 ? 'vez' : 'veces'}</span>
-                  </li>
-                ))}
-              </ul>
-              <p style={{ margin: '0.7rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
-                Cuenta cuántas veces alguien tocó el producto para consultarte.
+          {stats.productos?.length > 0 && (
+            <section style={{ marginBottom: '1.5rem' }}>
+              <h3 style={{ marginBottom: '0.25rem' }}>Tu catálogo, producto por producto</h3>
+              <p style={{ color: '#64748B', fontSize: '0.9rem', margin: '0 0 1rem' }}>
+                Así lo ve tu cliente. El número verde es cuántas veces tocaron cada producto para escribirte.
               </p>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                  gap: '1rem',
+                }}
+              >
+                {stats.productos.map((p) => (
+                  <div
+                    key={`${p.producto_id}-${p.variante_id || ''}`}
+                    style={{
+                      background: '#FFFFFF',
+                      border: p.consultas > 0 ? '1px solid rgba(34,197,94,0.4)' : '1px solid #E6ECF3',
+                      borderRadius: 16,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        aspectRatio: '1',
+                        background: p.imagen_url ? `url(${p.imagen_url}) center/cover` : '#F7F9FC',
+                        position: 'relative',
+                      }}
+                    >
+                      {!p.imagen_url && (
+                        <span
+                          style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'grid',
+                            placeItems: 'center',
+                            color: '#A3AFBF',
+                            fontSize: '0.8rem',
+                          }}
+                        >
+                          Sin foto
+                        </span>
+                      )}
+
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: 8,
+                          right: 8,
+                          background: p.consultas > 0 ? '#22C55E' : 'rgba(255,255,255,0.92)',
+                          color: p.consultas > 0 ? '#FFFFFF' : '#A3AFBF',
+                          border: p.consultas > 0 ? 'none' : '1px solid #E6ECF3',
+                          borderRadius: 999,
+                          padding: '0.2rem 0.6rem',
+                          fontSize: '0.82rem',
+                          fontWeight: 700,
+                        }}
+                      >
+                        {p.consultas}
+                      </span>
+                    </div>
+
+                    <div style={{ padding: '0.7rem 0.8rem 0.85rem' }}>
+                      <p style={{ margin: 0, fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.3 }}>{p.nombre}</p>
+
+                      {(p.categoria || p.observaciones) && (
+                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                          {[p.categoria, p.observaciones].filter(Boolean).join(' · ')}
+                        </p>
+                      )}
+
+                      <p style={{ margin: '0.35rem 0 0', fontWeight: 700, color: '#1F3A5F', fontSize: '1rem' }}>
+                        {fmt(p.precio)}
+                      </p>
+
+                      <p
+                        style={{
+                          margin: '0.35rem 0 0',
+                          fontSize: '0.8rem',
+                          fontWeight: 600,
+                          color: p.consultas > 0 ? '#22C55E' : '#A3AFBF',
+                        }}
+                      >
+                        {p.consultas === 0
+                          ? 'Nadie lo consultó'
+                          : `${p.consultas} ${p.consultas === 1 ? 'consulta' : 'consultas'}`}
+                      </p>
+
+                      {Number(p.stock) <= 0 && (
+                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#EF4444' }}>Agotado</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {stats.total_visitas > 0 && stats.total_consultas === 0 && (
+                <p
+                  style={{
+                    background: 'rgba(245, 158, 11, 0.1)',
+                    border: '1px solid rgba(245, 158, 11, 0.35)',
+                    borderRadius: 12,
+                    padding: '0.8rem 0.95rem',
+                    fontSize: '0.9rem',
+                    color: '#8a5a00',
+                    marginTop: '1rem',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Tuviste {stats.total_visitas} visitas pero nadie tocó ningún producto. Suele ser por el precio, por
+                  fotos que no lucen, o porque no queda claro que se puede consultar.
+                </p>
+              )}
             </section>
           )}
         </>
@@ -731,6 +863,7 @@ export default function CatalogoEditor() {
           />
           Esconder los productos agotados
         </label>
+
         <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <input
             type="checkbox"
@@ -789,6 +922,7 @@ export default function CatalogoEditor() {
               {visibles.map((s) => {
                 const item = itemPorClave.get(clave(s))
                 const incluido = Boolean(item)
+
                 return (
                   <tr
                     key={clave(s)}
@@ -819,7 +953,14 @@ export default function CatalogoEditor() {
                             }}
                           />
                         )}
-                        <span>{s.nombre_completo}</span>
+                        <span>
+                          {s.nombre_completo}
+                          {(s.categoria_nombre || s.observaciones) && (
+                            <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                              {[s.categoria_nombre, s.observaciones].filter(Boolean).join(' · ')}
+                            </span>
+                          )}
+                        </span>
                       </div>
                     </td>
                     <td style={{ padding: '6px 8px', textAlign: 'right', color: '#64748B' }}>
@@ -885,8 +1026,7 @@ export default function CatalogoEditor() {
               {catalogo.publicado ? (
                 <>
                   Está publicado: al borrarlo, <strong>el enlace deja de funcionar</strong> para quien ya lo tenga
-                  guardado, y se pierden sus estadísticas de visitas.
-                  {' '}
+                  guardado, y se pierden sus estadísticas de visitas.{' '}
                   Si solo quieres que deje de verse, desmarca "Publicado" arriba: así conservas todo y puedes
                   volver a publicarlo cuando quieras.
                 </>
@@ -936,7 +1076,6 @@ export default function CatalogoEditor() {
           </div>
         )}
       </section>
-
     </main>
   )
 }
