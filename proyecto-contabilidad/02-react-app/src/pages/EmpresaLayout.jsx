@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useParams, useLocation, Link } from 'react-router-dom'
+import { NavLink, Outlet, useParams, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
   Home,
   Megaphone,
@@ -21,6 +21,8 @@ import {
   ChevronRight,
   Menu,
   X,
+  Plus,
+  MoreHorizontal,
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import Logo from '../components/Logo'
@@ -48,9 +50,7 @@ const inventario = [
   { to: '/analisis-costo', label: 'Análisis de costo' },
 ]
 
-const bancos = [
-  { to: '/bancos', label: 'Cuentas y conciliación', end: true },
-]
+const bancos = [{ to: '/bancos', label: 'Cuentas y conciliación', end: true }]
 
 const contabilidad = [
   { to: '/cuentas', label: 'Plan de cuentas' },
@@ -63,6 +63,14 @@ const reportes = [
   { to: '/libro-mayor', label: 'Libro mayor' },
   { to: '/balance-comprobacion', label: 'Balance de comprobación' },
   { to: '/estados-financieros', label: 'Estados financieros' },
+]
+
+// Los cuatro destinos de la barra inferior. Son los que se usan a
+// diario desde el celular; el resto vive en "Más".
+const barraMovil = [
+  { to: '', label: 'Inicio', Icon: Home, end: true },
+  { to: '/inventario/productos', label: 'Productos', Icon: Package },
+  { to: '/caja', label: 'Caja', Icon: Wallet },
 ]
 
 function GrupoColapsable({ titulo, Icon, items, empresaId, pathname }) {
@@ -100,6 +108,7 @@ function LayoutInterno() {
   const { rol } = useRol()
   const { id } = useParams()
   const location = useLocation()
+  const navigate = useNavigate()
   const [empresa, setEmpresa] = useState(null)
   const [menuAbierto, setMenuAbierto] = useState(false)
 
@@ -111,25 +120,24 @@ function LayoutInterno() {
     cargar()
   }, [id])
 
-  // Al navegar, el drawer se cierra solo: en celular molesta tener que
+  // Al navegar, el menú se cierra solo: en celular molesta tener que
   // cerrarlo a mano después de cada toque.
   useEffect(() => {
     setMenuAbierto(false)
   }, [location.pathname])
 
+  const enBarra = (to, end) => {
+    const ruta = `/empresas/${id}${to}`
+    return end ? location.pathname === ruta : location.pathname.startsWith(ruta)
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar-movil">
-        <button
-          type="button"
-          className="boton-menu"
-          onClick={() => setMenuAbierto(true)}
-          aria-label="Abrir menú"
-        >
-          <Menu size={22} strokeWidth={2} />
-        </button>
         <Logo to="/empresas" dark iconSize={30} textSize="1.05rem" />
-        <span style={{ width: 32 }} />
+        <span style={{ fontSize: '0.82rem', color: '#93A5C4', maxWidth: 140, textAlign: 'right' }}>
+          {empresa?.nombre}
+        </span>
       </header>
 
       <div
@@ -148,6 +156,7 @@ function LayoutInterno() {
         >
           <X size={20} strokeWidth={2} />
         </button>
+
         <div>
           <Logo to="/empresas" dark iconSize={38} textSize="1.15rem" />
           <p style={{ color: '#93A5C4', fontSize: '0.72rem', margin: '0.4rem 0 0', lineHeight: 1.35 }}>
@@ -260,10 +269,54 @@ function LayoutInterno() {
       <div className="app-content">
         <Outlet />
       </div>
+
+      {/* Barra inferior, solo en celular.
+          Vender va al centro y destacado porque es lo que se hace
+          cincuenta veces al día; lo demás se consulta de a ratos. */}
+      <nav className="barra-movil">
+        {barraMovil.slice(0, 2).map((s) => (
+          <NavLink
+            key={s.to}
+            to={`/empresas/${id}${s.to}`}
+            end={s.end}
+            className={'barra-movil-item' + (enBarra(s.to, s.end) ? ' activo' : '')}
+          >
+            <s.Icon size={21} strokeWidth={1.9} />
+            <span>{s.label}</span>
+          </NavLink>
+        ))}
+
+        <button
+          type="button"
+          className="barra-movil-vender"
+          onClick={() => navigate(`/empresas/${id}/inventario/venta`)}
+          aria-label="Registrar una venta"
+        >
+          <Plus size={26} strokeWidth={2.5} />
+          <span>Vender</span>
+        </button>
+
+        <NavLink
+          to={`/empresas/${id}/caja`}
+          className={'barra-movil-item' + (enBarra('/caja') ? ' activo' : '')}
+        >
+          <Wallet size={21} strokeWidth={1.9} />
+          <span>Caja</span>
+        </NavLink>
+
+        <button
+          type="button"
+          className={'barra-movil-item' + (menuAbierto ? ' activo' : '')}
+          onClick={() => setMenuAbierto(true)}
+          aria-label="Abrir menú"
+        >
+          <MoreHorizontal size={21} strokeWidth={1.9} />
+          <span>Más</span>
+        </button>
+      </nav>
     </div>
   )
 }
-
 
 export default function EmpresaLayout() {
   const { id } = useParams()
