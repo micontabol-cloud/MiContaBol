@@ -3,11 +3,9 @@ import { Link } from 'react-router-dom'
 import {
   Check,
   ArrowRight,
-  ArrowDown,
   TrendingUp,
   Package,
   Search,
-  Smartphone,
   CreditCard,
   FileSpreadsheet,
   Lock,
@@ -15,6 +13,9 @@ import {
   EyeOff,
   Notebook,
   HandHeart,
+  Cloud,
+  UserCog,
+  Download,
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import Logo from '../components/Logo'
@@ -24,37 +25,47 @@ const fmt = (n) => `Bs ${Number(n).toLocaleString('es-BO', { maximumFractionDigi
 
 const rubros = ['Zapaterías', 'Boutiques', 'Minimarkets', 'Ferreterías', 'Joyerías', 'Farmacias']
 
-// Iconos lineales, un solo sistema. Los emojis mezclan estilos y
-// hacen que un producto serio parezca improvisado.
-const seisCosas = [
-  {
-    Icon: TrendingUp,
-    titulo: 'Sabes cuánto ganas',
-    texto: 'Tu utilidad real, descontando lo que te costó la mercadería.',
-    destacada: true,
-    dato: '+ Bs 5.430 este mes',
-  },
-  { Icon: Package, titulo: 'Controlas tu inventario', texto: 'Cada venta descuenta sola. Sabes qué reponer antes de quedarte sin nada.' },
-  { Icon: Search, titulo: 'Vendes rápido', texto: 'Buscas por nombre, color o talla. O escaneas el código de barras.' },
-  { Icon: Smartphone, titulo: 'Compartes tu catálogo', texto: 'Un enlace por WhatsApp y un QR para pegar en tu vitrina.' },
-  { Icon: CreditCard, titulo: 'Sabes quién te debe', texto: 'Ventas fiadas y abonos, con el saldo siempre al día.' },
-  { Icon: FileSpreadsheet, titulo: 'Tu contador recibe todo listo', texto: 'Estados financieros armados, en PDF o Excel.' },
+// Ventas reales del gráfico: con montos por mes se lee como producto,
+// no como wireframe.
+const ventasMeses = [
+  { mes: 'Mar', valor: 7800 },
+  { mes: 'Abr', valor: 9100 },
+  { mes: 'May', valor: 8700 },
+  { mes: 'Jun', valor: 10400 },
+  { mes: 'Jul', valor: 9900 },
+  { mes: 'Ago', valor: 12850 },
+]
+
+// Productos del catálogo de ejemplo. Cuando tengas fotos reales,
+// reemplaza "color" por "foto: '/demo/producto-1.jpg'".
+const productosDemo = [
+  { nombre: 'Modelo Roma', precio: 'Bs 450', color: '#8B5E4C', tono: '#A87561' },
+  { nombre: 'Modelo Milano', precio: 'Bs 520', color: '#1F3A5F', tono: '#2E5C8A' },
+  { nombre: 'Modelo Siena', precio: 'Bs 390', color: '#C9A227', tono: '#DCB94A' },
+  { nombre: 'Modelo Capri', precio: 'Bs 495', color: '#A8A9AD', tono: '#C4C5C9' },
 ]
 
 const antes = [
   'Ventas en un cuaderno',
   'Stock "más o menos"',
-  'Confundes ventas con ganancias',
+  '"No sé cuánto gané"',
   'Fotos una por una por WhatsApp',
   'Una bolsa de papeles para el contador',
 ]
 
 const despues = [
-  'Ventas registradas en segundos',
-  'Stock exacto, siempre',
-  'Ganancia real en cada venta',
-  'Catálogo con enlace y QR',
-  'Contabilidad lista para tu contador',
+  { texto: 'Ventas registradas en segundos', Icon: Search },
+  { texto: 'Stock exacto, siempre', Icon: Package },
+  { texto: 'Ganancia real: Bs 5.430', Icon: TrendingUp, fuerte: true },
+  { texto: 'Catálogo con enlace y QR', Icon: CreditCard },
+  { texto: 'Contabilidad lista para tu contador', Icon: FileSpreadsheet },
+]
+
+const confianza = [
+  { Icon: Lock, titulo: 'Solo tú ves tus números', texto: 'Ni siquiera nosotros accedemos a tus datos personales.' },
+  { Icon: Cloud, titulo: 'Respaldo automático', texto: 'Tu información se guarda todos los días, sin que hagas nada.' },
+  { Icon: UserCog, titulo: 'Tú decides quién ve qué', texto: 'Cada persona de tu equipo entra solo a lo que necesita.' },
+  { Icon: Download, titulo: 'Tu información es tuya', texto: 'Si algún día te vas, te la llevas completa.' },
 ]
 
 const preguntas = [
@@ -86,8 +97,6 @@ const preguntas = [
 
 /* ---------- Piezas visuales ---------- */
 
-// Marco de ventana de navegador: hace que el mockup se lea como
-// software real y no como una tarjeta decorativa.
 function Ventana({ children, ancho = 'auto' }) {
   return (
     <div
@@ -133,7 +142,6 @@ function Ventana({ children, ancho = 'auto' }) {
   )
 }
 
-// Teléfono, para las secciones de móvil y catálogo
 function Telefono({ children, alto = 400, etiqueta }) {
   return (
     <div style={{ textAlign: 'center' }}>
@@ -147,28 +155,37 @@ function Telefono({ children, alto = 400, etiqueta }) {
           margin: '0 auto',
         }}
       >
-        <div
-          style={{
-            background: '#FFFFFF',
-            borderRadius: 22,
-            height: alto,
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
+        <div style={{ background: '#FFFFFF', borderRadius: 22, height: alto, overflow: 'hidden', position: 'relative' }}>
           {children}
         </div>
       </div>
       {etiqueta && (
-        <p style={{ margin: '0.75rem 0 0', fontSize: '0.85rem', fontWeight: 600, color: 'inherit', opacity: 0.85 }}>
-          {etiqueta}
-        </p>
+        <p style={{ margin: '0.75rem 0 0', fontSize: '0.85rem', fontWeight: 600, opacity: 0.85 }}>{etiqueta}</p>
       )}
     </div>
   )
 }
 
-// La pantalla de venta con la ganancia: el corazón del producto
+/* Un zapato dibujado: mejor que un cubo gris mientras no haya fotos.
+   Con fotos reales, se reemplaza por <img src={p.foto} />. */
+function ZapatoDibujado({ color, tono }) {
+  return (
+    <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', display: 'block' }}>
+      <rect width="100" height="100" fill="#F1F5FA" />
+      <ellipse cx="50" cy="78" rx="34" ry="5" fill="rgba(15,26,41,0.08)" />
+      {/* suela */}
+      <path d="M18 70 Q18 76 26 76 L74 76 Q82 76 82 70 L82 66 L18 66 Z" fill={tono} opacity="0.55" />
+      {/* cuerpo */}
+      <path d="M22 66 Q20 44 34 36 Q44 30 54 32 Q66 35 72 46 Q79 57 78 66 Z" fill={color} />
+      {/* empeine */}
+      <path d="M34 44 Q46 38 58 42 Q64 44 66 50 Q52 46 38 50 Z" fill="#FFFFFF" opacity="0.22" />
+      {/* correa */}
+      <rect x="36" y="50" width="30" height="4" rx="2" fill="#FFFFFF" opacity="0.55" />
+      <circle cx="66" cy="52" r="2.6" fill="#FFFFFF" opacity="0.8" />
+    </svg>
+  )
+}
+
 function PantallaVenta({ compacta = false }) {
   return (
     <div style={{ padding: compacta ? '0.9rem' : '1.3rem' }}>
@@ -177,13 +194,7 @@ function PantallaVenta({ compacta = false }) {
         Modelo Roma · Rojo · Talla 38
       </p>
 
-      <div
-        style={{
-          background: 'var(--color-bg-secondary)',
-          borderRadius: 12,
-          padding: '0.85rem',
-        }}
-      >
+      <div style={{ background: 'var(--color-bg-secondary)', borderRadius: 12, padding: '0.85rem' }}>
         <p style={{ margin: '0 0 0.6rem', fontWeight: 700, color: 'var(--color-navy)', fontSize: '0.85rem' }}>
           Esto es lo que va a pasar
         </p>
@@ -215,8 +226,13 @@ function PantallaVenta({ compacta = false }) {
   )
 }
 
-// El panel de inicio, para demostrar que el producto existe
+/* Dashboard con el gráfico real: montos por mes y la variación */
 function PantallaDashboard() {
+  const max = Math.max(...ventasMeses.map((m) => m.valor))
+  const ultimo = ventasMeses[ventasMeses.length - 1].valor
+  const previo = ventasMeses[ventasMeses.length - 2].valor
+  const variacion = Math.round(((ultimo - previo) / previo) * 100)
+
   const kpis = [
     { label: 'Vendido este mes', valor: 'Bs 12.850', destacado: 'ventas' },
     { label: 'Tu ganancia', valor: 'Bs 5.430', destacado: 'utilidad' },
@@ -224,15 +240,13 @@ function PantallaDashboard() {
     { label: 'En inventario', valor: 'Bs 12.400' },
   ]
 
-  const barras = [42, 58, 51, 70, 64, 88]
-
   return (
     <div style={{ padding: '1.25rem', background: 'var(--color-bg-secondary)' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.9rem' }}>
         <BoliMascot pose="hola" size={34} />
         <div>
           <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)', fontSize: '0.95rem' }}>
-            Gianna Calzados
+            Calzados Patito
           </p>
           <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
             ¡Buen inicio de semana! Aquí está tu resumen.
@@ -282,67 +296,70 @@ function PantallaDashboard() {
           background: '#FFFFFF',
           border: '1px solid var(--color-border)',
           borderRadius: 12,
-          padding: '0.85rem',
+          padding: '0.9rem',
           marginTop: '0.7rem',
         }}
       >
-        <p style={{ margin: '0 0 0.6rem', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-navy)' }}>
-          Ventas de los últimos 6 meses
-        </p>
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem', height: 62 }}>
-          {barras.map((h, i) => (
-            <div
-              key={i}
-              style={{
-                flex: 1,
-                height: `${h}%`,
-                background: i === barras.length - 1 ? 'var(--color-coral)' : 'rgba(31, 58, 95, 0.18)',
-                borderRadius: '4px 4px 0 0',
-              }}
-            />
-          ))}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.8rem' }}>
+          <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-navy)' }}>
+            Ventas de los últimos 6 meses
+          </p>
+          <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-success)' }}>
+            ↑ {variacion}% vs. mes anterior
+          </p>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.6rem', height: 78 }}>
+          {ventasMeses.map((m, i) => {
+            const esUltimo = i === ventasMeses.length - 1
+            return (
+              <div key={m.mes} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <span
+                  style={{
+                    fontSize: '0.58rem',
+                    fontWeight: 700,
+                    color: esUltimo ? 'var(--color-coral)' : 'var(--color-text-disabled)',
+                    marginBottom: '0.2rem',
+                  }}
+                >
+                  {(m.valor / 1000).toFixed(1)}k
+                </span>
+                <div
+                  style={{
+                    width: '100%',
+                    height: `${(m.valor / max) * 52}px`,
+                    background: esUltimo ? 'var(--color-coral)' : 'rgba(31, 58, 95, 0.2)',
+                    borderRadius: '4px 4px 0 0',
+                  }}
+                />
+                <span style={{ fontSize: '0.6rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
+                  {m.mes}
+                </span>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
   )
 }
 
-/* Catálogo público, dentro del teléfono */
 function PantallaCatalogo() {
-  const productos = [
-    { nombre: 'Modelo Roma', precio: 'Bs 450' },
-    { nombre: 'Modelo Milano', precio: 'Bs 520' },
-    { nombre: 'Modelo Siena', precio: 'Bs 380' },
-    { nombre: 'Modelo Capri', precio: 'Bs 495' },
-  ]
-
   return (
     <div style={{ height: '100%', background: 'var(--color-bg-secondary)' }}>
       <div style={{ background: 'var(--color-navy)', padding: '1rem 0.85rem 0.85rem' }}>
-        <p style={{ margin: 0, color: '#FFFFFF', fontWeight: 700, fontSize: '0.9rem' }}>Gianna Calzados</p>
+        <p style={{ margin: 0, color: '#FFFFFF', fontWeight: 700, fontSize: '0.9rem' }}>Calzados Patito</p>
         <p style={{ margin: '0.1rem 0 0', color: '#C7D2E0', fontSize: '0.7rem' }}>Temporada nueva</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', padding: '0.7rem' }}>
-        {productos.map((p) => (
+        {productosDemo.map((p) => (
           <div
             key={p.nombre}
-            style={{
-              background: '#FFFFFF',
-              borderRadius: 10,
-              border: '1px solid var(--color-border)',
-              overflow: 'hidden',
-            }}
+            style={{ background: '#FFFFFF', borderRadius: 10, border: '1px solid var(--color-border)', overflow: 'hidden' }}
           >
-            <div
-              style={{
-                aspectRatio: '1',
-                background: 'linear-gradient(135deg, #E8EDF4 0%, #D6DFEA 100%)',
-                display: 'grid',
-                placeItems: 'center',
-              }}
-            >
-              <Package size={22} strokeWidth={1.5} style={{ color: 'var(--color-text-disabled)' }} />
+            <div style={{ aspectRatio: '1' }}>
+              <ZapatoDibujado color={p.color} tono={p.tono} />
             </div>
             <div style={{ padding: '0.4rem 0.5rem 0.55rem' }}>
               <p style={{ margin: 0, fontSize: '0.68rem', fontWeight: 600, color: 'var(--color-text)' }}>{p.nombre}</p>
@@ -357,7 +374,6 @@ function PantallaCatalogo() {
   )
 }
 
-/* Conversación de WhatsApp que llega al comerciante */
 function PantallaWhatsapp() {
   return (
     <div style={{ height: '100%', background: '#ECE5DD', display: 'flex', flexDirection: 'column' }}>
@@ -391,13 +407,13 @@ function PantallaWhatsapp() {
         </div>
       </div>
 
-      <div style={{ padding: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+      <div style={{ padding: '0.85rem' }}>
         <div
           style={{
             background: '#FFFFFF',
             borderRadius: '10px 10px 10px 2px',
             padding: '0.6rem 0.7rem',
-            maxWidth: '88%',
+            maxWidth: '90%',
             boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
           }}
         >
@@ -443,7 +459,7 @@ export default function Landing() {
         <div className="landing-container landing-header-inner">
           <Logo iconSize={36} textSize="1.2rem" />
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <a href="#como-funciona" style={{ fontSize: '0.92rem' }}>Producto</a>
+            <a href="#producto" style={{ fontSize: '0.92rem' }}>Producto</a>
             <a href="#precios" style={{ fontSize: '0.92rem' }}>Precios</a>
             <a href="#preguntas" style={{ fontSize: '0.92rem' }}>Preguntas</a>
             <Link to="/login">
@@ -487,7 +503,7 @@ export default function Landing() {
               <Link to="/login">
                 <button className="btn-hero btn-lg">Probar gratis 1 mes</button>
               </Link>
-              <a href="#como-funciona">
+              <a href="#producto">
                 <button
                   type="button"
                   className="btn-lg"
@@ -514,7 +530,6 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Ventana real con los montos flotando */}
           <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
             <Ventana ancho={360}>
               <PantallaVenta />
@@ -557,7 +572,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 2 — RUBROS: una franja, no una sección */}
+      {/* Franja de rubros */}
       <div className="trust-strip">
         <div className="landing-container">
           <p style={{ textAlign: 'center', color: '#FFFFFF', fontWeight: 600, margin: '0 0 0.7rem', fontSize: '0.95rem' }}>
@@ -574,8 +589,8 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* 3 — EL DASHBOARD: demuestra que el producto existe */}
-      <section className="landing-section">
+      {/* 2 — DASHBOARD */}
+      <section className="landing-section" id="producto">
         <div className="landing-container" style={{ textAlign: 'center' }}>
           <h2 className="landing-h2">Abres MiContaBol y sabes cómo está tu negocio.</h2>
           <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
@@ -590,8 +605,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 4 — EL MOMENTO WOW, como flujo de tres pasos */}
-      <section className="landing-section bg-tint" id="como-funciona">
+      {/* 3 — LA VENTA */}
+      <section className="landing-section bg-tint">
         <div className="landing-container">
           <h2 className="landing-h2" style={{ textAlign: 'center' }}>
             Antes de confirmar una venta, ya sabes cuánto ganaste.
@@ -608,11 +623,11 @@ export default function Landing() {
             }}
           >
             {[
-              { n: '1', titulo: 'Buscas', valor: 'Roma rojo 38', Icon: Search },
-              { n: '2', titulo: 'Cobras', valor: 'Bs 580', Icon: CreditCard },
-              { n: '3', titulo: 'Sabes cuánto ganaste', valor: '+ Bs 233', Icon: TrendingUp, verde: true },
+              { titulo: 'Buscas', valor: 'Roma rojo 38', Icon: Search },
+              { titulo: 'Cobras', valor: 'Bs 580', Icon: CreditCard },
+              { titulo: 'Sabes cuánto ganaste', valor: '+ Bs 233', Icon: TrendingUp, verde: true },
             ].map((p, i, arr) => (
-              <div key={p.n} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div key={p.titulo} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div
                   style={{
                     background: '#FFFFFF',
@@ -654,15 +669,7 @@ export default function Landing() {
             Tú registras una venta. MiContaBol hace todo lo demás.
           </p>
 
-          <div
-            style={{
-              display: 'flex',
-              gap: '0.6rem',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginTop: '1rem',
-            }}
-          >
+          <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1rem' }}>
             {['Caja', 'Inventario', 'Kardex', 'Ganancia', 'Contabilidad'].map((t) => (
               <span
                 key={t}
@@ -716,50 +723,98 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 5 — SEIS COSAS, con la primera destacada */}
+      {/* 4 — TÚ → MICONTABOL → TU CONTADOR (subida al cuarto lugar) */}
       <section className="landing-section">
         <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>Seis cosas que dejas de adivinar</h2>
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
-            No es un sistema con mil opciones. Resuelve lo que un comerciante necesita todos los días.
-          </p>
+          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
+            Tú manejas el negocio. MiContaBol ordena los números.
+          </h2>
 
-          <div className="landing-grid-3" style={{ marginTop: '2rem' }}>
-            {seisCosas.map((f) => (
-              <div
-                key={f.titulo}
-                className="landing-card"
-                style={{
-                  textAlign: 'left',
-                  border: f.destacada ? '2px solid rgba(34,197,94,0.35)' : undefined,
-                  background: f.destacada ? 'rgba(34, 197, 94, 0.04)' : undefined,
-                }}
-              >
-                <f.Icon
-                  size={24}
-                  strokeWidth={1.7}
-                  style={{ color: f.destacada ? 'var(--color-success)' : 'var(--color-navy)' }}
-                />
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '1rem',
+              flexWrap: 'wrap',
+              marginTop: '2.25rem',
+            }}
+          >
+            {[
+              { titulo: 'Tú', items: ['Ventas', 'Compras', 'Gastos'], sub: 'en lenguaje normal' },
+              { titulo: 'MiContaBol', items: ['Ordena todo', 'automáticamente'], centro: true },
+              {
+                titulo: 'Tu contador',
+                items: ['Balance', 'Estado de resultados', 'Libro mayor', 'PDF / Excel'],
+                sub: 'todo donde corresponde',
+              },
+            ].map((col, i, arr) => (
+              <div key={col.titulo} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div
+                  style={{
+                    background: col.centro ? 'var(--color-navy)' : '#FFFFFF',
+                    border: col.centro ? 'none' : '1px solid var(--color-border)',
+                    borderRadius: 'var(--radius-lg)',
+                    boxShadow: 'var(--shadow-card)',
+                    padding: '1.3rem 1.5rem',
+                    width: 210,
+                    textAlign: 'center',
+                  }}
+                >
+                  <div style={{ marginBottom: '0.7rem', display: 'flex', justifyContent: 'center' }}>
+                    {col.centro ? (
+                      <Logo dark iconSize={26} textSize="0.95rem" />
+                    ) : (
+                      <span style={{ fontWeight: 700, color: 'var(--color-navy)', fontSize: '1rem' }}>{col.titulo}</span>
+                    )}
+                  </div>
 
-                {f.dato && (
-                  <p style={{ margin: '0.7rem 0 0', fontSize: '1.15rem', fontWeight: 800, color: 'var(--color-success)' }}>
-                    {f.dato}
-                  </p>
+                  {col.items.map((it) => (
+                    <p
+                      key={it}
+                      style={{
+                        margin: '0 0 0.3rem',
+                        fontSize: '0.88rem',
+                        color: col.centro ? '#C7D2E0' : 'var(--color-text)',
+                      }}
+                    >
+                      {it}
+                    </p>
+                  ))}
+
+                  {col.sub && (
+                    <p style={{ margin: '0.6rem 0 0', fontSize: '0.76rem', color: 'var(--color-text-disabled)' }}>
+                      {col.sub}
+                    </p>
+                  )}
+                </div>
+
+                {i < arr.length - 1 && (
+                  <ArrowRight size={20} strokeWidth={2} style={{ color: 'var(--color-text-disabled)', flexShrink: 0 }} />
                 )}
-
-                <p style={{ fontWeight: 700, color: 'var(--color-navy)', margin: f.dato ? '0.2rem 0 0.25rem' : '0.7rem 0 0.25rem' }}>
-                  {f.titulo}
-                </p>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', margin: 0, lineHeight: 1.5 }}>
-                  {f.texto}
-                </p>
               </div>
             ))}
           </div>
+
+          <p
+            style={{
+              textAlign: 'center',
+              maxWidth: 560,
+              margin: '2rem auto 0',
+              fontSize: '1rem',
+              color: 'var(--color-text-secondary)',
+              lineHeight: 1.6,
+            }}
+          >
+            No necesitas aprender debe, haber ni partida doble.{' '}
+            <strong style={{ color: 'var(--color-navy)' }}>
+              MiContaBol no reemplaza a tu contador: le facilita el trabajo.
+            </strong>
+          </p>
         </div>
       </section>
 
-      {/* 6 — INVENTARIO */}
+      {/* 5 — INVENTARIO */}
       <section className="landing-section bg-gris">
         <div className="landing-container landing-grid-2">
           <div>
@@ -795,7 +850,7 @@ export default function Landing() {
               }}
             >
               <p style={{ margin: '0 0 1.1rem', fontWeight: 700, color: 'var(--color-navy)' }}>
-                Cuánta plata tienes en el estante
+                Cuánto dinero tienes parado en mercadería
               </p>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.9rem' }}>
@@ -836,7 +891,6 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Boli aparece con un dato útil, no de adorno */}
             <div
               style={{
                 display: 'flex',
@@ -860,20 +914,13 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 7 — CATÁLOGO: cartel → celular → WhatsApp */}
+      {/* 6 — CATÁLOGO */}
       <section className="landing-section">
         <div className="landing-container">
           <h2 className="landing-h2" style={{ textAlign: 'center' }}>
             Convierte tu vitrina en un catálogo digital.
           </h2>
-          <p
-            style={{
-              textAlign: 'center',
-              color: 'var(--color-text-secondary)',
-              maxWidth: 600,
-              margin: '0.5rem auto 0',
-            }}
-          >
+          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', maxWidth: 600, margin: '0.5rem auto 0' }}>
             Tu cliente escanea el QR pegado en tu local, mira tus productos con foto y precio, y te escribe directo
             por WhatsApp.
           </p>
@@ -888,7 +935,6 @@ export default function Landing() {
               marginTop: '2.5rem',
             }}
           >
-            {/* El cartel físico */}
             <div style={{ textAlign: 'center' }}>
               <div
                 style={{
@@ -915,7 +961,6 @@ export default function Landing() {
                   PRODUCTOS
                 </p>
 
-                {/* QR dibujado */}
                 <div
                   style={{
                     width: 96,
@@ -930,15 +975,11 @@ export default function Landing() {
                     padding: 8,
                   }}
                 >
-                  {/* Patrón fijo: no aleatorio, para que no cambie en cada render */}
                   {'1101011100010111010011101100101110011010011101011001110101'
                     .split('')
                     .slice(0, 49)
                     .map((v, i) => (
-                      <span
-                        key={i}
-                        style={{ background: v === '1' ? 'var(--color-navy)' : 'transparent', borderRadius: 1 }}
-                      />
+                      <span key={i} style={{ background: v === '1' ? 'var(--color-navy)' : 'transparent', borderRadius: 1 }} />
                     ))}
                 </div>
 
@@ -994,7 +1035,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 8 — TU NEGOCIO EN TU BOLSILLO (azul oscuro) */}
+      {/* 7 — TU NEGOCIO EN EL BOLSILLO */}
       <section style={{ background: 'var(--color-navy)', padding: '3.5rem 0' }}>
         <div className="landing-container" style={{ textAlign: 'center' }}>
           <h2 className="landing-h2" style={{ color: '#FFFFFF', fontSize: '2rem' }}>
@@ -1012,7 +1053,6 @@ export default function Landing() {
               flexWrap: 'wrap',
               marginTop: '2.5rem',
               color: '#C7D2E0',
-              position: 'relative',
             }}
           >
             <Telefono alto={310} etiqueta="Vender">
@@ -1059,13 +1099,11 @@ export default function Landing() {
           </div>
 
           <BoliMascot pose="hola" size={90} style={{ margin: '2rem auto 0' }} />
-          <p style={{ color: '#93A5C4', fontSize: '0.88rem', margin: '0.6rem 0 0' }}>
-            Mi contabilidad en el bolsillo.
-          </p>
+          <p style={{ color: '#93A5C4', fontSize: '0.88rem', margin: '0.6rem 0 0' }}>Tu negocio en el bolsillo.</p>
         </div>
       </section>
 
-      {/* 9 — VENDEDOR vs DUEÑO */}
+      {/* 8 — VENDEDORES */}
       <section className="landing-section">
         <div className="landing-container">
           <h2 className="landing-h2" style={{ textAlign: 'center' }}>
@@ -1087,6 +1125,7 @@ export default function Landing() {
                 titulo: 'Lo que ves tú',
                 Icon: Eye,
                 items: ['Todo lo anterior', 'Costo de cada producto', 'Margen y ganancia', 'Reportes y contabilidad'],
+                // Azul, no coral: el coral se reserva para acciones.
                 destacado: true,
               },
             ].map((col) => (
@@ -1094,7 +1133,7 @@ export default function Landing() {
                 key={col.titulo}
                 style={{
                   background: '#FFFFFF',
-                  border: col.destacado ? '2px solid var(--color-coral)' : '1px solid var(--color-border)',
+                  border: col.destacado ? '2px solid var(--color-navy-light)' : '1px solid var(--color-border)',
                   borderRadius: 'var(--radius-lg)',
                   boxShadow: 'var(--shadow-card)',
                   padding: '1.5rem',
@@ -1104,7 +1143,7 @@ export default function Landing() {
                   <col.Icon
                     size={20}
                     strokeWidth={1.8}
-                    style={{ color: col.destacado ? 'var(--color-coral)' : 'var(--color-text-secondary)' }}
+                    style={{ color: col.destacado ? 'var(--color-navy-light)' : 'var(--color-text-secondary)' }}
                   />
                   <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)' }}>{col.titulo}</p>
                 </div>
@@ -1139,10 +1178,12 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 10 — LO QUE CAMBIA */}
+      {/* 9 — DE "MÁS O MENOS" A SABER (fusión de las dos secciones) */}
       <section className="landing-section bg-tint">
         <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>Lo que cambia</h2>
+          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
+            De "más o menos" a saber exactamente cómo va tu negocio
+          </h2>
 
           <div className="landing-grid-2" style={{ marginTop: '2rem', alignItems: 'stretch' }}>
             <div
@@ -1153,7 +1194,15 @@ export default function Landing() {
                 padding: '1.6rem',
               }}
             >
-              <p style={{ margin: '0 0 1.2rem', fontWeight: 700, color: 'var(--color-text-secondary)', fontSize: '0.9rem', letterSpacing: '0.03em' }}>
+              <p
+                style={{
+                  margin: '0 0 1.2rem',
+                  fontWeight: 700,
+                  color: 'var(--color-text-secondary)',
+                  fontSize: '0.9rem',
+                  letterSpacing: '0.03em',
+                }}
+              >
                 ANTES
               </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
@@ -1177,13 +1226,36 @@ export default function Landing() {
                 padding: '1.6rem',
               }}
             >
-              <p style={{ margin: '0 0 1.2rem', fontWeight: 700, color: 'var(--color-coral)', fontSize: '0.9rem', letterSpacing: '0.03em' }}>
+              <p
+                style={{
+                  margin: '0 0 1.2rem',
+                  fontWeight: 700,
+                  color: 'var(--color-coral)',
+                  fontSize: '0.9rem',
+                  letterSpacing: '0.03em',
+                }}
+              >
                 CON MICONTABOL
               </p>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
                 {despues.map((d) => (
-                  <li key={d} style={{ color: 'var(--color-text)', fontSize: '0.98rem', fontWeight: 500 }}>
-                    {d}
+                  <li
+                    key={d.texto}
+                    style={{
+                      display: 'flex',
+                      gap: '0.6rem',
+                      alignItems: 'center',
+                      color: d.fuerte ? 'var(--color-success)' : 'var(--color-text)',
+                      fontSize: '0.98rem',
+                      fontWeight: d.fuerte ? 700 : 500,
+                    }}
+                  >
+                    <d.Icon
+                      size={17}
+                      strokeWidth={1.9}
+                      style={{ color: d.fuerte ? 'var(--color-success)' : 'var(--color-navy)', flexShrink: 0 }}
+                    />
+                    {d.texto}
                   </li>
                 ))}
               </ul>
@@ -1195,18 +1267,11 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 11 — CÓMO PASO MI INFORMACIÓN */}
+      {/* 10 — MIGRACIÓN */}
       <section className="landing-section">
         <div className="landing-container">
           <h2 className="landing-h2" style={{ textAlign: 'center' }}>¿Y cómo paso lo que ya tengo?</h2>
-          <p
-            style={{
-              textAlign: 'center',
-              color: 'var(--color-text-secondary)',
-              maxWidth: 600,
-              margin: '0.5rem auto 0',
-            }}
-          >
+          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', maxWidth: 600, margin: '0.5rem auto 0' }}>
             Es la primera pregunta de todo el que ya tiene su negocio andando.
           </p>
 
@@ -1238,8 +1303,6 @@ export default function Landing() {
             ))}
           </div>
 
-          {/* El miedo real no es cargar datos, es soltar lo que ya
-              funciona. Decirlo primero baja la resistencia. */}
           <div
             style={{
               background: 'var(--color-bg-secondary)',
@@ -1265,119 +1328,82 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 12 — TU CONTADOR */}
+      {/* 11 — CONFIANZA
+          Va aquí, justo antes del precio: es la última barrera antes
+          de decidir. Cuando tengas testimonios reales, van encima de
+          esta sección — el bloque comentado más abajo tiene el formato. */}
       <section className="landing-section bg-gris">
         <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-            Tú manejas el negocio. MiContaBol ordena los números.
-          </h2>
+          <h2 className="landing-h2" style={{ textAlign: 'center' }}>Tus números están seguros</h2>
+          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
+            Le vas a confiar la información de tu negocio. Así la cuidamos.
+          </p>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '1rem',
-              flexWrap: 'wrap',
-              marginTop: '2.25rem',
-            }}
-          >
-            {[
-              { titulo: 'Tú', items: ['Ventas', 'Compras', 'Gastos'], sub: 'en lenguaje normal' },
-              { titulo: 'MiContaBol', items: ['Ordena todo', 'automáticamente'], centro: true },
-              {
-                titulo: 'Tu contador',
-                items: ['Balance', 'Estado de resultados', 'Libro mayor', 'PDF / Excel'],
-                sub: 'todo donde corresponde',
-              },
-            ].map((col, i, arr) => (
-              <div key={col.titulo} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div
-                  style={{
-                    background: col.centro ? 'var(--color-navy)' : '#FFFFFF',
-                    border: col.centro ? 'none' : '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-card)',
-                    padding: '1.3rem 1.5rem',
-                    width: 210,
-                    textAlign: 'center',
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: '0 0 0.7rem',
-                      fontWeight: 700,
-                      color: col.centro ? '#FFFFFF' : 'var(--color-navy)',
-                      fontSize: '1rem',
-                    }}
-                  >
-                    {col.centro ? <Logo dark iconSize={26} textSize="0.95rem" /> : col.titulo}
-                  </p>
-
-                  {col.items.map((it) => (
-                    <p
-                      key={it}
-                      style={{
-                        margin: '0 0 0.3rem',
-                        fontSize: '0.88rem',
-                        color: col.centro ? '#C7D2E0' : 'var(--color-text)',
-                      }}
-                    >
-                      {it}
-                    </p>
-                  ))}
-
-                  {col.sub && (
-                    <p style={{ margin: '0.6rem 0 0', fontSize: '0.76rem', color: 'var(--color-text-disabled)' }}>
-                      {col.sub}
-                    </p>
-                  )}
-                </div>
-
-                {i < arr.length - 1 && (
-                  <ArrowDown
-                    size={20}
-                    strokeWidth={2}
-                    style={{ color: 'var(--color-text-disabled)', flexShrink: 0, transform: 'rotate(-90deg)' }}
-                  />
-                )}
+          <div className="landing-grid-4" style={{ marginTop: '2rem' }}>
+            {confianza.map((c) => (
+              <div key={c.titulo} className="landing-card" style={{ textAlign: 'left' }}>
+                <c.Icon size={22} strokeWidth={1.7} style={{ color: 'var(--color-navy)' }} />
+                <p style={{ fontWeight: 700, color: 'var(--color-navy)', margin: '0.6rem 0 0.25rem', fontSize: '0.95rem' }}>
+                  {c.titulo}
+                </p>
+                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.88rem', margin: 0, lineHeight: 1.5 }}>
+                  {c.texto}
+                </p>
               </div>
             ))}
           </div>
-
-          <p
-            style={{
-              textAlign: 'center',
-              maxWidth: 560,
-              margin: '2rem auto 0',
-              fontSize: '1rem',
-              color: 'var(--color-text-secondary)',
-              lineHeight: 1.6,
-            }}
-          >
-            No necesitas aprender debe, haber ni partida doble.{' '}
-            <strong style={{ color: 'var(--color-navy)' }}>
-              MiContaBol no reemplaza a tu contador: le facilita el trabajo.
-            </strong>
-          </p>
         </div>
       </section>
 
       {/*
-        TESTIMONIOS — cuando tengas clientes reales, esta sección va aquí.
-        No la dejo escrita con datos inventados: un testimonio falso es la
-        forma más rápida de perder la confianza que todo lo demás construyó.
+        ────────────────────────────────────────────────────────────
+        TESTIMONIOS — pendiente hasta tener clientes reales.
 
-        Formato sugerido, con autorización del cliente:
-          ★★★★★
-          "Antes sabía cuánto vendía, pero nunca cuánto ganaba."
-          María P. · Boutique · Santa Cruz
+        Cuando dos o tres comerciantes lleven un mes usándolo y te den
+        permiso por escrito, esta sección va JUSTO ARRIBA de "Tus
+        números están seguros".
+
+        Estructura lista para llenar:
+
+        <section className="landing-section">
+          <div className="landing-container">
+            <h2 className="landing-h2" style={{ textAlign: 'center' }}>
+              Comerciantes que ya lo usan
+            </h2>
+            <div className="landing-grid-3" style={{ marginTop: '2rem' }}>
+              {[
+                { frase: '...', nombre: '...', negocio: '...', ciudad: '...' },
+              ].map((t) => (
+                <div key={t.nombre} className="landing-card" style={{ textAlign: 'left' }}>
+                  <p style={{ color: '#F59E0B', margin: 0 }}>★★★★★</p>
+                  <p style={{ fontSize: '1rem', lineHeight: 1.6, margin: '0.6rem 0 1rem' }}>
+                    "{t.frase}"
+                  </p>
+                  <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)', fontSize: '0.9rem' }}>
+                    {t.nombre}
+                  </p>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
+                    {t.negocio} · {t.ciudad}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        Tres reglas para cuando llegue el momento:
+          · Frases textuales, nunca redactadas por ti
+          · Autorización explícita del comerciante
+          · Nombre real del negocio — un testimonio anónimo no convence
+        ────────────────────────────────────────────────────────────
       */}
 
-      {/* 13 — PRECIOS */}
+      {/* 12 — PRECIOS */}
       <section className="landing-section" id="precios">
         <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>Empieza gratis. Crece cuando lo necesites.</h2>
+          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
+            Pruébalo gratis. Elige tu plan cuando estés listo.
+          </h2>
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
             <div
@@ -1472,9 +1498,7 @@ export default function Landing() {
                     </p>
 
                     <p style={{ margin: 0 }}>
-                      <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-navy)' }}>
-                        {fmt(precio)}
-                      </span>
+                      <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-navy)' }}>{fmt(precio)}</span>
                       <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
                         {ciclo === 'anual' ? ' /año' : ' /trimestre'}
                       </span>
@@ -1483,20 +1507,17 @@ export default function Landing() {
                       Equivale a {fmt(Math.round(precio / meses))} al mes
                     </p>
 
-                    {/* Contextualizar el precio por día lo hace más
-                        fácil de aceptar que el monto del trimestre. */}
-                    {recomendado && (
+                    {recomendado ? (
                       <p style={{ margin: '0.2rem 0 1.1rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                         Menos de <strong>Bs {porDia.toFixed(0)} al día</strong>.
                       </p>
+                    ) : (
+                      <div style={{ height: '1.1rem' }} />
                     )}
-                    {!recomendado && <div style={{ height: '1.1rem' }} />}
 
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       <li style={{ fontSize: '0.88rem' }}>
-                        <strong>
-                          {p.limite_productos ? `${p.limite_productos} productos` : 'Productos ilimitados'}
-                        </strong>
+                        <strong>{p.limite_productos ? `${p.limite_productos} productos` : 'Productos ilimitados'}</strong>
                       </li>
                       <li style={{ fontSize: '0.88rem' }}>
                         {p.limite_negocios === 1 ? '1 negocio' : `Hasta ${p.limite_negocios} negocios`} ·{' '}
@@ -1545,7 +1566,7 @@ export default function Landing() {
             </div>
           )}
 
-          {/* 14 — EL TRIAL QUE EMPIEZA DESPUÉS, con su propio CTA */}
+          {/* El trial, con su propio CTA */}
           <div
             style={{
               background: 'var(--color-navy)',
@@ -1564,7 +1585,7 @@ export default function Landing() {
 
             <Link to="/login">
               <button className="btn-hero btn-lg" style={{ marginTop: '1.5rem' }}>
-                Empezar mi mes gratis
+                Probar MiContaBol gratis
               </button>
             </Link>
 
@@ -1591,7 +1612,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 15 — PREGUNTAS */}
+      {/* 13 — PREGUNTAS */}
       <section className="landing-section bg-gris" id="preguntas">
         <div className="landing-container" style={{ maxWidth: 760 }}>
           <h2 className="landing-h2" style={{ textAlign: 'center' }}>Preguntas frecuentes</h2>
@@ -1650,7 +1671,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 16 — CTA FINAL */}
+      {/* 14 — CTA FINAL */}
       <section style={{ background: 'var(--color-navy)', padding: '4rem 0' }}>
         <div className="landing-container" style={{ textAlign: 'center' }}>
           <BoliMascot pose="agradecido" size={120} style={{ margin: '0 auto 1.5rem' }} />
@@ -1700,7 +1721,7 @@ export default function Landing() {
 
           <div>
             <p className="landing-footer-heading">Producto</p>
-            <a href="#como-funciona">Cómo funciona</a>
+            <a href="#producto">Cómo funciona</a>
             <a href="#precios">Precios</a>
             <a href="#preguntas">Preguntas</a>
           </div>
