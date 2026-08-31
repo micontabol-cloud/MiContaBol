@@ -3,15 +3,118 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ═══ Lo que ve Google ═══ -->
+    <title>MiContaBol — Controla tu negocio sin saber contabilidad</title>
+    <meta
+      name="description"
+      content="Sistema de ventas e inventario para negocios en Bolivia. Registra tus ventas, controla tu stock y descubre cuánto ganas de verdad. La contabilidad se arma sola. Prueba gratis 1 mes."
+    />
+    <link rel="canonical" href="https://micontabol.com/" />
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="MiContaBol" />
+    <meta name="geo.region" content="BO" />
+    <meta name="geo.placename" content="Santa Cruz de la Sierra" />
+
+    <!-- ═══ La tarjeta que aparece al compartir por WhatsApp,
+         Facebook e Instagram. Sin esto llega un enlace pelado. ═══ -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://micontabol.com/" />
+    <meta property="og:site_name" content="MiContaBol" />
+    <meta property="og:locale" content="es_BO" />
+    <meta property="og:title" content="Controla tu negocio sin saber contabilidad" />
+    <meta
+      property="og:description"
+      content="Registra tus ventas, controla tu inventario y descubre cuánto ganas de verdad. Hecho para comerciantes bolivianos. Prueba gratis 1 mes."
+    />
+    <meta property="og:image" content="https://micontabol.com/compartir.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="MiContaBol — tu negocio en el bolsillo" />
+
+    <!-- ═══ Twitter / X ═══ -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Controla tu negocio sin saber contabilidad" />
+    <meta
+      name="twitter:description"
+      content="Registra tus ventas, controla tu inventario y descubre cuánto ganas de verdad. Prueba gratis 1 mes."
+    />
+    <meta name="twitter:image" content="https://micontabol.com/compartir.png" />
+
+    <!-- ═══ Color de la barra del navegador en el celular ═══ -->
+    <meta name="theme-color" content="#1F3A5F" />
+
+    <!-- ═══ Iconos ═══ -->
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+
+    <!-- ═══ Tipografía ═══ -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
-    <title>MiContaBol — Mi contabilidad en el bolsillo</title>
+
+    <!-- ═══ Datos estructurados: le dice a Google qué es esto ═══ -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "MiContaBol",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "url": "https://micontabol.com",
+        "description": "Sistema de ventas, inventario y contabilidad automática para negocios pequeños en Bolivia.",
+        "inLanguage": "es-BO",
+        "areaServed": { "@type": "Country", "name": "Bolivia" },
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": "Bolsillo",
+            "price": "299",
+            "priceCurrency": "BOB",
+            "description": "Plan trimestral para negocios que recién se ordenan."
+          },
+          {
+            "@type": "Offer",
+            "name": "Negocio",
+            "price": "780",
+            "priceCurrency": "BOB",
+            "description": "Plan trimestral con reportes contables y acompañamiento."
+          },
+          {
+            "@type": "Offer",
+            "name": "Empresario",
+            "price": "1250",
+            "priceCurrency": "BOB",
+            "description": "Plan trimestral para hasta 5 negocios."
+          }
+        ]
+      }
+    </script>
+
+    <!-- ═══════════════════════════════════════════════════════
+         MEDICIÓN — Google Analytics y Google Ads
+
+         Está comentado a propósito. Para activarlo:
+           1. Quita las líneas <!-- y --> que envuelven el bloque
+           2. Reemplaza G-XXXXXXXXXX por tu ID de Analytics
+           3. Reemplaza AW-XXXXXXXXX por tu ID de Google Ads
+
+         Si todavía no tienes cuenta de Ads, activa solo Analytics:
+         borra la línea del AW- y listo.
+         ═══════════════════════════════════════════════════════ -->
+    <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || []
+      function gtag() { dataLayer.push(arguments) }
+      gtag('js', new Date())
+      gtag('config', 'G-XXXXXXXXXX')
+      gtag('config', 'AW-XXXXXXXXX')
+    </script>
+    -->
   </head>
   <body>
     <div id="root"></div>
