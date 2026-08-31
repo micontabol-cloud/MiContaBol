@@ -1,0 +1,22 @@
+# MiContaBol
+
+User-agent: *
+
+# La landing y las páginas legales sí se indexan
+Allow: /$
+Allow: /privacidad
+Allow: /terminos
+
+# El área privada no: son datos de los clientes
+Disallow: /login
+Disallow: /empresas
+Disallow: /perfil
+Disallow: /suscripcion
+Disallow: /admin
+
+# Los catálogos públicos tampoco. Son públicos por enlace, pero que
+# aparezcan en Google sería exponer los productos y precios de cada
+# comerciante sin que él lo haya decidido.
+Disallow: /c/
+
+Sitemap: https://micontabol.com/sitemap.xml
