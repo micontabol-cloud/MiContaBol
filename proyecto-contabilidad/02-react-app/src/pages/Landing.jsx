@@ -36,15 +36,6 @@ const ventasMeses = [
   { mes: 'Ago', valor: 12850 },
 ]
 
-// Productos del catálogo de ejemplo. Cuando tengas fotos reales,
-// reemplaza "color" por "foto: '/demo/producto-1.jpg'".
-const productosDemo = [
-  { nombre: 'Modelo Roma', precio: 'Bs 450', color: '#8B5E4C', tono: '#A87561' },
-  { nombre: 'Modelo Milano', precio: 'Bs 520', color: '#1F3A5F', tono: '#2E5C8A' },
-  { nombre: 'Modelo Siena', precio: 'Bs 390', color: '#C9A227', tono: '#DCB94A' },
-  { nombre: 'Modelo Capri', precio: 'Bs 495', color: '#A8A9AD', tono: '#C4C5C9' },
-]
-
 const antes = [
   'Ventas en un cuaderno',
   'Stock "más o menos"',
@@ -163,26 +154,6 @@ function Telefono({ children, alto = 400, etiqueta }) {
         <p style={{ margin: '0.75rem 0 0', fontSize: '0.85rem', fontWeight: 600, opacity: 0.85 }}>{etiqueta}</p>
       )}
     </div>
-  )
-}
-
-/* Un zapato dibujado: mejor que un cubo gris mientras no haya fotos.
-   Con fotos reales, se reemplaza por <img src={p.foto} />. */
-function ZapatoDibujado({ color, tono }) {
-  return (
-    <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', display: 'block' }}>
-      <rect width="100" height="100" fill="#F1F5FA" />
-      <ellipse cx="50" cy="78" rx="34" ry="5" fill="rgba(15,26,41,0.08)" />
-      {/* suela */}
-      <path d="M18 70 Q18 76 26 76 L74 76 Q82 76 82 70 L82 66 L18 66 Z" fill={tono} opacity="0.55" />
-      {/* cuerpo */}
-      <path d="M22 66 Q20 44 34 36 Q44 30 54 32 Q66 35 72 46 Q79 57 78 66 Z" fill={color} />
-      {/* empeine */}
-      <path d="M34 44 Q46 38 58 42 Q64 44 66 50 Q52 46 38 50 Z" fill="#FFFFFF" opacity="0.22" />
-      {/* correa */}
-      <rect x="36" y="50" width="30" height="4" rx="2" fill="#FFFFFF" opacity="0.55" />
-      <circle cx="66" cy="52" r="2.6" fill="#FFFFFF" opacity="0.8" />
-    </svg>
   )
 }
 
@@ -344,33 +315,16 @@ function PantallaDashboard() {
   )
 }
 
+/* Captura real del catálogo funcionando. Una foto del producto de
+   verdad convence más que cualquier mockup: se nota que existe y que
+   alguien lo usó. */
 function PantallaCatalogo() {
   return (
-    <div style={{ height: '100%', background: 'var(--color-bg-secondary)' }}>
-      <div style={{ background: 'var(--color-navy)', padding: '1rem 0.85rem 0.85rem' }}>
-        <p style={{ margin: 0, color: '#FFFFFF', fontWeight: 700, fontSize: '0.9rem' }}>Calzados Patito</p>
-        <p style={{ margin: '0.1rem 0 0', color: '#C7D2E0', fontSize: '0.7rem' }}>Temporada nueva</p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', padding: '0.7rem' }}>
-        {productosDemo.map((p) => (
-          <div
-            key={p.nombre}
-            style={{ background: '#FFFFFF', borderRadius: 10, border: '1px solid var(--color-border)', overflow: 'hidden' }}
-          >
-            <div style={{ aspectRatio: '1' }}>
-              <ZapatoDibujado color={p.color} tono={p.tono} />
-            </div>
-            <div style={{ padding: '0.4rem 0.5rem 0.55rem' }}>
-              <p style={{ margin: 0, fontSize: '0.68rem', fontWeight: 600, color: 'var(--color-text)' }}>{p.nombre}</p>
-              <p style={{ margin: '0.1rem 0 0', fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-navy)' }}>
-                {p.precio}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <img
+      src="/demo/catalogo-movil.png"
+      alt="Catálogo público de Calzados Patito visto desde un celular"
+      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
+    />
   )
 }
 
@@ -994,13 +948,13 @@ export default function Landing() {
 
             <ArrowRight size={22} strokeWidth={2} style={{ color: 'var(--color-text-disabled)' }} />
 
-            <Telefono alto={330} etiqueta="Tu catálogo">
+            <Telefono alto={400} etiqueta="Tu catálogo">
               <PantallaCatalogo />
             </Telefono>
 
             <ArrowRight size={22} strokeWidth={2} style={{ color: 'var(--color-text-disabled)' }} />
 
-            <Telefono alto={330} etiqueta="Te escribe">
+            <Telefono alto={400} etiqueta="Te escribe">
               <PantallaWhatsapp />
             </Telefono>
           </div>
@@ -1055,15 +1009,15 @@ export default function Landing() {
               color: '#C7D2E0',
             }}
           >
-            <Telefono alto={310} etiqueta="Vender">
+            <Telefono alto={360} etiqueta="Vender">
               <PantallaVenta compacta />
             </Telefono>
 
-            <Telefono alto={310} etiqueta="Tu catálogo">
+            <Telefono alto={360} etiqueta="Tu catálogo">
               <PantallaCatalogo />
             </Telefono>
 
-            <Telefono alto={310} etiqueta="Tus números">
+            <Telefono alto={360} etiqueta="Tus números">
               <div style={{ padding: '0.9rem', background: 'var(--color-bg-secondary)', height: '100%' }}>
                 {[
                   { l: 'Vendido hoy', v: 'Bs 1.840' },
