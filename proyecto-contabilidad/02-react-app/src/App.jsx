@@ -40,6 +40,7 @@ import CuentasPorPagar from './pages/CuentasPorPagar'
 import Caja from './pages/Caja'
 import Bancos from './pages/Bancos'
 import Personal from './pages/Personal'
+import ActivosFijos from './pages/ActivosFijos'
 import Conciliacion from './pages/Conciliacion'
 import AnalisisCosto from './pages/AnalisisCosto'
 import Asientos from './pages/Asientos'
@@ -48,6 +49,7 @@ import LibroMayor from './pages/LibroMayor'
 import BalanceComprobacion from './pages/BalanceComprobacion'
 import EstadosFinancieros from './pages/EstadosFinancieros'
 import Reportes from './pages/Reportes'
+import ResultadoOperativo from './pages/ResultadoOperativo'
 import CierreContable from './pages/CierreContable'
 import Miembros from './pages/Miembros'
 
@@ -167,6 +169,15 @@ export default function App() {
                 </RequiereRol>
               }
             />
+            {/* Bienes del negocio: vitrinas, vehículos, computadoras */}
+            <Route
+              path="activos"
+              element={
+                <RequiereRol>
+                  <ActivosFijos />
+                </RequiereRol>
+              }
+            />
             <Route
               path="bancos"
               element={
@@ -236,6 +247,15 @@ export default function App() {
               element={
                 <RequiereRol>
                   <Reportes />
+                </RequiereRol>
+              }
+            />
+            {/* ¿Gana tu negocio? — el estado de resultados con EBITDA */}
+            <Route
+              path="resultado-operativo"
+              element={
+                <RequiereRol>
+                  <ResultadoOperativo />
                 </RequiereRol>
               }
             />
