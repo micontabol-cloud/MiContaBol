@@ -11,6 +11,7 @@ import {
   Wallet,
   Landmark,
   UsersRound,
+  Building2,
   BookOpen,
   BarChart3,
   CreditCard,
@@ -19,7 +20,6 @@ import {
   Sparkles,
   ChevronDown,
   ChevronRight,
-  Menu,
   X,
   Plus,
   MoreHorizontal,
@@ -58,8 +58,11 @@ const contabilidad = [
   { to: '/cierre', label: 'Cierre de ejercicio' },
 ]
 
+// "¿Gana tu negocio?" va segundo, después del resumen: es el reporte
+// que responde la pregunta que el dueño realmente se hace.
 const reportes = [
   { to: '/reportes', label: 'Resumen', end: true },
+  { to: '/resultado-operativo', label: '¿Gana tu negocio?' },
   { to: '/libro-mayor', label: 'Libro mayor' },
   { to: '/balance-comprobacion', label: 'Balance de comprobación' },
   { to: '/estados-financieros', label: 'Estados financieros' },
@@ -237,6 +240,17 @@ function LayoutInterno() {
             >
               <UsersRound {...ICONO} />
               Personal
+            </NavLink>
+          )}
+          {/* Vitrinas, vehículos, computadoras: lo que el negocio usa
+              para trabajar, no lo que vende. */}
+          {puedeConfigurar(rol) && (
+            <NavLink
+              to={`/empresas/${id}/activos`}
+              className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+            >
+              <Building2 {...ICONO} />
+              Bienes del negocio
             </NavLink>
           )}
           {esAdmin(rol) && (
