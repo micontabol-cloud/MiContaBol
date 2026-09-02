@@ -34,6 +34,19 @@ const fechaLarga = (iso) => {
   return `${Number(d)} de ${meses[Number(m) - 1]}`
 }
 
+
+// Si paga hoy, ¿hasta cuándo le alcanza? Los días que le quedan
+// de prueba no se pierden: el trimestre arranca desde ahí.
+function fechaSiPagaHoy(diasRestantes, meses) {
+  const d = new Date()
+  if (diasRestantes > 0) d.setDate(d.getDate() + diasRestantes)
+  d.setMonth(d.getMonth() + meses)
+
+  const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado']
+  const meses_ = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+  return `${d.getDate()} de ${meses_[d.getMonth()]} de ${d.getFullYear()}`
+}
+
 export default function Suscripcion() {
   const { session } = useAuth()
   const [sus, setSus] = useState(null)
@@ -318,26 +331,100 @@ export default function Suscripcion() {
         </div>
       </div>
 
-      {/* Por qué Negocio */}
-      <div
-        style={{
-          background: 'rgba(242, 85, 90, 0.05)',
-          border: '1px solid rgba(242, 85, 90, 0.25)',
-          borderRadius: 14,
-          padding: '1rem 1.2rem',
-          marginTop: '1.25rem',
-          display: 'flex',
-          gap: '0.9rem',
-          alignItems: 'flex-start',
-        }}
-      >
-        <CalendarClock size={22} strokeWidth={1.8} style={{ color: '#F2555A', flexShrink: 0, marginTop: 2 }} />
-        <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.6, color: '#253046' }}>
-          <strong style={{ color: '#1F3A5F' }}>Con el plan Negocio nos sentamos una hora contigo.</strong> Cargamos
-          tus productos, tus saldos y quién te debe, y haces tu primera venta con nosotros al lado. Sales con tu
-          negocio adentro, no con una app vacía.
-        </p>
-      </div>
+      {/* Por qué Negocio — cambia según dónde esté el cliente */}
+      {(() => {
+        const planNegocio = planes.find((p) => p.codigo === 'negocio')
+        const yaEsNegocio = sus?.plan_codigo === 'negocio'
+        const meses = CICLOS[ciclo].meses
+        const diasQueQuedan = enPrueba && dias > 0 ? dias : 0
+        const hasta = fechaSiPagaHoy(diasQueQuedan, meses)
+
+        // Si ya paga Negocio y tiene su sesión, no hay nada que
+        // recomendarle: sería ruido.
+        if (yaEsNegocio && !enPrueba && !vencida) return null
+
+        return (
+          <div
+            style={{
+              background: 'rgba(242, 85, 90, 0.05)',
+              border: '1px solid rgba(242, 85, 90, 0.25)',
+              borderRadius: 14,
+              padding: '1.15rem 1.3rem',
+              marginTop: '1.25rem',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start' }}>
+              <CalendarClock size={22} strokeWidth={1.8} style={{ color: '#F2555A', flexShrink: 0, marginTop: 3 }} />
+
+              <div style={{ flex: 1, minWidth: 240 }}>
+                {enPrueba ? (
+                  <>
+                    <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F', fontSize: '1rem' }}>
+                      Estás probando el plan Negocio, pero la sesión de arranque no viene incluida
+                    </p>
+                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.94rem', lineHeight: 1.6, color: '#253046' }}>
+                      Tienes todas las funciones gratis por 30 días. Lo único que no entra en la prueba es la{' '}
+                      <strong>hora de arranque con un asesor</strong>: para agendarla hay que pagar el plan.
+                    </p>
+
+                    {diasQueQuedan > 0 && (
+                      <p
+                        style={{
+                          margin: '0.85rem 0 0',
+                          padding: '0.75rem 0.9rem',
+                          background: '#FFFFFF',
+                          border: '1px solid rgba(34, 197, 94, 0.3)',
+                          borderRadius: 10,
+                          fontSize: '0.92rem',
+                          lineHeight: 1.6,
+                          color: '#253046',
+                        }}
+                      >
+                        <strong style={{ color: '#15803D' }}>No pierdes tus días de prueba.</strong> Si pagas hoy,
+                        se suman los <strong>{diasQueQuedan} días</strong> que te quedan más los{' '}
+                        <strong>{meses === 12 ? '365' : '90'} días</strong> del plan{' '}
+                        {CICLOS[ciclo].label.toLowerCase()}: tu suscripción llegaría hasta el{' '}
+                        <strong>{hasta}</strong>.
+                      </p>
+                    )}
+                  </>
+                ) : vencida ? (
+                  <>
+                    <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F', fontSize: '1rem' }}>
+                      Renueva y agenda tu sesión de arranque
+                    </p>
+                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.94rem', lineHeight: 1.6, color: '#253046' }}>
+                      Con el plan Negocio nos sentamos una hora contigo: cargamos tus productos, tus saldos y quién
+                      te debe.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F', fontSize: '1rem' }}>
+                      Con el plan Negocio nos sentamos una hora contigo
+                    </p>
+                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.94rem', lineHeight: 1.6, color: '#253046' }}>
+                      Cargamos tus productos, tus saldos y quién te debe, y haces tu primera venta con nosotros al
+                      lado. Sales con tu negocio adentro, no con una app vacía.
+                    </p>
+                  </>
+                )}
+
+                {planNegocio && !sesion && (
+                  <button
+                    className="btn-hero"
+                    type="button"
+                    onClick={() => elegirPlan(planNegocio)}
+                    style={{ marginTop: '1rem' }}
+                  >
+                    Pagar y agendar mi arranque
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       <div className="panel-cards" style={{ marginTop: '1.25rem' }}>
         {planes.map((p) => {
