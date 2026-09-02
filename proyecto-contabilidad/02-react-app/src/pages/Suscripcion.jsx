@@ -1,22 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Check } from 'lucide-react'
+import { Check, CalendarClock } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
 import BoliMascot from '../components/BoliMascot'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(0)}`
 
+// Solo trimestral y anual: el mensual no tiene precio cargado
 const CICLOS = {
-  mensual: { label: 'Mensual', sufijo: '/mes', meses: 1, campo: 'precio_mensual' },
   trimestral: { label: 'Trimestral', sufijo: '/trimestre', meses: 3, campo: 'precio_trimestral' },
   anual: { label: 'Anual', sufijo: '/año', meses: 12, campo: 'precio_anual' },
 }
 
 const CARACTERISTICAS = [
-  { clave: 'productos', label: 'Productos' },
-  { clave: 'limite_negocios', label: 'Negocios' },
-  { clave: 'limite_usuarios', label: 'Usuarios' },
   { clave: 'base', label: 'Ventas, compras, clientes y catálogo' },
   { clave: 'reportes_contables', label: 'Reportes contables formales' },
   { clave: 'exportar_archivos', label: 'Exportar a PDF y Excel' },
@@ -25,18 +22,29 @@ const CARACTERISTICAS = [
   { clave: 'importar_excel', label: 'Importar desde Excel' },
 ]
 
+const hora12 = (h) => {
+  if (h === 12) return '12:00 del mediodía'
+  if (h < 12) return `${h}:00 de la mañana`
+  return `${h - 12}:00 de la tarde`
+}
+
+const fechaLarga = (iso) => {
+  const [a, m, d] = iso.split('-')
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+  return `${Number(d)} de ${meses[Number(m) - 1]}`
+}
+
 export default function Suscripcion() {
   const { session } = useAuth()
   const [sus, setSus] = useState(null)
   const [planes, setPlanes] = useState([])
   const [config, setConfig] = useState(null)
   const [solicitud, setSolicitud] = useState(null)
+  const [sesion, setSesion] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [ciclo, setCiclo] = useState('trimestral')
 
   const [planElegido, setPlanElegido] = useState(null)
-  // El QR del plan y ciclo elegidos. Si no hay uno específico,
-  // la función devuelve el general del ciclo.
   const [qrPlan, setQrPlan] = useState(null)
   const [archivo, setArchivo] = useState(null)
   const [referencia, setReferencia] = useState('')
@@ -44,17 +52,25 @@ export default function Suscripcion() {
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState(null)
 
+  // Agenda
+  const [disponibles, setDisponibles] = useState([])
+  const [fechaSesion, setFechaSesion] = useState('')
+  const [horaSesion, setHoraSesion] = useState('')
+  const [telefono, setTelefono] = useState('')
+
   async function cargar() {
-    const [{ data: s }, { data: p }, { data: c }, { data: sol }] = await Promise.all([
+    const [{ data: s }, { data: p }, { data: c }, { data: sol }, { data: ses }] = await Promise.all([
       supabase.rpc('mi_suscripcion'),
       supabase.from('planes').select('*').eq('visible', true).order('orden'),
       supabase.from('configuracion_plataforma').select('*').eq('id', 1).single(),
       supabase.rpc('mi_solicitud_pendiente'),
+      supabase.rpc('mi_sesion_arranque'),
     ])
     setSus(s)
     setPlanes(p || [])
     setConfig(c)
     setSolicitud(sol)
+    setSesion(ses)
     setCargando(false)
   }
 
@@ -68,6 +84,8 @@ export default function Suscripcion() {
     setPlanElegido(plan)
     setError(null)
     setQrPlan(null)
+    setFechaSesion('')
+    setHoraSesion('')
 
     const { data } = await supabase.rpc('qr_para_plan', {
       p_plan_codigo: plan.codigo,
@@ -75,14 +93,15 @@ export default function Suscripcion() {
     })
     setQrPlan(data)
 
-    setTimeout(
-      () => document.getElementById('como-pagar')?.scrollIntoView({ behavior: 'smooth' }),
-      50
-    )
+    // Los horarios solo hacen falta si el plan incluye la sesión
+    if (plan.incluye_kickoff) {
+      const { data: h } = await supabase.rpc('horarios_disponibles', { p_dias: 21 })
+      setDisponibles(h || [])
+    }
+
+    setTimeout(() => document.getElementById('como-pagar')?.scrollIntoView({ behavior: 'smooth' }), 50)
   }
 
-  // Al cambiar de ciclo con un plan ya elegido, el QR debe
-  // cambiar también: el de trimestral no sirve para pagar el anual.
   async function cambiarCiclo(nuevo) {
     setCiclo(nuevo)
 
@@ -98,9 +117,21 @@ export default function Suscripcion() {
 
   async function enviarComprobante(e) {
     e.preventDefault()
+
     if (!archivo) {
       setError('Sube la foto o captura de tu comprobante.')
       return
+    }
+
+    if (planElegido.incluye_kickoff) {
+      if (!telefono.trim() || telefono.replace(/\D/g, '').length < 7) {
+        setError('Necesitamos tu WhatsApp para confirmar la reunión.')
+        return
+      }
+      if (!fechaSesion || !horaSesion) {
+        setError('Elige el día y la hora de tu sesión de arranque.')
+        return
+      }
     }
 
     setError(null)
@@ -123,6 +154,9 @@ export default function Suscripcion() {
       p_comprobante_path: ruta,
       p_referencia: referencia || null,
       p_nota: nota || null,
+      p_telefono: telefono || null,
+      p_sesion_fecha: planElegido.incluye_kickoff ? fechaSesion : null,
+      p_sesion_hora: planElegido.incluye_kickoff ? Number(horaSesion) : null,
     })
 
     setEnviando(false)
@@ -137,6 +171,8 @@ export default function Suscripcion() {
     setArchivo(null)
     setReferencia('')
     setNota('')
+    setFechaSesion('')
+    setHoraSesion('')
     cargar()
   }
 
@@ -151,6 +187,8 @@ export default function Suscripcion() {
   const enPrueba = sus?.estado === 'prueba'
   const vencida = sus?.estado === 'vencida'
   const dias = sus?.dias_restantes
+
+  const horasDelDia = disponibles.find((d) => d.fecha === fechaSesion)?.horas || []
 
   return (
     <main style={{ maxWidth: 980, margin: '3rem auto', fontFamily: 'sans-serif' }}>
@@ -201,6 +239,42 @@ export default function Suscripcion() {
         </div>
       </div>
 
+      {/* Sesión ya agendada */}
+      {sesion && (
+        <div
+          style={{
+            display: 'flex',
+            gap: '1rem',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            background: sesion.estado === 'confirmada' ? 'rgba(34, 197, 94, 0.07)' : 'rgba(59, 130, 246, 0.07)',
+            border: `1px solid ${sesion.estado === 'confirmada' ? 'rgba(34,197,94,0.3)' : 'rgba(59,130,246,0.3)'}`,
+            borderRadius: 16,
+            padding: '1.15rem 1.3rem',
+            marginTop: '1rem',
+          }}
+        >
+          <CalendarClock
+            size={26}
+            strokeWidth={1.8}
+            style={{ color: sesion.estado === 'confirmada' ? '#22C55E' : '#3B82F6', flexShrink: 0 }}
+          />
+          <div style={{ flex: 1, minWidth: 240 }}>
+            <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F' }}>
+              {sesion.estado === 'confirmada'
+                ? 'Tu sesión de arranque está confirmada'
+                : 'Tu sesión queda por confirmar'}
+            </p>
+            <p style={{ margin: '0.25rem 0 0', color: '#64748B', fontSize: '0.92rem' }}>
+              {fechaLarga(sesion.fecha)} a las {hora12(sesion.hora)}.{' '}
+              {sesion.estado === 'confirmada'
+                ? 'Te escribimos al WhatsApp para coordinar.'
+                : 'La confirmamos apenas verifiquemos tu pago.'}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Planes */}
       <div
         style={{
@@ -220,7 +294,6 @@ export default function Suscripcion() {
             background: '#F7F9FC',
             padding: '0.25rem',
             borderRadius: 999,
-            flexWrap: 'wrap',
           }}
         >
           {Object.entries(CICLOS).map(([valor, c]) => (
@@ -231,7 +304,7 @@ export default function Suscripcion() {
               style={{
                 border: 'none',
                 borderRadius: 999,
-                padding: '0.45rem 1rem',
+                padding: '0.45rem 1.1rem',
                 fontSize: '0.88rem',
                 fontWeight: 600,
                 background: ciclo === valor ? '#FFFFFF' : 'transparent',
@@ -245,13 +318,33 @@ export default function Suscripcion() {
         </div>
       </div>
 
+      {/* Por qué Negocio */}
+      <div
+        style={{
+          background: 'rgba(242, 85, 90, 0.05)',
+          border: '1px solid rgba(242, 85, 90, 0.25)',
+          borderRadius: 14,
+          padding: '1rem 1.2rem',
+          marginTop: '1.25rem',
+          display: 'flex',
+          gap: '0.9rem',
+          alignItems: 'flex-start',
+        }}
+      >
+        <CalendarClock size={22} strokeWidth={1.8} style={{ color: '#F2555A', flexShrink: 0, marginTop: 2 }} />
+        <p style={{ margin: 0, fontSize: '0.95rem', lineHeight: 1.6, color: '#253046' }}>
+          <strong style={{ color: '#1F3A5F' }}>Con el plan Negocio nos sentamos una hora contigo.</strong> Cargamos
+          tus productos, tus saldos y quién te debe, y haces tu primera venta con nosotros al lado. Sales con tu
+          negocio adentro, no con una app vacía.
+        </p>
+      </div>
+
       <div className="panel-cards" style={{ marginTop: '1.25rem' }}>
         {planes.map((p) => {
           const actual = p.codigo === sus?.plan_codigo && !vencida
           const recomendado = p.codigo === 'negocio'
           const precio = precioDe(p, ciclo)
           const meses = CICLOS[ciclo].meses
-          const disponible = precio !== null && Number(precio) > 0
 
           return (
             <section
@@ -287,29 +380,50 @@ export default function Suscripcion() {
                 {p.descripcion}
               </p>
 
-              {disponible ? (
-                <>
-                  <p style={{ margin: '0 0 0.2rem' }}>
-                    <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1F3A5F' }}>{fmt(precio)}</span>
-                    <span style={{ color: '#64748B', fontSize: '0.9rem' }}>{CICLOS[ciclo].sufijo}</span>
+              <p style={{ margin: '0 0 0.2rem' }}>
+                <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1F3A5F' }}>{fmt(precio)}</span>
+                <span style={{ color: '#64748B', fontSize: '0.9rem' }}>{CICLOS[ciclo].sufijo}</span>
+              </p>
+              <p style={{ margin: '0 0 0.9rem', fontSize: '0.82rem', color: '#22C55E', fontWeight: 600 }}>
+                Equivale a {fmt(precio / meses)}/mes
+              </p>
+
+              {/* La sesión primero: es lo que diferencia a Negocio */}
+              {p.incluye_kickoff && (
+                <div
+                  style={{
+                    background: 'rgba(34, 197, 94, 0.07)',
+                    border: '1px solid rgba(34, 197, 94, 0.25)',
+                    borderRadius: 10,
+                    padding: '0.6rem 0.75rem',
+                    marginBottom: '0.9rem',
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: '0.85rem',
+                      fontWeight: 700,
+                      color: '#15803D',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.4rem',
+                    }}
+                  >
+                    <CalendarClock size={15} strokeWidth={2} />
+                    1 hora de arranque con un asesor
                   </p>
-                  {meses > 1 && (
-                    <p style={{ margin: '0 0 0.9rem', fontSize: '0.82rem', color: '#22C55E', fontWeight: 600 }}>
-                      Equivale a {fmt(precio / meses)}/mes
-                    </p>
-                  )}
-                </>
-              ) : (
-                <p style={{ margin: '0 0 0.9rem', color: '#A3AFBF', fontSize: '0.9rem' }}>
-                  No disponible en {CICLOS[ciclo].label.toLowerCase()}
-                </p>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', color: '#64748B' }}>
+                    Agendas tu horario al pagar
+                  </p>
+                </div>
               )}
 
               <ul
                 style={{
                   listStyle: 'none',
                   padding: 0,
-                  margin: '1rem 0 0',
+                  margin: 0,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '0.45rem',
@@ -324,9 +438,7 @@ export default function Suscripcion() {
                   {p.limite_usuarios} usuarios
                 </li>
 
-                {CARACTERISTICAS.filter(
-                  (c) => !['productos', 'limite_negocios', 'limite_usuarios'].includes(c.clave)
-                ).map((c) => {
+                {CARACTERISTICAS.map((c) => {
                   const incluido = c.clave === 'base' ? true : p[c.clave]
                   return (
                     <li
@@ -347,16 +459,6 @@ export default function Suscripcion() {
                   )
                 })}
 
-                {p.incluye_kickoff && (
-                  <li
-                    style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}
-                  >
-                    <span style={{ color: '#22C55E' }}>
-                      <Check size={15} strokeWidth={2.5} />
-                    </span>
-                    Sesión de arranque con un asesor
-                  </li>
-                )}
                 {p.asesorias_mes > 0 && (
                   <li
                     style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}
@@ -385,7 +487,7 @@ export default function Suscripcion() {
                     className={recomendado ? 'btn-hero' : undefined}
                     type="button"
                     onClick={() => elegirPlan(p)}
-                    disabled={!disponible}
+                    style={recomendado ? { width: '100%' } : undefined}
                   >
                     Elegir {p.nombre}
                   </button>
@@ -489,12 +591,10 @@ export default function Suscripcion() {
                     lineHeight: 1.5,
                   }}
                 >
-                  Todavía no hay QR para este plan. Puedes pagar por transferencia o escribirnos por WhatsApp.
+                  Todavía no hay QR para este plan. Paga por transferencia o escríbenos por WhatsApp.
                 </div>
               )}
 
-              {/* El monto en grande: aunque el QR ya lo lleve, verlo
-                  escrito evita que alguien pague de menos. */}
               <p style={{ margin: '0.75rem 0 0', fontWeight: 800, fontSize: '1.35rem', color: '#1F3A5F' }}>
                 {fmt(precioDe(planElegido, ciclo))}
               </p>
@@ -513,11 +613,9 @@ export default function Suscripcion() {
               )}
             </div>
 
-            {/* Comprobante */}
-            <form onSubmit={enviarComprobante} style={{ flex: 1, minWidth: 260 }}>
+            <form onSubmit={enviarComprobante} style={{ flex: 1, minWidth: 280 }}>
               <p style={{ margin: '0 0 1rem', lineHeight: 1.55 }}>
-                Escanea el QR con la app de tu banco, paga, y sube aquí la captura o foto del comprobante. Revisamos
-                que haya llegado y activamos tu plan el mismo día.
+                Escanea el QR con la app de tu banco, paga, y sube aquí la captura o foto del comprobante.
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
@@ -533,6 +631,110 @@ export default function Suscripcion() {
                     Foto, captura o PDF. Solo lo vemos nosotros.
                   </span>
                 </label>
+
+                {/* Agendar la sesión: solo en planes que la incluyen */}
+                {planElegido.incluye_kickoff && (
+                  <div
+                    style={{
+                      background: '#FFFFFF',
+                      border: '1px solid rgba(34, 197, 94, 0.3)',
+                      borderRadius: 12,
+                      padding: '1rem 1.15rem',
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: '0 0 0.3rem',
+                        fontWeight: 700,
+                        color: '#1F3A5F',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                      }}
+                    >
+                      <CalendarClock size={18} strokeWidth={1.9} style={{ color: '#22C55E' }} />
+                      Agenda tu sesión de arranque
+                    </p>
+                    <p style={{ margin: '0 0 0.9rem', fontSize: '0.86rem', color: '#64748B', lineHeight: 1.5 }}>
+                      Una hora con un asesor para cargar tus productos y hacer tu primera venta juntos.
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '0.7rem', flexWrap: 'wrap' }}>
+                      <label style={{ flex: 1, minWidth: 155 }}>
+                        Día
+                        <br />
+                        <select
+                          value={fechaSesion}
+                          onChange={(e) => {
+                            setFechaSesion(e.target.value)
+                            setHoraSesion('')
+                          }}
+                          style={{ width: '100%' }}
+                        >
+                          <option value="">-- Elige un día --</option>
+                          {disponibles.map((d) => (
+                            <option key={d.fecha} value={d.fecha}>
+                              {d.dia_nombre} {fechaLarga(d.fecha)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+
+                      <label style={{ flex: 1, minWidth: 140 }}>
+                        Hora
+                        <br />
+                        <select
+                          value={horaSesion}
+                          onChange={(e) => setHoraSesion(e.target.value)}
+                          disabled={!fechaSesion}
+                          style={{ width: '100%' }}
+                        >
+                          <option value="">-- Elige la hora --</option>
+                          {horasDelDia.map((h) => (
+                            <option key={h} value={h}>
+                              {h}:00 a {h + 1}:00
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <label style={{ display: 'block', marginTop: '0.75rem' }}>
+                      Tu WhatsApp
+                      <br />
+                      <input
+                        value={telefono}
+                        onChange={(e) => setTelefono(e.target.value)}
+                        placeholder="70000000"
+                        style={{ width: '100%' }}
+                      />
+                      <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+                        Te escribimos por aquí para confirmar la reunión.
+                      </span>
+                    </label>
+
+                    {fechaSesion && horaSesion && (
+                      <p
+                        style={{
+                          margin: '0.85rem 0 0',
+                          padding: '0.7rem 0.85rem',
+                          background: 'rgba(59, 130, 246, 0.07)',
+                          border: '1px solid rgba(59, 130, 246, 0.28)',
+                          borderRadius: 10,
+                          fontSize: '0.86rem',
+                          color: '#1e40af',
+                          lineHeight: 1.55,
+                        }}
+                      >
+                        Tu reunión queda reservada para el{' '}
+                        <strong>
+                          {fechaLarga(fechaSesion)} a las {hora12(Number(horaSesion))}
+                        </strong>
+                        . La confirmamos apenas verifiquemos tu pago, y te escribimos al WhatsApp.
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 <label>
                   Número de transacción (opcional)
