@@ -7,6 +7,12 @@ import BoliMascot from '../components/BoliMascot'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(0)}`
 
+const CICLOS = {
+  mensual: { label: 'Mensual', sufijo: '/mes', meses: 1, campo: 'precio_mensual' },
+  trimestral: { label: 'Trimestral', sufijo: '/trimestre', meses: 3, campo: 'precio_trimestral' },
+  anual: { label: 'Anual', sufijo: '/año', meses: 12, campo: 'precio_anual' },
+}
+
 const CARACTERISTICAS = [
   { clave: 'productos', label: 'Productos' },
   { clave: 'limite_negocios', label: 'Negocios' },
@@ -29,6 +35,9 @@ export default function Suscripcion() {
   const [ciclo, setCiclo] = useState('trimestral')
 
   const [planElegido, setPlanElegido] = useState(null)
+  // El QR del plan y ciclo elegidos. Si no hay uno específico,
+  // la función devuelve el general del ciclo.
+  const [qrPlan, setQrPlan] = useState(null)
   const [archivo, setArchivo] = useState(null)
   const [referencia, setReferencia] = useState('')
   const [nota, setNota] = useState('')
@@ -39,7 +48,7 @@ export default function Suscripcion() {
     const [{ data: s }, { data: p }, { data: c }, { data: sol }] = await Promise.all([
       supabase.rpc('mi_suscripcion'),
       supabase.from('planes').select('*').eq('visible', true).order('orden'),
-      supabase.from('configuracion_plataforma').select('*').single(),
+      supabase.from('configuracion_plataforma').select('*').eq('id', 1).single(),
       supabase.rpc('mi_solicitud_pendiente'),
     ])
     setSus(s)
@@ -52,6 +61,40 @@ export default function Suscripcion() {
   useEffect(() => {
     cargar()
   }, [])
+
+  const precioDe = (plan, c) => plan?.[CICLOS[c]?.campo] ?? null
+
+  async function elegirPlan(plan) {
+    setPlanElegido(plan)
+    setError(null)
+    setQrPlan(null)
+
+    const { data } = await supabase.rpc('qr_para_plan', {
+      p_plan_codigo: plan.codigo,
+      p_ciclo: ciclo,
+    })
+    setQrPlan(data)
+
+    setTimeout(
+      () => document.getElementById('como-pagar')?.scrollIntoView({ behavior: 'smooth' }),
+      50
+    )
+  }
+
+  // Al cambiar de ciclo con un plan ya elegido, el QR debe
+  // cambiar también: el de trimestral no sirve para pagar el anual.
+  async function cambiarCiclo(nuevo) {
+    setCiclo(nuevo)
+
+    if (planElegido) {
+      setQrPlan(null)
+      const { data } = await supabase.rpc('qr_para_plan', {
+        p_plan_codigo: planElegido.codigo,
+        p_ciclo: nuevo,
+      })
+      setQrPlan(data)
+    }
+  }
 
   async function enviarComprobante(e) {
     e.preventDefault()
@@ -90,6 +133,7 @@ export default function Suscripcion() {
     }
 
     setPlanElegido(null)
+    setQrPlan(null)
     setArchivo(null)
     setReferencia('')
     setNota('')
@@ -158,27 +202,41 @@ export default function Suscripcion() {
       </div>
 
       {/* Planes */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap', marginTop: '2.5rem' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '1rem',
+          flexWrap: 'wrap',
+          marginTop: '2.5rem',
+        }}
+      >
         <h2 style={{ margin: 0 }}>Elige tu plan</h2>
-        <div style={{ display: 'flex', gap: '0.4rem', background: '#F7F9FC', padding: '0.25rem', borderRadius: 999, flexWrap: 'wrap' }}>
-          {[
-            { valor: 'mensual', label: 'Mensual' },
-            { valor: 'trimestral', label: 'Trimestral' },
-            { valor: 'anual', label: 'Anual' },
-          ].map((c) => (
+        <div
+          style={{
+            display: 'flex',
+            gap: '0.4rem',
+            background: '#F7F9FC',
+            padding: '0.25rem',
+            borderRadius: 999,
+            flexWrap: 'wrap',
+          }}
+        >
+          {Object.entries(CICLOS).map(([valor, c]) => (
             <button
-              key={c.valor}
+              key={valor}
               type="button"
-              onClick={() => setCiclo(c.valor)}
+              onClick={() => cambiarCiclo(valor)}
               style={{
                 border: 'none',
                 borderRadius: 999,
                 padding: '0.45rem 1rem',
                 fontSize: '0.88rem',
                 fontWeight: 600,
-                background: ciclo === c.valor ? '#FFFFFF' : 'transparent',
-                color: ciclo === c.valor ? '#1F3A5F' : '#64748B',
-                boxShadow: ciclo === c.valor ? '0 1px 3px rgba(31,58,95,0.12)' : 'none',
+                background: ciclo === valor ? '#FFFFFF' : 'transparent',
+                color: ciclo === valor ? '#1F3A5F' : '#64748B',
+                boxShadow: ciclo === valor ? '0 1px 3px rgba(31,58,95,0.12)' : 'none',
               }}
             >
               {c.label}
@@ -191,9 +249,9 @@ export default function Suscripcion() {
         {planes.map((p) => {
           const actual = p.codigo === sus?.plan_codigo && !vencida
           const recomendado = p.codigo === 'negocio'
-          const precio =
-            ciclo === 'mensual' ? p.precio_mensual : ciclo === 'trimestral' ? p.precio_trimestral : p.precio_anual
-          const meses = ciclo === 'mensual' ? 1 : ciclo === 'trimestral' ? 3 : 12
+          const precio = precioDe(p, ciclo)
+          const meses = CICLOS[ciclo].meses
+          const disponible = precio !== null && Number(precio) > 0
 
           return (
             <section
@@ -229,55 +287,70 @@ export default function Suscripcion() {
                 {p.descripcion}
               </p>
 
-              <p style={{ margin: '0 0 0.2rem' }}>
-                <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1F3A5F' }}>{fmt(precio)}</span>
-                <span style={{ color: '#64748B', fontSize: '0.9rem' }}>
-                  {ciclo === 'mensual' ? ' /mes' : ciclo === 'trimestral' ? ' /trimestre' : ' /año'}
-                </span>
-              </p>
-              {meses > 1 && (
-                <p style={{ margin: '0 0 0.9rem', fontSize: '0.82rem', color: '#22C55E', fontWeight: 600 }}>
-                  Equivale a {fmt(precio / meses)}/mes
+              {disponible ? (
+                <>
+                  <p style={{ margin: '0 0 0.2rem' }}>
+                    <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1F3A5F' }}>{fmt(precio)}</span>
+                    <span style={{ color: '#64748B', fontSize: '0.9rem' }}>{CICLOS[ciclo].sufijo}</span>
+                  </p>
+                  {meses > 1 && (
+                    <p style={{ margin: '0 0 0.9rem', fontSize: '0.82rem', color: '#22C55E', fontWeight: 600 }}>
+                      Equivale a {fmt(precio / meses)}/mes
+                    </p>
+                  )}
+                </>
+              ) : (
+                <p style={{ margin: '0 0 0.9rem', color: '#A3AFBF', fontSize: '0.9rem' }}>
+                  No disponible en {CICLOS[ciclo].label.toLowerCase()}
                 </p>
               )}
 
-              <ul style={{ listStyle: 'none', padding: 0, margin: '1rem 0 0', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <ul
+                style={{
+                  listStyle: 'none',
+                  padding: 0,
+                  margin: '1rem 0 0',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.45rem',
+                }}
+              >
                 <li style={{ fontSize: '0.88rem' }}>
                   <strong>{p.limite_productos ? `${p.limite_productos} productos` : 'Productos ilimitados'}</strong>
-                  {p.limite_productos && (
-                    <span style={{ color: '#A3AFBF' }}> (tallas y colores cuentan)</span>
-                  )}
+                  {p.limite_productos && <span style={{ color: '#A3AFBF' }}> (tallas y colores cuentan)</span>}
                 </li>
                 <li style={{ fontSize: '0.88rem' }}>
                   {p.limite_negocios === 1 ? '1 negocio' : `Hasta ${p.limite_negocios} negocios`} ·{' '}
                   {p.limite_usuarios} usuarios
                 </li>
 
-                {CARACTERISTICAS.filter((c) => !['productos', 'limite_negocios', 'limite_usuarios'].includes(c.clave)).map(
-                  (c) => {
-                    const incluido = c.clave === 'base' ? true : p[c.clave]
-                    return (
-                      <li
-                        key={c.clave}
-                        style={{
-                          display: 'flex',
-                          gap: '0.5rem',
-                          alignItems: 'flex-start',
-                          fontSize: '0.88rem',
-                          color: incluido ? '#253046' : '#C4CCD8',
-                        }}
-                      >
-                        <span style={{ color: incluido ? '#22C55E' : '#E6ECF3', flexShrink: 0 }}>
-                          {incluido ? <Check size={15} strokeWidth={2.5} /> : '—'}
-                        </span>
-                        {c.label}
-                      </li>
-                    )
-                  }
-                )}
+                {CARACTERISTICAS.filter(
+                  (c) => !['productos', 'limite_negocios', 'limite_usuarios'].includes(c.clave)
+                ).map((c) => {
+                  const incluido = c.clave === 'base' ? true : p[c.clave]
+                  return (
+                    <li
+                      key={c.clave}
+                      style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        alignItems: 'flex-start',
+                        fontSize: '0.88rem',
+                        color: incluido ? '#253046' : '#C4CCD8',
+                      }}
+                    >
+                      <span style={{ color: incluido ? '#22C55E' : '#E6ECF3', flexShrink: 0 }}>
+                        {incluido ? <Check size={15} strokeWidth={2.5} /> : '—'}
+                      </span>
+                      {c.label}
+                    </li>
+                  )
+                })}
 
                 {p.incluye_kickoff && (
-                  <li style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}>
+                  <li
+                    style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}
+                  >
                     <span style={{ color: '#22C55E' }}>
                       <Check size={15} strokeWidth={2.5} />
                     </span>
@@ -285,7 +358,9 @@ export default function Suscripcion() {
                   </li>
                 )}
                 {p.asesorias_mes > 0 && (
-                  <li style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}>
+                  <li
+                    style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}
+                  >
                     <span style={{ color: '#22C55E' }}>
                       <Check size={15} strokeWidth={2.5} />
                     </span>
@@ -309,11 +384,8 @@ export default function Suscripcion() {
                   <button
                     className={recomendado ? 'btn-hero' : undefined}
                     type="button"
-                    onClick={() => {
-                      setPlanElegido(p)
-                      setError(null)
-                      setTimeout(() => document.getElementById('como-pagar')?.scrollIntoView({ behavior: 'smooth' }), 50)
-                    }}
+                    onClick={() => elegirPlan(p)}
+                    disabled={!disponible}
                   >
                     Elegir {p.nombre}
                   </button>
@@ -343,9 +415,9 @@ export default function Suscripcion() {
           <div style={{ flex: 1, minWidth: 240 }}>
             <p style={{ margin: 0, fontWeight: 700, color: '#1e40af' }}>Estamos revisando tu pago</p>
             <p style={{ margin: '0.25rem 0 0', color: '#64748B', fontSize: '0.92rem' }}>
-              Recibimos tu comprobante del plan <strong>{solicitud.plan_nombre}</strong> {solicitud.ciclo} por Bs{' '}
-              {Number(solicitud.monto).toFixed(0)}. Apenas confirmemos que llegó a la cuenta, activamos tu membresía.
-              Suele tomar unas horas.
+              Recibimos tu comprobante del plan <strong>{solicitud.plan_nombre}</strong> {solicitud.ciclo} por{' '}
+              {fmt(solicitud.monto)}. Apenas confirmemos que llegó a la cuenta, activamos tu membresía. Suele tomar
+              unas horas.
             </p>
           </div>
         </div>
@@ -385,57 +457,58 @@ export default function Suscripcion() {
               flexWrap: 'wrap',
             }}
           >
-            {/* QR */}
+            {/* QR del plan y ciclo elegidos */}
             <div style={{ textAlign: 'center' }}>
-              {(() => {
-                const qr = ciclo === 'anual' ? config?.qr_anual_url : config?.qr_trimestral_url
-                return qr ? (
-                  <img
-                    src={qr}
-                    alt="QR para pagar"
-                    style={{
-                      width: 230,
-                      height: 230,
-                      objectFit: 'contain',
-                      background: '#FFFFFF',
-                      border: '1px solid #E6ECF3',
-                      borderRadius: 14,
-                      padding: '0.5rem',
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: 230,
-                      height: 230,
-                      borderRadius: 14,
-                      background: '#FFFFFF',
-                      border: '1px dashed #E6ECF3',
-                      display: 'grid',
-                      placeItems: 'center',
-                      color: '#A3AFBF',
-                      fontSize: '0.85rem',
-                      padding: '1rem',
-                    }}
-                  >
-                    QR no configurado. Escríbenos por WhatsApp.
-                  </div>
-                )
-              })()}
+              {qrPlan ? (
+                <img
+                  src={qrPlan}
+                  alt={`QR para pagar el plan ${planElegido.nombre}`}
+                  style={{
+                    width: 230,
+                    height: 230,
+                    objectFit: 'contain',
+                    background: '#FFFFFF',
+                    border: '1px solid #E6ECF3',
+                    borderRadius: 14,
+                    padding: '0.5rem',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 230,
+                    height: 230,
+                    borderRadius: 14,
+                    background: '#FFFFFF',
+                    border: '1px dashed #E6ECF3',
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: '#A3AFBF',
+                    fontSize: '0.85rem',
+                    padding: '1rem',
+                    lineHeight: 1.5,
+                  }}
+                >
+                  Todavía no hay QR para este plan. Puedes pagar por transferencia o escribirnos por WhatsApp.
+                </div>
+              )}
 
+              {/* El monto en grande: aunque el QR ya lo lleve, verlo
+                  escrito evita que alguien pague de menos. */}
               <p style={{ margin: '0.75rem 0 0', fontWeight: 800, fontSize: '1.35rem', color: '#1F3A5F' }}>
-                Bs {Number(ciclo === 'anual' ? planElegido.precio_anual : planElegido.precio_trimestral).toFixed(0)}
+                {fmt(precioDe(planElegido, ciclo))}
               </p>
               <p style={{ margin: 0, color: '#64748B', fontSize: '0.88rem' }}>
-                Plan {planElegido.nombre} · {ciclo === 'anual' ? 'Anual' : 'Trimestral'}
+                Plan {planElegido.nombre} · {CICLOS[ciclo].label}
               </p>
 
               {config?.banco_nombre && (
                 <div style={{ marginTop: '0.9rem', fontSize: '0.82rem', color: '#64748B', textAlign: 'left' }}>
-                  <p style={{ margin: 0 }}>O por transferencia:</p>
+                  <p style={{ margin: 0, fontWeight: 600 }}>O por transferencia:</p>
                   <p style={{ margin: 0 }}>{config.banco_nombre}</p>
                   {config.banco_cuenta && <p style={{ margin: 0 }}>Cuenta: {config.banco_cuenta}</p>}
                   {config.banco_titular && <p style={{ margin: 0 }}>A nombre de: {config.banco_titular}</p>}
+                  {config.banco_nit && <p style={{ margin: 0 }}>NIT/CI: {config.banco_nit}</p>}
                 </div>
               )}
             </div>
@@ -484,7 +557,13 @@ export default function Suscripcion() {
                   <button className="btn-hero" type="submit" disabled={enviando}>
                     {enviando ? 'Enviando...' : 'Enviar comprobante'}
                   </button>
-                  <button type="button" onClick={() => setPlanElegido(null)}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlanElegido(null)
+                      setQrPlan(null)
+                    }}
+                  >
                     Cancelar
                   </button>
                 </div>
@@ -506,7 +585,6 @@ export default function Suscripcion() {
           </a>
         </p>
       )}
-
     </main>
   )
 }
