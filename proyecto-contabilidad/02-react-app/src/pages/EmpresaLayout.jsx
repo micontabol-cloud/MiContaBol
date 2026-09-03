@@ -18,6 +18,7 @@ import {
   Settings,
   UserRound,
   Sparkles,
+  Handshake,
   ChevronDown,
   ChevronRight,
   X,
@@ -40,6 +41,15 @@ const principal = [
   { to: '/catalogos', label: 'Catálogo', Icon: Megaphone },
   { to: '/proveedores', label: 'Proveedores', Icon: Truck },
   { to: '/caja', label: 'Caja', Icon: Wallet },
+]
+
+// El promotor ve otra app: solo lo que necesita para vender.
+// No es una versión recortada del menú del dueño, es un menú propio.
+const menuPromotor = [
+  { to: '/promotor', label: 'Mi resumen', Icon: Home, end: true },
+  { to: '/promotor/catalogo', label: 'Qué puedo vender', Icon: Package },
+  { to: '/promotor/ventas', label: 'Mis ventas', Icon: ShoppingCart },
+  { to: '/promotor/cuenta', label: 'Mi cuenta', Icon: Wallet },
 ]
 
 const inventario = [
@@ -68,12 +78,16 @@ const reportes = [
   { to: '/estados-financieros', label: 'Estados financieros' },
 ]
 
-// Los cuatro destinos de la barra inferior. Son los que se usan a
-// diario desde el celular; el resto vive en "Más".
 const barraMovil = [
   { to: '', label: 'Inicio', Icon: Home, end: true },
   { to: '/inventario/productos', label: 'Productos', Icon: Package },
   { to: '/caja', label: 'Caja', Icon: Wallet },
+]
+
+const barraMovilPromotor = [
+  { to: '/promotor', label: 'Inicio', Icon: Home, end: true },
+  { to: '/promotor/catalogo', label: 'Catálogo', Icon: Package },
+  { to: '/promotor/cuenta', label: 'Mi cuenta', Icon: Wallet },
 ]
 
 function GrupoColapsable({ titulo, Icon, items, empresaId, pathname }) {
@@ -115,16 +129,16 @@ function LayoutInterno() {
   const [empresa, setEmpresa] = useState(null)
   const [menuAbierto, setMenuAbierto] = useState(false)
 
+  const promotor = rol === 'promotor'
+
   useEffect(() => {
     async function cargar() {
-      const { data } = await supabase.from('empresas').select('*').eq('id', id).single()
+      const { data } = await supabase.from('empresas').select('nombre').eq('id', id).single()
       setEmpresa(data)
     }
     cargar()
   }, [id])
 
-  // Al navegar, el menú se cierra solo: en celular molesta tener que
-  // cerrarlo a mano después de cada toque.
   useEffect(() => {
     setMenuAbierto(false)
   }, [location.pathname])
@@ -133,6 +147,8 @@ function LayoutInterno() {
     const ruta = `/empresas/${id}${to}`
     return end ? location.pathname === ruta : location.pathname.startsWith(ruta)
   }
+
+  const barra = promotor ? barraMovilPromotor : barraMovil
 
   return (
     <div className="app-shell">
@@ -169,98 +185,133 @@ function LayoutInterno() {
           </p>
         </div>
 
-        <div className="sidebar-empresa-chip">{empresa?.nombre || 'Cargando...'}</div>
+        <div className="sidebar-empresa-chip">
+          {empresa?.nombre || 'Cargando...'}
+          {promotor && (
+            <span style={{ display: 'block', fontSize: '0.7rem', color: '#93A5C4', marginTop: '0.15rem' }}>
+              Promotor
+            </span>
+          )}
+        </div>
 
         <nav className="sidebar-nav">
-          {principal.map((s) => (
-            <NavLink
-              key={s.to}
-              to={`/empresas/${id}${s.to}`}
-              end={s.end}
-              className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
-            >
-              <s.Icon {...ICONO} />
-              {s.label}
-            </NavLink>
-          ))}
-
-          <div className="sidebar-divider" />
-
-          <GrupoColapsable
-            titulo="Inventario"
-            Icon={Package}
-            items={inventario}
-            empresaId={id}
-            pathname={location.pathname}
-          />
-
-          {/* La contabilidad y los reportes son para quien lleva las
-              cuentas; el vendedor no necesita verlos. */}
-          {puedeConfigurar(rol) && (
+          {promotor ? (
+            /* El promotor tiene su propio menú: no ve compras,
+               proveedores, contabilidad ni reportes. */
+            menuPromotor.map((s) => (
+              <NavLink
+                key={s.to}
+                to={`/empresas/${id}${s.to}`}
+                end={s.end}
+                className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+              >
+                <s.Icon {...ICONO} />
+                {s.label}
+              </NavLink>
+            ))
+          ) : (
             <>
+              {principal.map((s) => (
+                <NavLink
+                  key={s.to}
+                  to={`/empresas/${id}${s.to}`}
+                  end={s.end}
+                  className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+                >
+                  <s.Icon {...ICONO} />
+                  {s.label}
+                </NavLink>
+              ))}
+
+              <div className="sidebar-divider" />
+
               <GrupoColapsable
-                titulo="Bancos"
-                Icon={Landmark}
-                items={bancos}
+                titulo="Inventario"
+                Icon={Package}
+                items={inventario}
                 empresaId={id}
                 pathname={location.pathname}
               />
-              <GrupoColapsable
-                titulo="Contabilidad"
-                Icon={BookOpen}
-                items={contabilidad}
-                empresaId={id}
-                pathname={location.pathname}
-              />
-              <GrupoColapsable
-                titulo="Reportes"
-                Icon={BarChart3}
-                items={reportes}
-                empresaId={id}
-                pathname={location.pathname}
-              />
+
+              {/* La contabilidad y los reportes son para quien lleva las
+                  cuentas; el vendedor no necesita verlos. */}
+              {puedeConfigurar(rol) && (
+                <>
+                  <GrupoColapsable
+                    titulo="Bancos"
+                    Icon={Landmark}
+                    items={bancos}
+                    empresaId={id}
+                    pathname={location.pathname}
+                  />
+                  <GrupoColapsable
+                    titulo="Contabilidad"
+                    Icon={BookOpen}
+                    items={contabilidad}
+                    empresaId={id}
+                    pathname={location.pathname}
+                  />
+                  <GrupoColapsable
+                    titulo="Reportes"
+                    Icon={BarChart3}
+                    items={reportes}
+                    empresaId={id}
+                    pathname={location.pathname}
+                  />
+                </>
+              )}
+
+              <div className="sidebar-divider" />
+
+              {puedeConfigurar(rol) && (
+                <NavLink
+                  to={`/empresas/${id}/formas-de-pago`}
+                  className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+                >
+                  <CreditCard {...ICONO} />
+                  Formas de pago
+                </NavLink>
+              )}
+              {puedeConfigurar(rol) && (
+                <NavLink
+                  to={`/empresas/${id}/personal`}
+                  className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+                >
+                  <UsersRound {...ICONO} />
+                  Personal
+                </NavLink>
+              )}
+              {/* Quienes venden por fuera, con mercadería tuya */}
+              {puedeConfigurar(rol) && (
+                <NavLink
+                  to={`/empresas/${id}/promotores`}
+                  className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+                >
+                  <Handshake {...ICONO} />
+                  Promotores
+                </NavLink>
+              )}
+              {/* Vitrinas, vehículos, computadoras: lo que el negocio usa
+                  para trabajar, no lo que vende. */}
+              {puedeConfigurar(rol) && (
+                <NavLink
+                  to={`/empresas/${id}/activos`}
+                  className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+                >
+                  <Building2 {...ICONO} />
+                  Bienes del negocio
+                </NavLink>
+              )}
+              {esAdmin(rol) && (
+                <NavLink
+                  to={`/empresas/${id}/perfil-empresa`}
+                  className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
+                >
+                  <Settings {...ICONO} />
+                  Mi negocio
+                </NavLink>
+              )}
             </>
-          )}
-
-          <div className="sidebar-divider" />
-
-          {puedeConfigurar(rol) && (
-            <NavLink
-              to={`/empresas/${id}/formas-de-pago`}
-              className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
-            >
-              <CreditCard {...ICONO} />
-              Formas de pago
-            </NavLink>
-          )}
-          {puedeConfigurar(rol) && (
-            <NavLink
-              to={`/empresas/${id}/personal`}
-              className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
-            >
-              <UsersRound {...ICONO} />
-              Personal
-            </NavLink>
-          )}
-          {/* Vitrinas, vehículos, computadoras: lo que el negocio usa
-              para trabajar, no lo que vende. */}
-          {puedeConfigurar(rol) && (
-            <NavLink
-              to={`/empresas/${id}/activos`}
-              className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
-            >
-              <Building2 {...ICONO} />
-              Bienes del negocio
-            </NavLink>
-          )}
-          {esAdmin(rol) && (
-            <NavLink
-              to={`/empresas/${id}/perfil-empresa`}
-              className={({ isActive }) => 'sidebar-link' + (isActive ? ' active' : '')}
-            >
-              <Settings {...ICONO} />
-              Mi negocio
-            </NavLink>
           )}
 
           <div className="sidebar-divider" />
@@ -269,10 +320,14 @@ function LayoutInterno() {
             <UserRound {...ICONO} />
             Mi perfil
           </NavLink>
-          <NavLink to="/suscripcion" className="sidebar-link">
-            <Sparkles {...ICONO} />
-            Mi plan
-          </NavLink>
+
+          {/* El plan lo maneja el dueño, no el promotor */}
+          {!promotor && (
+            <NavLink to="/suscripcion" className="sidebar-link">
+              <Sparkles {...ICONO} />
+              Mi plan
+            </NavLink>
+          )}
         </nav>
 
         <Link to="/empresas" style={{ color: '#93A5C4', fontSize: '0.8rem', marginTop: 'auto' }}>
@@ -288,7 +343,7 @@ function LayoutInterno() {
           Vender va al centro y destacado porque es lo que se hace
           cincuenta veces al día; lo demás se consulta de a ratos. */}
       <nav className="barra-movil">
-        {barraMovil.slice(0, 2).map((s) => (
+        {barra.slice(0, 2).map((s) => (
           <NavLink
             key={s.to}
             to={`/empresas/${id}${s.to}`}
@@ -303,20 +358,28 @@ function LayoutInterno() {
         <button
           type="button"
           className="barra-movil-vender"
-          onClick={() => navigate(`/empresas/${id}/inventario/venta`)}
+          onClick={() =>
+            navigate(promotor ? `/empresas/${id}/promotor/vender` : `/empresas/${id}/inventario/venta`)
+          }
           aria-label="Registrar una venta"
         >
           <Plus size={26} strokeWidth={2.5} />
           <span>Vender</span>
         </button>
 
-        <NavLink
-          to={`/empresas/${id}/caja`}
-          className={'barra-movil-item' + (enBarra('/caja') ? ' activo' : '')}
-        >
-          <Wallet size={21} strokeWidth={1.9} />
-          <span>Caja</span>
-        </NavLink>
+        {(() => {
+          const tercero = barra[2]
+          const IconoTercero = tercero.Icon
+          return (
+            <NavLink
+              to={`/empresas/${id}${tercero.to}`}
+              className={'barra-movil-item' + (enBarra(tercero.to) ? ' activo' : '')}
+            >
+              <IconoTercero size={21} strokeWidth={1.9} />
+              <span>{tercero.label}</span>
+            </NavLink>
+          )
+        })()}
 
         <button
           type="button"
