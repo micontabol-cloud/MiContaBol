@@ -336,7 +336,10 @@ export default function Suscripcion() {
         const planNegocio = planes.find((p) => p.codigo === 'negocio')
         const yaEsNegocio = sus?.plan_codigo === 'negocio'
         const meses = CICLOS[ciclo].meses
-        const diasQueQuedan = enPrueba && dias > 0 ? dias : 0
+        // La prueba es de 30 días. Si por algún motivo la base
+        // dice más, no se promete de más: el mensaje se topa ahí.
+        const DIAS_PRUEBA = 30
+        const diasQueQuedan = enPrueba && dias > 0 ? Math.min(dias, DIAS_PRUEBA) : 0
         const hasta = fechaSiPagaHoy(diasQueQuedan, meses)
 
         // Si ya paga Negocio y tiene su sesión, no hay nada que
@@ -380,9 +383,9 @@ export default function Suscripcion() {
                           color: '#253046',
                         }}
                       >
-                        <strong style={{ color: '#15803D' }}>No pierdes tus días de prueba.</strong> Si pagas hoy,
-                        se suman los <strong>{diasQueQuedan} días</strong> que te quedan más los{' '}
-                        <strong>{meses === 12 ? '365' : '90'} días</strong> del plan{' '}
+                        <strong style={{ color: '#15803D' }}>No pierdes lo que te queda de prueba.</strong> Si
+                        pagas hoy, se suman los <strong>{diasQueQuedan} días</strong> que te quedan de prueba más
+                        los <strong>{meses === 12 ? '12 meses' : '3 meses'}</strong> del plan{' '}
                         {CICLOS[ciclo].label.toLowerCase()}: tu suscripción llegaría hasta el{' '}
                         <strong>{hasta}</strong>.
                       </p>
