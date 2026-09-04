@@ -42,6 +42,11 @@ import Bancos from './pages/Bancos'
 import Personal from './pages/Personal'
 import Promotores from './pages/Promotores'
 import ConsignacionPromotor from './pages/ConsignacionPromotor'
+import PromotorInicio from './pages/PromotorInicio'
+import PromotorCatalogo from './pages/PromotorCatalogo'
+import PromotorVender from './pages/PromotorVender'
+import PromotorVentas from './pages/PromotorVentas'
+import PromotorCuenta from './pages/PromotorCuenta'
 import ActivosFijos from './pages/ActivosFijos'
 import Conciliacion from './pages/Conciliacion'
 import AnalisisCosto from './pages/AnalisisCosto'
@@ -188,6 +193,16 @@ export default function App() {
                 </RequiereRol>
               }
             />
+
+            {/* Las pantallas del promotor. Sin RequiereRol: las
+                funciones que llaman ya verifican que quien entra
+                sea promotor, y este componente exige roles
+                internos que el promotor no tiene. */}
+            <Route path="promotor" element={<PromotorInicio />} />
+            <Route path="promotor/catalogo" element={<PromotorCatalogo />} />
+            <Route path="promotor/vender" element={<PromotorVender />} />
+            <Route path="promotor/ventas" element={<PromotorVentas />} />
+            <Route path="promotor/cuenta" element={<PromotorCuenta />} />
             {/* Bienes del negocio: vitrinas, vehículos, computadoras */}
             <Route
               path="activos"
