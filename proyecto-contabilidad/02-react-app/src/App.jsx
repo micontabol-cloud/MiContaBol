@@ -40,6 +40,7 @@ import CuentasPorPagar from './pages/CuentasPorPagar'
 import Caja from './pages/Caja'
 import Bancos from './pages/Bancos'
 import Personal from './pages/Personal'
+import Promotores from './pages/Promotores'
 import ActivosFijos from './pages/ActivosFijos'
 import Conciliacion from './pages/Conciliacion'
 import AnalisisCosto from './pages/AnalisisCosto'
@@ -166,6 +167,15 @@ export default function App() {
               element={
                 <RequiereRol>
                   <Personal />
+                </RequiereRol>
+              }
+            />
+            {/* Quienes venden por fuera, con mercadería tuya */}
+            <Route
+              path="promotores"
+              element={
+                <RequiereRol>
+                  <Promotores />
                 </RequiereRol>
               }
             />
