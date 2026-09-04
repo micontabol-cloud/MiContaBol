@@ -47,6 +47,7 @@ import PromotorCatalogo from './pages/PromotorCatalogo'
 import PromotorVender from './pages/PromotorVender'
 import PromotorVentas from './pages/PromotorVentas'
 import PromotorCuenta from './pages/PromotorCuenta'
+import PromotorComisiones from './pages/PromotorComisiones'
 import ActivosFijos from './pages/ActivosFijos'
 import Conciliacion from './pages/Conciliacion'
 import AnalisisCosto from './pages/AnalisisCosto'
@@ -203,6 +204,7 @@ export default function App() {
             <Route path="promotor/vender" element={<PromotorVender />} />
             <Route path="promotor/ventas" element={<PromotorVentas />} />
             <Route path="promotor/cuenta" element={<PromotorCuenta />} />
+            <Route path="promotor/comisiones" element={<PromotorComisiones />} />
             {/* Bienes del negocio: vitrinas, vehículos, computadoras */}
             <Route
               path="activos"
