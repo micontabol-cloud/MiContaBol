@@ -41,6 +41,7 @@ import Caja from './pages/Caja'
 import Bancos from './pages/Bancos'
 import Personal from './pages/Personal'
 import Promotores from './pages/Promotores'
+import ConsignacionPromotor from './pages/ConsignacionPromotor'
 import ActivosFijos from './pages/ActivosFijos'
 import Conciliacion from './pages/Conciliacion'
 import AnalisisCosto from './pages/AnalisisCosto'
@@ -176,6 +177,14 @@ export default function App() {
               element={
                 <RequiereRol>
                   <Promotores />
+                </RequiereRol>
+              }
+            />
+            <Route
+              path="promotores/:promotorId/mercaderia"
+              element={
+                <RequiereRol>
+                  <ConsignacionPromotor />
                 </RequiereRol>
               }
             />
