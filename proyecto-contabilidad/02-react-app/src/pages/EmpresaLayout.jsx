@@ -19,6 +19,7 @@ import {
   UserRound,
   Sparkles,
   Handshake,
+  TrendingUp,
   ChevronDown,
   ChevronRight,
   X,
@@ -49,6 +50,7 @@ const menuPromotor = [
   { to: '/promotor', label: 'Mi resumen', Icon: Home, end: true },
   { to: '/promotor/catalogo', label: 'Qué puedo vender', Icon: Package },
   { to: '/promotor/ventas', label: 'Mis ventas', Icon: ShoppingCart },
+  { to: '/promotor/comisiones', label: 'Lo que he ganado', Icon: TrendingUp },
   { to: '/promotor/cuenta', label: 'Mi cuenta', Icon: Wallet },
 ]
 
