@@ -11,6 +11,7 @@ export default function Promotores() {
 
   const [datos, setDatos] = useState(null)
   const [cuentas, setCuentas] = useState([])
+  const [cupo, setCupo] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
   const [aviso, setAviso] = useState(null)
@@ -18,6 +19,7 @@ export default function Promotores() {
   const [mostrarForm, setMostrarForm] = useState(false)
   const [nuevo, setNuevo] = useState({
     email: '',
+    password: '',
     nombre: '',
     telefono: '',
     zona: '',
@@ -25,6 +27,7 @@ export default function Promotores() {
     tipo_acceso: 'consignacion',
   })
   const [creando, setCreando] = useState(false)
+  const [credenciales, setCredenciales] = useState(null)
 
   const [cobrando, setCobrando] = useState(null)
   const [pago, setPago] = useState({ monto: '', cuenta: '', nota: '' })
@@ -32,7 +35,7 @@ export default function Promotores() {
 
   async function cargar() {
     setCargando(true)
-    const [{ data, error: err }, { data: ctas }] = await Promise.all([
+    const [{ data, error: err }, { data: ctas }, { data: cp }] = await Promise.all([
       supabase.rpc('resumen_promotores', { p_empresa_id: empresaId }),
       supabase
         .from('plan_cuentas')
@@ -42,10 +45,12 @@ export default function Promotores() {
         .eq('permite_movimiento', true)
         .eq('activo', true)
         .order('codigo'),
+      supabase.rpc('cupo_usuarios', { p_empresa_id: empresaId }),
     ])
     if (err) setError(err.message)
     setDatos(data)
     setCuentas(ctas || [])
+    setCupo(cp)
     setCargando(false)
   }
 
@@ -59,9 +64,10 @@ export default function Promotores() {
     setError(null)
     setCreando(true)
 
-    const { error } = await supabase.rpc('alta_promotor', {
+    const { data, error } = await supabase.rpc('crear_promotor', {
       p_empresa_id: empresaId,
       p_email: nuevo.email.trim().toLowerCase(),
+      p_password: nuevo.password,
       p_nombre: nuevo.nombre.trim(),
       p_telefono: nuevo.telefono || null,
       p_zona: nuevo.zona || null,
@@ -72,10 +78,28 @@ export default function Promotores() {
     setCreando(false)
     if (error) return setError(error.message)
 
-    setNuevo({ email: '', nombre: '', telefono: '', zona: '', descuento: 30, tipo_acceso: 'consignacion' })
+    // Los datos de acceso quedan a la vista para poder copiarlos:
+    // el dueño se los tiene que pasar por WhatsApp.
+    setCredenciales(
+      data?.cuenta_nueva
+        ? { email: nuevo.email.trim().toLowerCase(), password: nuevo.password, nombre: nuevo.nombre }
+        : null
+    )
+
+    setNuevo({
+      email: '',
+      password: '',
+      nombre: '',
+      telefono: '',
+      zona: '',
+      descuento: 30,
+      tipo_acceso: 'consignacion',
+    })
     setMostrarForm(false)
-    setAviso('Promotor dado de alta.')
-    setTimeout(() => setAviso(null), 5000)
+    if (!data?.cuenta_nueva) {
+      setAviso('Ese correo ya tenía cuenta. Se le dio acceso como promotor.')
+      setTimeout(() => setAviso(null), 6000)
+    }
     cargar()
   }
 
@@ -217,6 +241,87 @@ export default function Promotores() {
         cliente lo que quiera, y te paga la diferencia. La mercadería sigue siendo tuya hasta que se venda.
       </p>
 
+      {/* Datos de acceso recién creados */}
+      {credenciales && (
+        <div
+          style={{
+            background: 'rgba(34, 197, 94, 0.07)',
+            border: '1px solid rgba(34, 197, 94, 0.35)',
+            borderRadius: 16,
+            padding: '1.25rem 1.4rem',
+            marginBottom: '1.5rem',
+          }}
+        >
+          <p style={{ margin: 0, fontWeight: 700, color: '#15803D' }}>
+            Cuenta creada para {credenciales.nombre}
+          </p>
+          <p style={{ margin: '0.4rem 0 0.9rem', fontSize: '0.92rem', color: '#64748B', lineHeight: 1.55 }}>
+            Pásale estos datos por WhatsApp. Al entrar puede cambiar la contraseña desde su perfil.
+          </p>
+
+          <div
+            style={{
+              background: '#FFFFFF',
+              border: '1px solid #E6ECF3',
+              borderRadius: 10,
+              padding: '0.85rem 1rem',
+              fontFamily: 'monospace',
+              fontSize: '0.9rem',
+              lineHeight: 1.8,
+            }}
+          >
+            <div>micontabol.com</div>
+            <div>Correo: {credenciales.email}</div>
+            <div>Contraseña: {credenciales.password}</div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.9rem', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              className="btn-hero"
+              onClick={() => {
+                const texto = `Hola ${credenciales.nombre}, ya tienes tu acceso a MiContaBol:\n\nmicontabol.com\nCorreo: ${credenciales.email}\nContraseña: ${credenciales.password}\n\nEntra y cambia tu contraseña desde Mi perfil.`
+                window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank', 'noopener')
+              }}
+            >
+              Enviar por WhatsApp
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `micontabol.com\nCorreo: ${credenciales.email}\nContraseña: ${credenciales.password}`
+                )
+              }}
+            >
+              Copiar
+            </button>
+            <button type="button" onClick={() => setCredenciales(null)}>
+              Listo
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Cupo del plan */}
+      {cupo && !cupo.hay_cupo && (
+        <div
+          style={{
+            background: 'rgba(245, 158, 11, 0.1)',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            borderRadius: 12,
+            padding: '0.9rem 1.1rem',
+            marginBottom: '1.25rem',
+            fontSize: '0.92rem',
+            color: '#8a5a00',
+            lineHeight: 1.55,
+          }}
+        >
+          <strong>Ya usaste los {cupo.limite} usuarios de tu plan {cupo.plan}.</strong> Para sumar más promotores
+          necesitas cambiar de plan.
+        </div>
+      )}
+
       {/* Alta */}
       {mostrarForm && (
         <form
@@ -229,11 +334,23 @@ export default function Promotores() {
             marginBottom: '1.5rem',
           }}
         >
-          <p style={{ margin: '0 0 0.9rem', fontWeight: 700, color: '#1F3A5F' }}>Nuevo promotor</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.9rem' }}>
+            <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F' }}>Nuevo promotor</p>
+            {cupo && (
+              <span style={{ fontSize: '0.85rem', color: cupo.disponibles > 0 ? '#64748B' : '#EF4444' }}>
+                {cupo.usados} de {cupo.limite} usuarios · plan {cupo.plan}
+              </span>
+            )}
+          </div>
+
+          <p style={{ margin: '0 0 0.9rem', fontSize: '0.88rem', color: '#64748B', lineHeight: 1.55 }}>
+            Le creas la cuenta aquí mismo. No necesita registrarse antes: le pasas el correo y la contraseña por
+            WhatsApp y ya puede entrar.
+          </p>
 
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
             <label>
-              Correo de su cuenta
+              Su correo
               <br />
               <input
                 type="email"
@@ -241,10 +358,26 @@ export default function Promotores() {
                 value={nuevo.email}
                 onChange={(e) => setNuevo({ ...nuevo, email: e.target.value })}
                 placeholder="promotor@correo.com"
-                style={{ width: 240 }}
+                style={{ width: 230 }}
               />
               <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
-                Tiene que haberse registrado antes en MiContaBol.
+                Con esto entra al sistema.
+              </span>
+            </label>
+
+            <label>
+              Contraseña temporal
+              <br />
+              <input
+                required
+                minLength={6}
+                value={nuevo.password}
+                onChange={(e) => setNuevo({ ...nuevo, password: e.target.value })}
+                placeholder="mínimo 6 caracteres"
+                style={{ width: 190 }}
+              />
+              <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+                Se la pasas por WhatsApp.
               </span>
             </label>
 
