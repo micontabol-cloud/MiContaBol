@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Handshake, Package, Plus } from 'lucide-react'
 import { supabase } from '../supabaseClient'
-import PanelModulo from '../components/PanelModulo'
+import BoliMascot from '../components/BoliMascot'
 
 const fmt = (n) => `Bs ${Number(n || 0).toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
@@ -139,18 +139,51 @@ export default function Promotores() {
 
   return (
     <main style={{ maxWidth: 980, fontFamily: 'sans-serif' }}>
-      <PanelModulo
-        titulo="Promotores"
-        pregunta="¿Cómo les está yendo?"
-        pose={totalDeuda > 0 ? 'consejo' : 'exito'}
-        hallazgos={hallazgos}
-        mensajeVacio="Todavía no tienes promotores."
-        acciones={
-          <button type="button" className="btn-hero" onClick={() => setMostrarForm(!mostrarForm)}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '1.25rem',
+          alignItems: 'flex-start',
+          flexWrap: 'wrap',
+          marginBottom: '1.5rem',
+        }}
+      >
+        <BoliMascot pose={totalDeuda > 0 ? 'consejo' : 'exito'} size={72} />
+
+        <div style={{ flex: 1, minWidth: 260 }}>
+          <h1 style={{ margin: 0 }}>Promotores</h1>
+          <p style={{ color: '#64748B', margin: '0.25rem 0 0' }}>¿Cómo les está yendo?</p>
+
+          {hallazgos.length > 0 && (
+            <ul style={{ listStyle: 'none', padding: 0, margin: '0.85rem 0 0' }}>
+              {hallazgos.map((h, i) => (
+                <li
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    gap: '0.6rem',
+                    alignItems: 'flex-start',
+                    marginBottom: '0.35rem',
+                    fontSize: '0.95rem',
+                  }}
+                >
+                  <span style={{ color: h.color, fontSize: '1.2rem', lineHeight: 1 }}>•</span>
+                  <span>{h.texto}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <button
+            type="button"
+            className="btn-hero"
+            onClick={() => setMostrarForm(!mostrarForm)}
+            style={{ marginTop: '1rem' }}
+          >
             {mostrarForm ? 'Cancelar' : '+ Dar de alta un promotor'}
           </button>
-        }
-      />
+        </div>
+      </div>
 
       {error && <p style={{ color: '#EF4444' }}>{error}</p>}
       {aviso && (
