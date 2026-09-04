@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { Handshake, Package, Plus } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import BoliMascot from '../components/BoliMascot'
@@ -564,18 +564,26 @@ export default function Promotores() {
                   </div>
                 </div>
 
-                {Number(p.debe) > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCobrando(cobrando === p.id ? null : p.id)
-                      setPago({ monto: String(p.debe), cuenta: '', nota: '' })
-                    }}
-                    style={{ alignSelf: 'flex-start', fontSize: '0.85rem' }}
-                  >
-                    Registrar pago
-                  </button>
-                )}
+                <div style={{ display: 'flex', gap: '0.5rem', alignSelf: 'flex-start', flexWrap: 'wrap' }}>
+                  <Link to={`/empresas/${empresaId}/promotores/${p.id}/mercaderia`}>
+                    <button type="button" style={{ fontSize: '0.85rem' }}>
+                      Mercadería
+                    </button>
+                  </Link>
+
+                  {Number(p.debe) > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCobrando(cobrando === p.id ? null : p.id)
+                        setPago({ monto: String(p.debe), cuenta: '', nota: '' })
+                      }}
+                      style={{ fontSize: '0.85rem' }}
+                    >
+                      Registrar pago
+                    </button>
+                  )}
+                </div>
               </div>
 
               {cobrando === p.id && (
