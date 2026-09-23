@@ -696,38 +696,39 @@ export default function Productos() {
       ) : productosFiltrados.length === 0 ? (
         <p style={{ color: '#64748B' }}>Ningún producto coincide con la búsqueda.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
-              <th style={{ padding: '4px 8px' }}></th>
-              <th style={{ padding: '4px 8px' }}>Producto</th>
-              <th style={{ padding: '4px 8px' }}>Categoría</th>
-              <th style={{ padding: '4px 8px' }}>Observación</th>
-              <th style={{ padding: '4px 8px', textAlign: 'right' }}>Costo</th>
-              <th style={{ padding: '4px 8px', textAlign: 'right' }}>Precio</th>
-              <th style={{ padding: '4px 8px', textAlign: 'right' }}>Margen</th>
-              <th style={{ padding: '4px 8px', textAlign: 'right' }}>Stock</th>
-              <th style={{ padding: '4px 8px' }}>Estado</th>
-              <th style={{ padding: '4px 8px' }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {productosFiltrados.map((p) => {
-              const m = margenDe(p.costo_fijo, p.precio_venta)
-              return (
-                <tr key={p.id} style={{ borderBottom: '1px solid #E6ECF3', opacity: p.activo ? 1 : 0.5 }}>
-                  <td style={{ padding: '4px 8px', width: 48 }}>
-                    {p.imagen_url ? (
-                      <img
-                        src={p.imagen_url}
-                        alt={p.nombre}
-                        style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 8, border: '1px solid #E6ECF3' }}
-                      />
-                    ) : (
-                      <div style={{ width: 40, height: 40, borderRadius: 8, background: '#F7F9FC', border: '1px solid #E6ECF3' }} />
-                    )}
-                  </td>
-                  <td style={{ padding: '4px 8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {productosFiltrados.map((p) => {
+            const m = margenDe(p.costo_fijo, p.precio_venta)
+            const agotado = p.stock_total <= 0
+            const bajo = p.tiene_stock_bajo
+            const estiloEstado = agotado
+              ? { background: 'rgba(239, 68, 68, 0.12)', color: '#B91C1C' }
+              : bajo
+              ? { background: 'rgba(245, 158, 11, 0.15)', color: '#8a5a00' }
+              : { background: 'rgba(34, 197, 94, 0.12)', color: '#15803D' }
+            return (
+              <div
+                key={p.id}
+                style={{
+                  border: '1px solid #E6ECF3',
+                  borderRadius: 14,
+                  padding: '0.85rem 0.95rem',
+                  background: '#FFFFFF',
+                  opacity: p.activo ? 1 : 0.5,
+                }}
+              >
+                <div style={{ display: 'flex', gap: '0.7rem', alignItems: 'flex-start' }}>
+                  {p.imagen_url ? (
+                    <img
+                      src={p.imagen_url}
+                      alt={p.nombre}
+                      style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 8, border: '1px solid #E6ECF3', flexShrink: 0 }}
+                    />
+                  ) : (
+                    <div style={{ width: 48, height: 48, borderRadius: 8, background: '#F7F9FC', border: '1px solid #E6ECF3', flexShrink: 0 }} />
+                  )}
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <Link to={`/empresas/${empresaId}/inventario/productos/${p.id}`} style={{ fontWeight: 600 }}>
                       {p.nombre}
                     </Link>
@@ -735,117 +736,143 @@ export default function Productos() {
                       {p.codigo}
                       {p.tiene_variantes && ' · con variantes'}
                     </div>
-                  </td>
-                  <td style={{ padding: '4px 8px', color: '#64748B', fontSize: '0.85rem' }}>
-                    {p.categoria_id ? nombreCategoriaPorId.get(p.categoria_id) : '—'}
-                  </td>
-                  <td style={{ padding: '4px 8px', color: '#64748B', fontSize: '0.85rem', maxWidth: 160 }}>
-                    {p.observaciones || '—'}
-                  </td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right' }}>{Number(p.costo_fijo).toFixed(2)}</td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right' }}>{Number(p.precio_venta).toFixed(2)}</td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right', color: colorMargen(m), fontWeight: 600 }}>
-                    {m === null ? '—' : `${m.toFixed(0)}%`}
-                  </td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right' }}>
-                    {p.stock_total.toFixed(2)} {p.unidad_medida}
-                  </td>
-                  <td style={{ padding: '4px 8px' }}>
-                    {(() => {
-                      const agotado = p.stock_total <= 0
-                      const bajo = p.tiene_stock_bajo
-                      const estilo = agotado
-                        ? { background: 'rgba(239, 68, 68, 0.12)', color: '#B91C1C' }
-                        : bajo
-                        ? { background: 'rgba(245, 158, 11, 0.15)', color: '#8a5a00' }
-                        : { background: 'rgba(34, 197, 94, 0.12)', color: '#15803D' }
-                      return (
-                        <span className="chip-estado" style={estilo}>
-                          {agotado ? 'Agotado' : bajo ? 'Por acabarse' : 'Disponible'}
-                        </span>
-                      )
-                    })()}
-                  </td>
-                  <td style={{ padding: '4px 8px', whiteSpace: 'nowrap' }}>
-                    <Link
-                      to={`/empresas/${empresaId}/inventario/productos/${p.id}`}
-                      style={{ fontSize: '0.85rem' }}
-                    >
-                      Abrir
-                    </Link>
-                    {' · '}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEliminando(eliminando === p.id ? null : p.id)
-                        setMotivoEliminar('')
-                        setError(null)
-                      }}
+                    <div
                       style={{
-                        background: 'transparent',
-                        border: 'none',
-                        color: '#EF4444',
-                        padding: 0,
-                        fontSize: '0.85rem',
-                        textDecoration: 'underline',
+                        display: 'flex',
+                        gap: '0.35rem',
+                        flexWrap: 'wrap',
+                        marginTop: '0.35rem',
+                        fontSize: '0.78rem',
                       }}
                     >
-                      Eliminar
-                    </button>
-                  </td>
-                </tr>
-              )
-            })}
-
-            {eliminando &&
-              (() => {
-                const p = productosFiltrados.find((x) => x.id === eliminando)
-                if (!p) return null
-                return (
-                  <tr key="confirmar-eliminar">
-                    <td colSpan={9} style={{ padding: '0.9rem 1rem', background: 'rgba(239, 68, 68, 0.05)' }}>
-                      <p style={{ margin: '0 0 0.6rem', fontWeight: 600, color: '#B91C1C' }}>
-                        Enviar «{p.nombre}» a la papelera
-                      </p>
-                      <p style={{ margin: '0 0 0.7rem', fontSize: '0.88rem', color: '#64748B' }}>
-                        Desaparece del inventario pero se puede restaurar. Si nunca se vendió, desde la papelera
-                        podrás borrarlo del todo.
-                        {p.stock_total > 0 && (
-                          <strong style={{ color: '#B91C1C' }}>
-                            {' '}
-                            Ojo: todavía tiene {p.stock_total.toFixed(0)} en stock.
-                          </strong>
-                        )}
-                      </p>
-                      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
-                        <label style={{ fontSize: '0.85rem' }}>
-                          Motivo (opcional)
-                          <br />
-                          <input
-                            value={motivoEliminar}
-                            onChange={(e) => setMotivoEliminar(e.target.value)}
-                            placeholder="ej. Cargado por error"
-                            style={{ width: 240 }}
-                          />
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => eliminarProducto(p)}
-                          disabled={procesandoEliminar}
-                          style={{ background: '#EF4444', borderColor: '#EF4444', color: '#FFFFFF' }}
+                      {p.categoria_id && (
+                        <span
+                          style={{
+                            background: '#F7F9FC',
+                            border: '1px solid #E6ECF3',
+                            borderRadius: 999,
+                            padding: '0.05rem 0.45rem',
+                            color: '#64748B',
+                            fontWeight: 600,
+                          }}
                         >
-                          Confirmar
-                        </button>
-                        <button type="button" onClick={() => setEliminando(null)}>
-                          Cancelar
-                        </button>
+                          {nombreCategoriaPorId.get(p.categoria_id)}
+                        </span>
+                      )}
+                      <span className="chip-estado" style={estiloEstado}>
+                        {agotado ? 'Agotado' : bajo ? 'Por acabarse' : 'Disponible'}
+                      </span>
+                    </div>
+                    {p.observaciones && (
+                      <div style={{ color: '#64748B', fontSize: '0.82rem', marginTop: '0.3rem' }}>
+                        {p.observaciones}
                       </div>
-                    </td>
-                  </tr>
-                )
-              })()}
-          </tbody>
-        </table>
+                    )}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(4, 1fr)',
+                    gap: '0.5rem',
+                    marginTop: '0.7rem',
+                    paddingTop: '0.7rem',
+                    borderTop: '1px solid #F7F9FC',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Costo</div>
+                    <div style={{ fontWeight: 600 }}>{Number(p.costo_fijo).toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Precio</div>
+                    <div style={{ fontWeight: 600 }}>{Number(p.precio_venta).toFixed(2)}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Margen</div>
+                    <div style={{ fontWeight: 600, color: colorMargen(m) }}>{m === null ? '—' : `${m.toFixed(0)}%`}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Stock</div>
+                    <div style={{ fontWeight: 600 }}>
+                      {p.stock_total.toFixed(2)} {p.unidad_medida}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.7rem' }}>
+                  <Link
+                    to={`/empresas/${empresaId}/inventario/productos/${p.id}`}
+                    style={{ fontSize: '0.85rem' }}
+                  >
+                    Abrir
+                  </Link>
+                  {' · '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEliminando(eliminando === p.id ? null : p.id)
+                      setMotivoEliminar('')
+                      setError(null)
+                    }}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#EF4444',
+                      padding: 0,
+                      fontSize: '0.85rem',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    Eliminar
+                  </button>
+                </div>
+
+                {eliminando === p.id && (
+                  <div style={{ marginTop: '0.75rem', padding: '0.9rem 1rem', background: 'rgba(239, 68, 68, 0.05)', borderRadius: 10 }}>
+                    <p style={{ margin: '0 0 0.6rem', fontWeight: 600, color: '#B91C1C' }}>
+                      Enviar «{p.nombre}» a la papelera
+                    </p>
+                    <p style={{ margin: '0 0 0.7rem', fontSize: '0.88rem', color: '#64748B' }}>
+                      Desaparece del inventario pero se puede restaurar. Si nunca se vendió, desde la papelera
+                      podrás borrarlo del todo.
+                      {p.stock_total > 0 && (
+                        <strong style={{ color: '#B91C1C' }}>
+                          {' '}
+                          Ojo: todavía tiene {p.stock_total.toFixed(0)} en stock.
+                        </strong>
+                      )}
+                    </p>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                      <label style={{ fontSize: '0.85rem' }}>
+                        Motivo (opcional)
+                        <br />
+                        <input
+                          value={motivoEliminar}
+                          onChange={(e) => setMotivoEliminar(e.target.value)}
+                          placeholder="ej. Cargado por error"
+                          style={{ width: '100%', maxWidth: 240 }}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => eliminarProducto(p)}
+                        disabled={procesandoEliminar}
+                        style={{ background: '#EF4444', borderColor: '#EF4444', color: '#FFFFFF' }}
+                      >
+                        Confirmar
+                      </button>
+                      <button type="button" onClick={() => setEliminando(null)}>
+                        Cancelar
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       )}
     </main>
   )
