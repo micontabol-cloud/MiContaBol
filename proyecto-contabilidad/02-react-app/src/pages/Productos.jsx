@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import BoliMascot from '../components/BoliMascot'
+import EscanerCodigo from '../components/EscanerCodigo'
 
 function margenDe(costo, precio) {
   const c = Number(costo)
@@ -618,6 +619,16 @@ export default function Productos() {
             placeholder="escanea aquí"
             style={{ width: 150 }}
           />
+          <details style={{ fontSize: '0.82rem', marginTop: '0.3rem' }}>
+            <summary style={{ cursor: 'pointer', color: '#64748B' }}>Usar cámara</summary>
+            <div style={{ marginTop: '0.5rem' }}>
+              <EscanerCodigo
+                onCodigo={(valor) => setCodigoBarras(valor)}
+                autoFocus={false}
+                placeholder="Escanea el código de barras..."
+              />
+            </div>
+          </details>
         </label>
         <label>
           Observación
