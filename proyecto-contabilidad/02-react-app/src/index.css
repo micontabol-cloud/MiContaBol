@@ -32,6 +32,7 @@
 
 html,
 body {
+  overflow-x: hidden;
   margin: 0;
   padding: 0;
   background: var(--color-bg-secondary);
@@ -730,6 +731,11 @@ button.sidebar-group-toggle:hover {
   align-items: center;
 }
 
+.landing-header-nav-links {
+  display: flex;
+  gap: 0.75rem;
+}
+
 @media (max-width: 780px) {
   .landing-header-inner {
     gap: 0.5rem;
@@ -750,6 +756,7 @@ button.sidebar-group-toggle:hover {
 .landing-hero {
   position: relative;
   padding: 4rem 0 4.5rem;
+  overflow-x: hidden;
   background:
     linear-gradient(105deg, rgba(31, 58, 95, 0.94) 0%, rgba(31, 58, 95, 0.86) 45%, rgba(22, 40, 63, 0.62) 100%),
     url('/login-hero.jpg') center 30% / cover no-repeat;
