@@ -413,9 +413,11 @@ export default function Landing() {
         <div className="landing-container landing-header-inner">
           <Logo iconSize={36} textSize="1.2rem" />
           <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <a href="#producto" style={{ fontSize: '0.92rem' }}>Producto</a>
-            <a href="#precios" style={{ fontSize: '0.92rem' }}>Precios</a>
-            <a href="#preguntas" style={{ fontSize: '0.92rem' }}>Preguntas</a>
+            <div className="landing-header-nav-links" style={{ display: 'flex', gap: '0.75rem' }}>
+              <a href="#producto" style={{ fontSize: '0.92rem' }}>Producto</a>
+              <a href="#precios" style={{ fontSize: '0.92rem' }}>Precios</a>
+              <a href="#preguntas" style={{ fontSize: '0.92rem' }}>Preguntas</a>
+            </div>
             <Link to="/login">
               <button type="button">Iniciar sesión</button>
             </Link>

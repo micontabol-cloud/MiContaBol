@@ -409,27 +409,30 @@ export default function NuevaVentaProducto() {
           {avisoEscaneo && <p style={{ color: '#F59E0B', fontSize: '0.88rem', margin: 0 }}>{avisoEscaneo}</p>}
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ textAlign: 'left' }}>
-              <th style={{ padding: '4px 8px' }}>Producto</th>
-              <th style={{ padding: '4px 8px' }}>Cantidad</th>
-              <th style={{ padding: '4px 8px' }}>Precio</th>
-              <th style={{ padding: '4px 8px' }}>Desc.</th>
-              <th style={{ padding: '4px 8px', textAlign: 'right' }}>Subtotal</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {lineas.map((l, i) => {
-              const prod = productos.find((p) => `${p.producto_id}|${p.variante_id || ''}` === l.clave)
-              const brutoLinea = (parseFloat(l.cantidad) || 0) * (parseFloat(l.precio_unitario) || 0)
-              const descLinea = parseFloat(l.descuento) || 0
-              const subtotal = Math.max(0, brutoLinea - descLinea)
-              return (
-                <tr key={i}>
-                  <td style={{ padding: '4px 8px' }}>
-                    <select required value={l.clave} onChange={(e) => actualizarLinea(i, 'clave', e.target.value)}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {lineas.map((l, i) => {
+            const prod = productos.find((p) => `${p.producto_id}|${p.variante_id || ''}` === l.clave)
+            const brutoLinea = (parseFloat(l.cantidad) || 0) * (parseFloat(l.precio_unitario) || 0)
+            const descLinea = parseFloat(l.descuento) || 0
+            const subtotal = Math.max(0, brutoLinea - descLinea)
+            return (
+              <div
+                key={i}
+                style={{
+                  border: '1px solid #E6ECF3',
+                  borderRadius: 14,
+                  padding: '0.85rem 0.95rem',
+                  background: '#FFFFFF',
+                }}
+              >
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <select
+                      required
+                      value={l.clave}
+                      onChange={(e) => actualizarLinea(i, 'clave', e.target.value)}
+                      style={{ width: '100%' }}
+                    >
                       <option value="">-- Selecciona --</option>
                       {productos.map((p) => {
                         const clave = `${p.producto_id}|${p.variante_id || ''}`
@@ -449,7 +452,7 @@ export default function NuevaVentaProducto() {
                           display: 'flex',
                           gap: '0.35rem',
                           flexWrap: 'wrap',
-                          marginTop: '0.25rem',
+                          marginTop: '0.4rem',
                           fontSize: '0.78rem',
                         }}
                       >
@@ -472,8 +475,29 @@ export default function NuevaVentaProducto() {
                         )}
                       </div>
                     )}
-                  </td>
-                  <td style={{ padding: '4px 8px', verticalAlign: 'top' }}>
+                  </div>
+                  {lineas.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => quitarLinea(i)}
+                      style={{ flexShrink: 0, padding: '0.35rem 0.6rem' }}
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    gap: '0.5rem',
+                    marginTop: '0.7rem',
+                  }}
+                >
+                  <label style={{ fontSize: '0.78rem', color: '#64748B' }}>
+                    Cantidad
+                    <br />
                     <input
                       type="number"
                       step="0.001"
@@ -481,20 +505,24 @@ export default function NuevaVentaProducto() {
                       max={prod?.stock_actual}
                       value={l.cantidad}
                       onChange={(e) => actualizarLinea(i, 'cantidad', e.target.value)}
-                      style={{ width: 80 }}
+                      style={{ width: '100%', marginTop: '0.2rem' }}
                     />
-                  </td>
-                  <td style={{ padding: '4px 8px' }}>
+                  </label>
+                  <label style={{ fontSize: '0.78rem', color: '#64748B' }}>
+                    Precio
+                    <br />
                     <input
                       type="number"
                       step="0.01"
                       min="0"
                       value={l.precio_unitario}
                       onChange={(e) => actualizarLinea(i, 'precio_unitario', e.target.value)}
-                      style={{ width: 90 }}
+                      style={{ width: '100%', marginTop: '0.2rem' }}
                     />
-                  </td>
-                  <td style={{ padding: '4px 8px' }}>
+                  </label>
+                  <label style={{ fontSize: '0.78rem', color: '#64748B' }}>
+                    Desc.
+                    <br />
                     <input
                       type="number"
                       step="0.01"
@@ -503,36 +531,31 @@ export default function NuevaVentaProducto() {
                       value={l.descuento}
                       onChange={(e) => actualizarLinea(i, 'descuento', e.target.value)}
                       placeholder="0"
-                      style={{ width: 75, textAlign: 'right' }}
+                      style={{ width: '100%', marginTop: '0.2rem', textAlign: 'right' }}
                     />
-                  </td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right' }}>
-                    {descLinea > 0 && (
-                      <span
-                        style={{
-                          display: 'block',
-                          fontSize: '0.78rem',
-                          color: '#A3AFBF',
-                          textDecoration: 'line-through',
-                        }}
-                      >
-                        {brutoLinea.toFixed(2)}
-                      </span>
-                    )}
-                    <span style={{ fontWeight: descLinea > 0 ? 700 : 400 }}>{subtotal.toFixed(2)}</span>
-                  </td>
-                  <td style={{ padding: '4px 8px' }}>
-                    {lineas.length > 1 && (
-                      <button type="button" onClick={() => quitarLinea(i)}>
-                        ×
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+                  </label>
+                </div>
+
+                <div style={{ textAlign: 'right', marginTop: '0.6rem' }}>
+                  {descLinea > 0 && (
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        marginRight: '0.5rem',
+                        fontSize: '0.78rem',
+                        color: '#A3AFBF',
+                        textDecoration: 'line-through',
+                      }}
+                    >
+                      {brutoLinea.toFixed(2)}
+                    </span>
+                  )}
+                  <span style={{ fontWeight: descLinea > 0 ? 700 : 400 }}>Subtotal: {subtotal.toFixed(2)}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
 
         <button type="button" onClick={agregarLinea} style={{ alignSelf: 'flex-start' }}>
           + Agregar producto

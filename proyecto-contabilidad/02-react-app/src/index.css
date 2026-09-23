@@ -356,6 +356,7 @@ button.sidebar-group-toggle:hover {
     justify-content: space-between;
     gap: 0.75rem;
     padding: 0.7rem 1rem;
+    padding-top: calc(0.7rem + env(safe-area-inset-top, 0px));
     background: var(--color-navy);
     position: sticky;
     top: 0;
@@ -715,6 +716,7 @@ button.sidebar-group-toggle:hover {
 
 .landing-header {
   padding: 1rem 0;
+  padding-top: calc(1rem + env(safe-area-inset-top, 0px));
   border-bottom: 1px solid var(--color-border);
   background: #FFFFFF;
   position: sticky;
@@ -726,6 +728,22 @@ button.sidebar-group-toggle:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+@media (max-width: 780px) {
+  .landing-header-inner {
+    gap: 0.5rem;
+  }
+
+  .landing-header-nav-links {
+    display: none;
+  }
+
+  .landing-header-inner button {
+    padding: 0.5rem 0.7rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
 }
 
 /* --- HERO con foto + dashboard flotando encima --- */
