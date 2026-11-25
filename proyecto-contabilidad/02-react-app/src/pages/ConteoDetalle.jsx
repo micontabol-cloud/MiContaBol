@@ -232,7 +232,7 @@ export default function ConteoDetalle() {
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px' }}>Producto</th>
@@ -292,7 +292,7 @@ export default function ConteoDetalle() {
                 )
               })}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 

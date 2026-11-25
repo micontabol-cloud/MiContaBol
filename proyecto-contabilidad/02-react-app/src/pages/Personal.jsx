@@ -473,7 +473,7 @@ export default function Personal() {
                     {historial[t.id].length === 0 ? (
                       <p style={{ color: '#64748B', fontSize: '0.9rem', margin: 0 }}>Sin movimientos todavía.</p>
                     ) : (
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
+                      <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
                         <thead>
                           <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                             <th style={{ padding: '3px 6px' }}>Fecha</th>
@@ -503,7 +503,7 @@ export default function Personal() {
                             </tr>
                           ))}
                         </tbody>
-                      </table>
+                      </table></div>
                     )}
                   </div>
                 )}

@@ -1,0 +1,24 @@
+{
+  "appId": "com.micontabol.app",
+  "appName": "MiContaBol",
+  "webDir": "dist",
+  "server": {
+    "iosScheme": "https"
+  },
+  "ios": {
+    "contentInset": "always"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "launchShowDuration": 1500,
+      "backgroundColor": "#1F3A5F",
+      "showSpinner": false
+    },
+    "StatusBar": {
+      "style": "LIGHT",
+      "backgroundColor": "#1F3A5F",
+      "overlaysWebView": false
+    }
+  }
+}

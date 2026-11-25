@@ -11,7 +11,7 @@ function Tabla({ titulo, filas }) {
       {filas.length === 0 ? (
         <p style={{ color: '#A3AFBF' }}>Sin movimientos</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
             {filas.map((f) => (
               <tr key={f.id} style={{ borderBottom: '1px solid #E6ECF3' }}>
@@ -22,7 +22,7 @@ function Tabla({ titulo, filas }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
     </div>
   )
@@ -211,14 +211,14 @@ export default function EstadosFinancieros() {
             <Tabla titulo="Pasivo" filas={pasivos} />
             <Tabla titulo="Patrimonio" filas={patrimonios} />
 
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <tbody>
                 <tr style={{ borderBottom: '1px solid #E6ECF3' }}>
                   <td style={{ padding: '4px 8px' }}>Utilidad del ejercicio (del Estado de Resultados)</td>
                   <td style={{ padding: '4px 8px', textAlign: 'right' }}>{utilidadNeta.toFixed(2)}</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
 
             <p style={{ marginTop: '1rem', fontWeight: 'bold' }}>Total activo: {totalActivo.toFixed(2)}</p>
             <p style={{ fontWeight: 'bold' }}>Total pasivo + patrimonio: {totalPasivoMasPatrimonio.toFixed(2)}</p>

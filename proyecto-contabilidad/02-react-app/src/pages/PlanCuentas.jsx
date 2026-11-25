@@ -246,7 +246,7 @@ export default function PlanCuentas() {
       ) : cuentasVisibles.length === 0 ? (
         <p>No hay cuentas para mostrar.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Código</th>
@@ -394,7 +394,7 @@ export default function PlanCuentas() {
               )
             })}
           </tbody>
-        </table>
+        </table></div>
       )}
     </main>
   )

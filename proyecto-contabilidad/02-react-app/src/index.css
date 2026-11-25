@@ -1103,3 +1103,25 @@ button.btn-lg {
     animation: none !important;
   }
 }
+
+/* Paso 1 · móvil */
+/* iOS hace zoom y desplaza la página al enfocar un campo con fuente menor a
+   16px. Con 16px no hay zoom, y no hace falta bloquear el zoom del usuario
+   (user-scalable=no perjudica la accesibilidad). !important porque algunos
+   campos traen tamaño en línea. */
+@media (max-width: 860px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='file']),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* Toda tabla vive dentro de este contenedor: si no cabe, se desliza
+     dentro de su recuadro y la página no se ensancha. */
+  .tabla-scroll {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

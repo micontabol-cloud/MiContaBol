@@ -39,7 +39,7 @@ export default function Comprobantes() {
       ) : comprobantes.length === 0 ? (
         <p>Todavía no hay ventas ni compras registradas.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>N°</th>
@@ -60,7 +60,7 @@ export default function Comprobantes() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
     </main>
   )

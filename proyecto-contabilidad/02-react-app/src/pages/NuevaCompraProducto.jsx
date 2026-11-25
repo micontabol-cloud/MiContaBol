@@ -298,7 +298,7 @@ export default function NuevaCompraProducto() {
           </label>
         )}
 
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left' }}>
               <th style={{ padding: '4px 8px' }}>Producto</th>
@@ -393,7 +393,7 @@ export default function NuevaCompraProducto() {
               ) : null
             )}
           </tbody>
-        </table>
+        </table></div>
 
         <button type="button" onClick={agregarLinea} style={{ alignSelf: 'flex-start' }}>
           + Agregar producto

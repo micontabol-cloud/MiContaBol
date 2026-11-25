@@ -184,7 +184,7 @@ export default function Caja() {
       </div>
 
       {balance.length > 0 && (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1.5rem' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Cuenta</th>
@@ -201,7 +201,7 @@ export default function Caja() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
 
       <h2>Registrar movimiento</h2>
@@ -274,7 +274,7 @@ export default function Caja() {
       ) : movimientos.length === 0 ? (
         <p style={{ color: '#64748B' }}>Todavía no hay movimientos.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Fecha</th>
@@ -299,7 +299,7 @@ export default function Caja() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
     </main>
   )

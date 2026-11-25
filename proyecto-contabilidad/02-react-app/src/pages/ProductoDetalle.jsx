@@ -395,7 +395,7 @@ export default function ProductoDetalle() {
       </p>
 
       {variantes.length > 0 && (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1rem' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '1rem' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Variante</th>
@@ -427,7 +427,7 @@ export default function ProductoDetalle() {
               )
             })}
           </tbody>
-        </table>
+        </table></div>
       )}
 
       <form
@@ -471,7 +471,7 @@ export default function ProductoDetalle() {
               Todavía no hay lotes. Se crean solos cuando registras una compra de este producto.
             </p>
           ) : (
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                   <th style={{ padding: '4px 8px' }}>Lote</th>
@@ -498,7 +498,7 @@ export default function ProductoDetalle() {
                   )
                 })}
               </tbody>
-            </table>
+            </table></div>
           )}
           <p style={{ color: '#64748B', fontSize: '0.85rem' }}>
             Las ventas descuentan automáticamente el lote que vence primero.
@@ -570,7 +570,7 @@ export default function ProductoDetalle() {
       {kardex.length === 0 ? (
         <p style={{ color: '#64748B' }}>Todavía no hay movimientos de este producto.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Fecha</th>
@@ -605,7 +605,7 @@ export default function ProductoDetalle() {
               )
             })}
           </tbody>
-        </table>
+        </table></div>
       )}
 
       {/* Acciones sobre el producto */}

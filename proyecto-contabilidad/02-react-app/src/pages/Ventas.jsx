@@ -285,7 +285,7 @@ export default function Ventas() {
         <p style={{ color: '#64748B' }}>Todavía no hay ventas registradas.</p>
       ) : (
         <div style={{ background: '#FFFFFF', border: '1px solid #E6ECF3', borderRadius: 16, padding: '1rem' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px' }}>N°</th>
@@ -433,7 +433,7 @@ export default function Ventas() {
                 </Fragment>
               ))}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
     </main>

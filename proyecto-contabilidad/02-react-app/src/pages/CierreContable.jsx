@@ -274,7 +274,7 @@ export default function CierreContable() {
       {cierres.length === 0 ? (
         <p style={{ color: '#64748B' }}>Todavía no hay cierres registrados.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Cerrado hasta</th>
@@ -302,7 +302,7 @@ export default function CierreContable() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
     </main>
   )

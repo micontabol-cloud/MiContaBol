@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import { NavLink, Outlet, useParams, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
   Home,
@@ -29,6 +29,10 @@ import {
 import { supabase } from '../supabaseClient'
 import Logo from '../components/Logo'
 import { RolProvider, useRol, puedeConfigurar, esAdmin } from '../contexts/RolContext'
+
+// Boli (asistente con IA) pesa poco, pero no hace falta para dibujar la pantalla:
+// se descarga aparte. Quién puede usarlo lo decide la base de datos.
+const BoliAsistente = lazy(() => import('../components/BoliAsistente'))
 
 // Un solo estilo de iconos en toda la app (Lucide, outline, mismo
 // grosor) en vez de mezclar emojis con símbolos.
@@ -338,7 +342,9 @@ function LayoutInterno() {
       </aside>
 
       <div className="app-content">
-        <Outlet />
+        <Suspense fallback={<p style={{ color: 'var(--color-text-secondary)' }}>Cargando…</p>}>
+          <Outlet />
+        </Suspense>
       </div>
 
       {/* Barra inferior, solo en celular.
@@ -393,6 +399,12 @@ function LayoutInterno() {
           <span>Más</span>
         </button>
       </nav>
+
+      {!promotor && (
+        <Suspense fallback={null}>
+          <BoliAsistente empresaId={id} />
+        </Suspense>
+      )}
     </div>
   )
 }

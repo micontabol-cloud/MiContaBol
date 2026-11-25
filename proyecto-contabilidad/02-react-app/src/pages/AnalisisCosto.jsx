@@ -94,7 +94,7 @@ export default function AnalisisCosto() {
         <p>Todavía no hay ventas de productos para comparar.</p>
       ) : (
         <>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px' }}>Producto</th>
@@ -115,7 +115,7 @@ export default function AnalisisCosto() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
 
           <div style={{ marginTop: '1.5rem' }}>
             <p>

@@ -85,7 +85,7 @@ export default function Miembros() {
       {cargando ? (
         <p>Cargando...</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Email</th>
@@ -108,7 +108,7 @@ export default function Miembros() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
 
       {soyAdmin && (

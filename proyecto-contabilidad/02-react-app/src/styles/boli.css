@@ -1,0 +1,502 @@
+/* =========================================================
+   Boli, el asistente — botón flotante y ventana de chat.
+
+   Todo está bajo .boli. Los botones y el input escriben su
+   selector con .boli delante a propósito: index.css tiene reglas
+   globales para `button` e `input` y así las de aquí las superan
+   sin tener que usar !important.
+   ========================================================= */
+
+.boli {
+  --boli-azul: var(--color-navy, #1F3A5F);
+  --boli-coral: var(--color-coral, #F2555A);
+  --boli-borde: var(--color-border, #E6ECF3);
+  --boli-suave: var(--color-bg-secondary, #F7F9FC);
+  --boli-texto: var(--color-text, #253046);
+  --boli-gris: var(--color-text-secondary, #64748B);
+}
+
+/* ── Botón flotante: micrófono (atajo) + cara de Boli ─────── */
+.boli .boli-fab {
+  position: fixed;
+  right: 14px;
+  /* Por encima de la barra inferior del celular y de la franja de gestos */
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.boli .boli-fab button.boli-fab-boli {
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--boli-azul);
+  border: 3px solid #FFFFFF;
+  box-shadow: 0 6px 18px rgba(31, 58, 95, 0.35);
+  overflow: hidden;
+  display: block;
+}
+
+.boli .boli-fab button.boli-fab-boli img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+
+.boli .boli-fab button.boli-fab-mic {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFFFFF;
+  color: var(--boli-azul);
+  border: 1px solid var(--boli-borde);
+  box-shadow: 0 4px 14px rgba(31, 58, 95, 0.18);
+}
+
+.boli .boli-fab button.boli-fab-boli:hover:not(:disabled),
+.boli .boli-fab button.boli-fab-mic:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.boli .boli-fab button.boli-fab-boli:hover:not(:disabled) {
+  background: var(--color-navy-light, #2E5C8A);
+  border-color: #FFFFFF;
+}
+
+.boli .boli-fab button.boli-fab-mic:hover:not(:disabled) {
+  background: var(--boli-suave);
+  border-color: var(--boli-borde);
+}
+
+@media (min-width: 861px) {
+  .boli .boli-fab {
+    right: 24px;
+    bottom: 24px;
+  }
+}
+
+/* ── Ventana: hoja desde abajo en celular, panel en compu ─── */
+.boli .boli-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 79;
+  background: rgba(15, 35, 64, 0.45);
+}
+
+.boli .boli-hoja {
+  position: fixed;
+  z-index: 80;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 88vh;
+  height: 88dvh;
+  max-height: 760px;
+  display: flex;
+  flex-direction: column;
+  background: #FFFFFF;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -8px 40px rgba(15, 35, 64, 0.28);
+  overflow: hidden;
+  animation: boli-sube 0.22s ease-out;
+}
+
+@media (min-width: 861px) {
+  .boli .boli-fondo {
+    display: none;
+  }
+
+  .boli .boli-hoja {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    width: 400px;
+    height: 620px;
+    max-height: calc(100dvh - 48px);
+    border-radius: 20px;
+    border: 1px solid var(--boli-borde);
+    box-shadow: 0 18px 50px rgba(15, 35, 64, 0.28);
+  }
+}
+
+@keyframes boli-sube {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── Cabecera ──────────────────────────────────────────────── */
+.boli .boli-cabecera {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 0.9rem;
+  background: var(--boli-azul);
+  color: #FFFFFF;
+}
+
+.boli .boli-cabecera-cara {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  background: #FFFFFF;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+}
+
+.boli .boli-cabecera-texto {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.boli .boli-cabecera-texto strong {
+  font-size: 1rem;
+}
+
+.boli .boli-cabecera-texto span {
+  font-size: 0.74rem;
+  color: #C9D6E8;
+}
+
+.boli .boli-cabecera button.boli-cerrar {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 50%;
+}
+
+.boli .boli-cabecera button.boli-cerrar:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* ── Conversación ──────────────────────────────────────────── */
+.boli .boli-lista {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem 0.9rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: #FFFFFF;
+}
+
+.boli .boli-vacio {
+  margin: auto 0;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.boli .boli-vacio img {
+  display: block;
+  height: auto;
+}
+
+.boli .boli-vacio-titulo {
+  margin: 0.4rem 0 0.2rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--boli-azul);
+}
+
+.boli .boli-vacio-texto {
+  margin: 0 0 1rem;
+  max-width: 290px;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--boli-gris);
+}
+
+.boli .boli-sugerencias {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.boli .boli-sugerencias button.boli-chip {
+  padding: 0.55rem 0.85rem;
+  min-height: 40px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  color: var(--boli-azul);
+  background: var(--boli-suave);
+  border: 1px solid var(--boli-borde);
+  border-radius: 999px;
+}
+
+.boli .boli-sugerencias button.boli-chip:hover:not(:disabled) {
+  background: #E3ECF7;
+  border-color: #C9D6E8;
+}
+
+.boli .boli-burbuja {
+  max-width: 88%;
+  padding: 0.6rem 0.8rem;
+  font-size: 0.93rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.boli .boli-burbuja p {
+  margin: 0;
+}
+
+.boli .boli-burbuja p + p,
+.boli .boli-burbuja p + ul,
+.boli .boli-burbuja ul + p {
+  margin-top: 0.45rem;
+}
+
+.boli .boli-burbuja ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.boli .boli-burbuja li + li {
+  margin-top: 0.15rem;
+}
+
+.boli .boli-burbuja-user {
+  align-self: flex-end;
+  color: #FFFFFF;
+  background: var(--boli-azul);
+  border-radius: 16px 16px 4px 16px;
+}
+
+.boli .boli-burbuja-boli {
+  align-self: flex-start;
+  color: var(--boli-texto);
+  background: var(--boli-suave);
+  border: 1px solid var(--boli-borde);
+  border-radius: 16px 16px 16px 4px;
+}
+
+.boli .boli-pensando {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--boli-gris);
+}
+
+.boli .boli-pensando em {
+  margin-left: 0.35rem;
+  font-style: normal;
+  font-size: 0.82rem;
+}
+
+.boli .boli-punto {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--boli-gris);
+  animation: boli-salto 1.1s infinite ease-in-out;
+}
+
+.boli .boli-punto:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.boli .boli-punto:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes boli-salto {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  35% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.boli .boli-aviso {
+  align-self: stretch;
+  padding: 0.65rem 0.8rem;
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: #7A4B00;
+  background: #FFF7E6;
+  border: 1px solid #F3D9A0;
+  border-radius: 12px;
+}
+
+.boli .boli-aviso p {
+  margin: 0;
+}
+
+.boli .boli-aviso a {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-weight: 700;
+  color: var(--boli-azul);
+}
+
+.boli .boli-aviso-fijo {
+  flex: none;
+  margin: 0 0.9rem 0.5rem;
+}
+
+/* ── Pie: aviso de voz, contador y entrada ─────────────────── */
+.boli .boli-voz-aviso {
+  flex: none;
+  margin: 0 0.9rem 0.4rem;
+  font-size: 0.8rem;
+  color: #9A3412;
+}
+
+.boli .boli-cupo {
+  flex: none;
+  margin: 0;
+  padding: 0.25rem 0.9rem 0;
+  font-size: 0.76rem;
+  color: var(--boli-gris);
+  text-align: center;
+}
+
+.boli .boli-cupo.bajo {
+  color: #9A3412;
+  font-weight: 600;
+}
+
+.boli .boli-form {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.8rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--boli-borde);
+  background: #FFFFFF;
+}
+
+.boli .boli-form input.boli-input {
+  flex: 1;
+  min-width: 0;
+  height: 46px;
+  padding: 0 0.9rem;
+  /* 16px: con menos, el iPhone hace zoom al tocar el campo */
+  font-size: 16px;
+  color: var(--boli-texto);
+  background: var(--boli-suave);
+  border: 1px solid var(--boli-borde);
+  border-radius: 23px;
+}
+
+.boli .boli-form input.boli-input:focus {
+  background: #FFFFFF;
+  border-color: var(--boli-azul);
+}
+
+.boli .boli-form input.boli-input:disabled {
+  opacity: 0.6;
+}
+
+.boli .boli-form button.boli-btn-mic,
+.boli .boli-form button.boli-btn-enviar {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.boli .boli-form button.boli-btn-mic {
+  position: relative;
+  color: var(--boli-azul);
+  background: #FFFFFF;
+  border: 1px solid var(--boli-borde);
+}
+
+.boli .boli-form button.boli-btn-mic:hover:not(:disabled) {
+  background: var(--boli-suave);
+  border-color: var(--boli-borde);
+}
+
+.boli .boli-form button.boli-btn-mic.activo,
+.boli .boli-form button.boli-btn-mic.activo:hover:not(:disabled) {
+  color: #FFFFFF;
+  background: var(--boli-coral);
+  border-color: var(--boli-coral);
+}
+
+.boli .boli-form button.boli-btn-mic.activo::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid var(--boli-coral);
+  opacity: 0;
+  animation: boli-pulso 1.4s infinite ease-out;
+}
+
+@keyframes boli-pulso {
+  from {
+    transform: scale(0.85);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+
+.boli .boli-form button.boli-btn-enviar {
+  color: #FFFFFF;
+  background: var(--boli-coral);
+  border: 1px solid var(--boli-coral);
+}
+
+.boli .boli-form button.boli-btn-enviar:hover:not(:disabled) {
+  background: var(--color-coral-hover, #E6474D);
+  border-color: var(--color-coral-hover, #E6474D);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boli .boli-hoja,
+  .boli .boli-punto,
+  .boli .boli-form button.boli-btn-mic.activo::after {
+    animation: none;
+  }
+  .boli .boli-fab button {
+    transition: none;
+  }
+}

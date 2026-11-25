@@ -105,7 +105,7 @@ export default function NuevoAsiento() {
           </label>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left' }}>
               <th style={{ padding: '4px 8px' }}>Cuenta</th>
@@ -161,7 +161,7 @@ export default function NuevoAsiento() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
 
         <button type="button" onClick={agregarLinea} style={{ alignSelf: 'flex-start' }}>
           + Agregar línea

@@ -142,7 +142,7 @@ export default function ConteosFisicos() {
       ) : conteos.length === 0 ? (
         <p style={{ color: '#64748B' }}>Todavía no has hecho ningún conteo.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Fecha</th>
@@ -176,7 +176,7 @@ export default function ConteosFisicos() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
       )}
     </main>
   )

@@ -127,7 +127,7 @@ export default function BalanceComprobacion() {
         <p>Todavía no hay cuentas con movimientos.</p>
       ) : (
         <>
-          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px' }}>Código</th>
@@ -158,7 +158,7 @@ export default function BalanceComprobacion() {
                 <td></td>
               </tr>
             </tfoot>
-          </table>
+          </table></div>
 
           <p style={{ marginTop: '1rem' }}>
             {Math.abs(totalDebe - totalHaber) < 0.005 ? (

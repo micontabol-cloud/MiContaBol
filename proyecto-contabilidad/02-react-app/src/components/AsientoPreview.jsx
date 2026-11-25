@@ -139,7 +139,7 @@ export default function AsientoPreview({
 
       {verDetalle && !ocultarSensibles && (
         <div style={{ marginTop: '0.7rem' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '3px 6px' }}>Cuenta</th>
@@ -169,7 +169,7 @@ export default function AsientoPreview({
                 <td style={{ padding: '3px 6px', textAlign: 'right' }}>{totalHaber.toFixed(2)}</td>
               </tr>
             </tfoot>
-          </table>
+          </table></div>
           <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: cuadra ? '#22C55E' : '#EF4444' }}>
             {cuadra ? '✓ El asiento cuadra' : '⚠️ El asiento no cuadra'}
           </p>

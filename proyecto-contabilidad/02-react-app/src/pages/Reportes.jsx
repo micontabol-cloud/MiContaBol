@@ -356,7 +356,7 @@ export default function Reportes() {
               Últimas anulaciones
             </p>
             <div style={{ maxHeight: 260, overflowY: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+              <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                 <tbody>
                   {anulaciones.detalle.slice(0, 15).map((a) => (
                     <tr key={a.id} style={{ borderBottom: '1px solid #F7F9FC' }}>
@@ -376,7 +376,7 @@ export default function Reportes() {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </table></div>
             </div>
           </section>
         )}

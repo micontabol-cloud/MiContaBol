@@ -908,7 +908,7 @@ export default function CatalogoEditor() {
         </div>
       ) : (
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px', width: 40 }}></th>
@@ -1007,7 +1007,7 @@ export default function CatalogoEditor() {
                 )
               })}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
