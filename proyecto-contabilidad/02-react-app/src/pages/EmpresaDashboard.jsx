@@ -38,6 +38,10 @@ export default function EmpresaDashboard() {
       if (!CACHE_INICIO.has(empresaId)) setCargando(true)
       setError(null)
 
+      // perfil y plan salen a la vez que lo demás
+      supabase.rpc('mi_perfil').then(({ data }) => setPerfil(data))
+      supabase.rpc('mi_suscripcion').then(({ data }) => setSuscripcion(data))
+
       const hoy = new Date()
       const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().slice(0, 10)
       const seisMesesAtras = new Date(hoy.getFullYear(), hoy.getMonth() - 5, 1).toISOString().slice(0, 10)
@@ -125,8 +129,6 @@ export default function EmpresaDashboard() {
       setEmpresa(empRes.data)
       setOnboardingOculto(!!empRes.data?.onboarding_oculto)
 
-      supabase.rpc('mi_perfil').then(({ data }) => setPerfil(data))
-      supabase.rpc('mi_suscripcion').then(({ data }) => setSuscripcion(data))
 
       const cuentaTipoPorId = new Map((cuentasRes.data || []).map((c) => [c.id, c.tipo]))
       let ingresosMes = 0
