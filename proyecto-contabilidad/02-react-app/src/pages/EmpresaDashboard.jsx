@@ -1,32 +1,40 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { supabase } from '../supabaseClient'
 import BoliMascot from '../components/BoliMascot'
 import { saludoDeBoli } from '../lib/saludos'
 import OnboardingChecklist from '../components/OnboardingChecklist'
 import AvisoSuscripcion from '../components/AvisoSuscripcion'
 
+const GraficoVentas = lazy(() => import('../components/GraficoVentas'))
+
+// Lo último que vio cada negocio en Inicio. Al volver se muestra al instante y se actualiza detrás.
+const CACHE_INICIO = new Map()
+supabase.auth.onAuthStateChange((evento) => {
+  if (evento === 'SIGNED_OUT') CACHE_INICIO.clear()
+})
+
 export default function EmpresaDashboard() {
   const { id: empresaId } = useParams()
-  const [empresa, setEmpresa] = useState(null)
-  const [cargando, setCargando] = useState(true)
+  const inicial = CACHE_INICIO.get(empresaId)
+  const [empresa, setEmpresa] = useState(inicial?.empresa ?? null)
+  const [cargando, setCargando] = useState(!inicial)
   const [error, setError] = useState(null)
-  const [kpis, setKpis] = useState({ ventasMes: 0, utilidadMes: 0, productos: 0, clientes: 0, caja: 0 })
-  const [cambioPorcentual, setCambioPorcentual] = useState(null)
-  const [ultimasVentas, setUltimasVentas] = useState([])
-  const [stockBajo, setStockBajo] = useState([])
-  const [datosGrafico, setDatosGrafico] = useState([])
-  const [porVencer, setPorVencer] = useState([])
-  const [ventasHoy, setVentasHoy] = useState({ cantidad: 0, monto: 0 })
-  const [totalVentasHistorico, setTotalVentasHistorico] = useState(0)
-  const [onboardingOculto, setOnboardingOculto] = useState(false)
-  const [perfil, setPerfil] = useState(null)
-  const [suscripcion, setSuscripcion] = useState(null)
+  const [kpis, setKpis] = useState(inicial?.kpis ?? { ventasMes: 0, utilidadMes: 0, productos: 0, clientes: 0, caja: 0 })
+  const [cambioPorcentual, setCambioPorcentual] = useState(inicial?.cambioPorcentual ?? null)
+  const [ultimasVentas, setUltimasVentas] = useState(inicial?.ultimasVentas ?? [])
+  const [stockBajo, setStockBajo] = useState(inicial?.stockBajo ?? [])
+  const [datosGrafico, setDatosGrafico] = useState(inicial?.datosGrafico ?? [])
+  const [porVencer, setPorVencer] = useState(inicial?.porVencer ?? [])
+  const [ventasHoy, setVentasHoy] = useState(inicial?.ventasHoy ?? { cantidad: 0, monto: 0 })
+  const [totalVentasHistorico, setTotalVentasHistorico] = useState(inicial?.totalVentasHistorico ?? 0)
+  const [onboardingOculto, setOnboardingOculto] = useState(inicial?.onboardingOculto ?? false)
+  const [perfil, setPerfil] = useState(inicial?.perfil ?? null)
+  const [suscripcion, setSuscripcion] = useState(inicial?.suscripcion ?? null)
 
   useEffect(() => {
     async function cargar() {
-      setCargando(true)
+      if (!CACHE_INICIO.has(empresaId)) setCargando(true)
       setError(null)
 
       const hoy = new Date()
@@ -177,6 +185,15 @@ export default function EmpresaDashboard() {
     cargar()
   }, [empresaId])
 
+  // Guarda lo que se ve para la próxima vez que se abra Inicio
+  useEffect(() => {
+    if (cargando || error) return
+    CACHE_INICIO.set(empresaId, {
+      empresa, kpis, cambioPorcentual, ultimasVentas, stockBajo, datosGrafico, porVencer,
+      ventasHoy, totalVentasHistorico, onboardingOculto, perfil, suscripcion,
+    })
+  }, [cargando, error, empresaId, empresa, kpis, cambioPorcentual, ultimasVentas, stockBajo, datosGrafico, porVencer, ventasHoy, totalVentasHistorico, onboardingOculto, perfil, suscripcion])
+
   const saludo = saludoDeBoli({
     nombre: perfil?.nombre,
     fechaNacimiento: perfil?.fecha_nacimiento,
@@ -285,15 +302,9 @@ export default function EmpresaDashboard() {
           <section style={{ marginTop: '2rem' }}>
             <h2>Ventas — últimos 6 meses</h2>
             <div style={{ width: '100%', height: 220 }}>
-              <ResponsiveContainer>
-                <BarChart data={datosGrafico}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#E6ECF3" />
-                  <XAxis dataKey="mes" stroke="#64748B" fontSize={12} />
-                  <YAxis stroke="#64748B" fontSize={12} />
-                  <Tooltip formatter={(value) => `Bs ${Number(value).toFixed(2)}`} />
-                  <Bar dataKey="ventas" fill="#F2555A" radius={[6, 6, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <Suspense fallback={<div style={{ height: 220 }} />}>
+                <GraficoVentas data={datosGrafico} />
+              </Suspense>
             </div>
           </section>
 

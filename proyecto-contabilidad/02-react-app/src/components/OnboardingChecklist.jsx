@@ -213,6 +213,7 @@ export default function OnboardingChecklist({ empresa, onOcultar }) {
               display: 'flex',
               gap: '0.85rem',
               alignItems: 'flex-start',
+              flexWrap: 'wrap',
               padding: '0.7rem 0.85rem',
               borderRadius: 12,
               background: p.hecho ? 'rgba(34, 197, 94, 0.06)' : '#F7F9FC',
@@ -238,7 +239,7 @@ export default function OnboardingChecklist({ empresa, onOcultar }) {
               {p.hecho ? <Check size={14} strokeWidth={3} /> : i + 1}
             </span>
 
-            <div style={{ flex: 1, minWidth: 180 }}>
+            <div style={{ flex: '1 1 150px', minWidth: 0 }}>
               <p
                 style={{
                   margin: 0,

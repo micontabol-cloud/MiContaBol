@@ -1307,3 +1307,13 @@ button.btn-lg {
   /* que la barra no tape lo último de cada pantalla */
   .app-shell.menu-min .app-content { padding-bottom: 6.5rem; }
 }
+
+
+/* ── Red de seguridad de ancho (celular) ──────────────────────────────────────
+   Si alguna pantalla tiene algo más ancho que el teléfono, se recorta dentro del
+   contenido en vez de achicar toda la página. */
+@media (max-width: 860px) {
+  .app-content {
+    overflow-x: clip;
+  }
+}

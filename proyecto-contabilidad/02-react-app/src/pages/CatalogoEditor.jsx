@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { Copy, ExternalLink, Check, QrCode, ArrowUp, ArrowDown, CopyPlus, Pencil, Trash2 } from 'lucide-react'
 import QRCode from 'qrcode'
 import { supabase } from '../supabaseClient'
@@ -12,6 +12,7 @@ const fmt = (n) => `Bs ${Number(n || 0).toFixed(2)}`
 
 export default function CatalogoEditor() {
   const { id: empresaId, catalogoId } = useParams()
+  const navegar = useNavigate()
 
   const [catalogo, setCatalogo] = useState(null)
   const [items, setItems] = useState([])
@@ -264,7 +265,7 @@ export default function CatalogoEditor() {
     setBorrando(false)
     if (error) return setError(error.message)
 
-    window.location.href = `/empresas/${empresaId}/catalogos`
+    navegar(`/empresas/${empresaId}/catalogos`)
   }
 
   async function duplicar() {
@@ -279,7 +280,7 @@ export default function CatalogoEditor() {
     setDuplicando(false)
 
     if (error) return setError(error.message)
-    window.location.href = `/empresas/${empresaId}/catalogos/${data}`
+    navegar(`/empresas/${empresaId}/catalogos/${data}`)
   }
 
   function copiarEnlace() {

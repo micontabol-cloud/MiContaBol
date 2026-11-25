@@ -1,3 +1,4 @@
+import TituloPagina from './components/TituloPagina'
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
@@ -115,6 +116,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <TituloPagina />
         <Suspense fallback={<Cargando />}>
           <Routes>
             <Route path="/" element={<Landing />} />
