@@ -10,12 +10,27 @@ import BoliMascot from './BoliMascot'
  * desincroniza — si el usuario borra todos sus productos, ese paso
  * vuelve a aparecer pendiente, que es lo correcto.
  */
-export default function OnboardingChecklist({ empresa, onOcultar }) {
+export default function OnboardingChecklist({ empresa, onOcultar, conteos }) {
   const { id: empresaId } = useParams()
   const [estado, setEstado] = useState(null)
   const [ocultando, setOcultando] = useState(false)
 
   useEffect(() => {
+    // Si Inicio ya trajo los conteos, no se vuelve a preguntar nada al servidor.
+    if (conteos) {
+      setEstado({
+        productos: (conteos.productos || 0) > 0,
+        ventas: (conteos.ventas || 0) > 0,
+        clientes: (conteos.clientes || 0) > 0,
+        bancos: (conteos.bancos || 0) > 0,
+        equipo: (conteos.miembros || 0) > 1,
+        catalogo: (conteos.catalogos || 0) > 0,
+        compras: (conteos.compras || 0) > 0,
+      })
+      return
+    }
+    // Inicio todavía está cargando: se espera para no preguntar de más.
+    if (!empresa) return
     async function calcular() {
       const [prodRes, ventaRes, clienteRes, bancoRes, miembroRes, catalogoRes, compraRes] = await Promise.all([
         supabase
@@ -52,7 +67,8 @@ export default function OnboardingChecklist({ empresa, onOcultar }) {
       })
     }
     calcular()
-  }, [empresaId])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [empresaId, conteos, empresa?.id])
 
   if (!estado || !empresa) return null
 

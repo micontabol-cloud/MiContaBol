@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient'
 import BoliMascot from '../components/BoliMascot'
 import { saludoDeBoli } from '../lib/saludos'
 import OnboardingChecklist from '../components/OnboardingChecklist'
+import { cargarInicio, conteosInicio } from '../lib/inicioPaquete'
 import AvisoSuscripcion from '../components/AvisoSuscripcion'
 
 const GraficoVentas = lazy(() => import('../components/GraficoVentas'))
@@ -54,7 +55,7 @@ export default function EmpresaDashboard() {
         lotesRes,
         ventasHoyRes,
         totalVentasRes,
-      ] = await Promise.all([
+      ] = await cargarInicio(empresaId, { inicioMes, seisMesesAtras, hoy: hoy.toISOString().slice(0, 10) }, () => Promise.all([
         supabase.from('empresas').select('*').eq('id', empresaId).single(),
         supabase.from('plan_cuentas').select('id, tipo').eq('empresa_id', empresaId),
         supabase
@@ -113,7 +114,7 @@ export default function EmpresaDashboard() {
           .eq('empresa_id', empresaId)
           .is('anulado_at', null)
           .eq('tipo', 'venta'),
-      ])
+      ]))
 
       if (empRes.error) {
         setError(empRes.error.message)
@@ -250,7 +251,7 @@ export default function EmpresaDashboard() {
       <AvisoSuscripcion suscripcion={suscripcion} />
 
       {!onboardingOculto && (
-        <OnboardingChecklist empresa={empresa} onOcultar={() => setOnboardingOculto(true)} />
+        <OnboardingChecklist empresa={empresa} conteos={conteosInicio.get(empresaId)} onOcultar={() => setOnboardingOculto(true)} />
       )}
 
       <div style={{ display: 'flex', gap: '0.6rem', margin: '1.25rem 0 1.75rem', flexWrap: 'wrap' }}>
