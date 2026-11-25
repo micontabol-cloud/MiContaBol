@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -164,7 +165,7 @@ export default function MetodosPago() {
             {metodos.map((m) => (
               <tr key={m.id} style={{ borderBottom: '1px solid #E6ECF3', opacity: m.activo ? 1 : 0.5 }}>
                 <td style={{ padding: '6px 8px', fontWeight: 600 }}>
-                  {m.icono} {m.nombre}
+                  <Ico e={m.icono} /> {m.nombre}
                 </td>
                 <td style={{ padding: '6px 8px' }}>
                   {m.es_credito ? (
@@ -183,7 +184,7 @@ export default function MetodosPago() {
                   )}
                   {!m.es_credito && !m.cuenta_id && (
                     <span style={{ color: '#B45309', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
-                      ⚠️ sin configurar
+                      <Ico e="⚠️" size={14} /> sin configurar
                     </span>
                   )}
                   {(() => {
@@ -200,14 +201,14 @@ export default function MetodosPago() {
                     if (esEfectivo && cuentaEsBanco) {
                       return (
                         <span style={{ color: '#B45309', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
-                          ⚠️ el efectivo suele ir a caja, no al banco
+                          <Ico e="⚠️" size={14} /> el efectivo suele ir a caja, no al banco
                         </span>
                       )
                     }
                     if (esDigital && cuentaEsCaja) {
                       return (
                         <span style={{ color: '#B45309', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
-                          ⚠️ esto llega al banco, no a la caja
+                          <Ico e="⚠️" size={14} /> esto llega al banco, no a la caja
                         </span>
                       )
                     }

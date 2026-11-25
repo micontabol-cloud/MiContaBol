@@ -1,3 +1,4 @@
+import Ico from './Ico'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 
@@ -57,14 +58,16 @@ export default function AsientoPreview({
             fontSize: '0.85rem',
           }}
         >
-          ⚠️ {aviso}
+          <Ico e="⚠️" /> {aviso}
         </p>
       )}
 
       <ul style={{ listStyle: 'none', padding: 0, margin: '0.75rem 0 0', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
         {lineas.map((l, i) => (
           <li key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start', fontSize: '0.92rem' }}>
-            <span aria-hidden="true">{l.icono || '•'}</span>
+            <span aria-hidden="true" style={{ display: 'inline-flex', paddingTop: 2 }}>
+              <Ico e={l.icono} size={17} fallback="•" />
+            </span>
             <span style={ocultarSensibles && l.sensible ? { color: '#A3AFBF' } : undefined}>
               {ocultarSensibles && l.sensible ? l.fraseOculta || l.frase : l.frase}
             </span>
@@ -171,7 +174,7 @@ export default function AsientoPreview({
             </tfoot>
           </table></div>
           <p style={{ margin: '0.4rem 0 0', fontSize: '0.8rem', color: cuadra ? '#22C55E' : '#EF4444' }}>
-            {cuadra ? '✓ El asiento cuadra' : '⚠️ El asiento no cuadra'}
+            {cuadra ? '✓ El asiento cuadra' : <><Ico e="⚠️" /> El asiento no cuadra</>}
           </p>
         </div>
       )}

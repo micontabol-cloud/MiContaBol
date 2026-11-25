@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -184,7 +185,7 @@ export default function Compras() {
         <section className="panel-card">
           <h3>A quiénes les debes</h3>
           {porPagar.length === 0 ? (
-            <p style={{ color: '#64748B', fontSize: '0.9rem', margin: 0 }}>No le debes nada a nadie. 🎉</p>
+            <p style={{ color: '#64748B', fontSize: '0.9rem', margin: 0 }}>No le debes nada a nadie. <Ico e="🎉" /></p>
           ) : (
             <ul className="panel-lista">
               {porPagar.slice(0, 5).map((c) => (

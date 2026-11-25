@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -179,7 +180,7 @@ export default function Perfil() {
             <p style={{ margin: 0, fontSize: '0.9rem', color: '#64748B' }}>
               Ese día voy a recibirte con un{' '}
               <strong style={{ color: '#1F3A5F' }}>
-                🎂 ¡Feliz cumpleaños{nombre ? `, ${nombre.trim().split(/\s+/)[0]}` : ''}!
+                <Ico e="🎂" /> ¡Feliz cumpleaños{nombre ? `, ${nombre.trim().split(/\s+/)[0]}` : ''}!
               </strong>
             </p>
           </div>

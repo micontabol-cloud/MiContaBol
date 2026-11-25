@@ -1,3 +1,5 @@
+import Ico from './Ico'
+
 export default function MetodoPagoSelector({ metodos, valor, onChange, etiqueta = '¿Cómo te pagan?' }) {
   return (
     <div>
@@ -28,7 +30,9 @@ export default function MetodoPagoSelector({ metodos, valor, onChange, etiqueta 
                 cursor: 'pointer',
               }}
             >
-              <span style={{ fontSize: '1.3rem' }}>{m.icono || '💰'}</span>
+              <span style={{ fontSize: '1.3rem', display: 'inline-flex' }}>
+                <Ico e={m.icono || '💰'} size={22} />
+              </span>
               <span>{m.nombre}</span>
               {sinCuenta && <span style={{ fontSize: '0.68rem', color: '#B45309' }}>sin configurar</span>}
             </button>

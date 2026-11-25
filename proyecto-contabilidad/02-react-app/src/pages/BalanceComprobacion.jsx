@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -162,10 +163,10 @@ export default function BalanceComprobacion() {
 
           <p style={{ marginTop: '1rem' }}>
             {Math.abs(totalDebe - totalHaber) < 0.005 ? (
-              <span style={{ color: '#15803D' }}>✅ El total debe y el total haber cuadran.</span>
+              <span style={{ color: '#15803D' }}><Ico e="✅" /> El total debe y el total haber cuadran.</span>
             ) : (
               <span style={{ color: '#DC2626' }}>
-                ⚠️ No cuadran (diferencia: {(totalDebe - totalHaber).toFixed(2)}).
+                <Ico e="⚠️" /> No cuadran (diferencia: {(totalDebe - totalHaber).toFixed(2)}).
               </span>
             )}
           </p>

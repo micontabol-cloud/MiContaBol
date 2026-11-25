@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -225,10 +226,10 @@ export default function EstadosFinancieros() {
 
             <p style={{ marginTop: '1rem' }}>
               {cuadra ? (
-                <span style={{ color: '#15803D' }}>✅ Activo = Pasivo + Patrimonio. La ecuación contable cuadra.</span>
+                <span style={{ color: '#15803D' }}><Ico e="✅" /> Activo = Pasivo + Patrimonio. La ecuación contable cuadra.</span>
               ) : (
                 <span style={{ color: '#DC2626' }}>
-                  ⚠️ No cuadra (diferencia: {(totalActivo - totalPasivoMasPatrimonio).toFixed(2)}).
+                  <Ico e="⚠️" /> No cuadra (diferencia: {(totalActivo - totalPasivoMasPatrimonio).toFixed(2)}).
                 </span>
               )}
             </p>

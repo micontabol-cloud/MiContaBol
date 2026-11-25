@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -374,7 +375,13 @@ export default function Productos() {
         style={{ margin: '1rem 0', border: '1px solid #E6ECF3', borderRadius: 12, padding: '0.75rem' }}
       >
         <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#1F3A5F' }}>
-          Cómo se registra tu contabilidad {configCompleta ? '✅' : '⚠️ (falta configurar)'}
+          Cómo se registra tu contabilidad {configCompleta ? (
+            <Ico e="✅" style={{ color: '#15803D' }} />
+          ) : (
+            <>
+              <Ico e="⚠️" style={{ color: '#B45309' }} /> (falta configurar)
+            </>
+          )}
         </summary>
 
         <div style={{ padding: '0.9rem 0 0' }}>

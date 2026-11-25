@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -383,7 +384,7 @@ export default function CatalogoPublico() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.92rem' }}>
               {datos.direccion && (
                 <p style={{ margin: 0 }}>
-                  📍{' '}
+                  <Ico e="📍" style={{ color: marca }} />{' '}
                   {datos.maps_url ? (
                     <a href={datos.maps_url} target="_blank" rel="noopener noreferrer" style={{ color: marca }}>
                       {datos.direccion}
@@ -393,10 +394,10 @@ export default function CatalogoPublico() {
                   )}
                 </p>
               )}
-              {datos.horarios && <p style={{ margin: 0 }}>🕒 {datos.horarios}</p>}
+              {datos.horarios && <p style={{ margin: 0 }}><Ico e="🕒" style={{ color: marca }} /> {datos.horarios}</p>}
               {datos.whatsapp && (
                 <p style={{ margin: 0 }}>
-                  💬{' '}
+                  <Ico e="💬" style={{ color: marca }} />{' '}
                   <a
                     href={`https://wa.me/${String(datos.whatsapp).replace(/\D/g, '')}`}
                     target="_blank"
@@ -409,7 +410,7 @@ export default function CatalogoPublico() {
               )}
               {datos.instagram && (
                 <p style={{ margin: 0 }}>
-                  📷{' '}
+                  <Ico e="📷" style={{ color: marca }} />{' '}
                   <a
                     href={`https://instagram.com/${String(datos.instagram).replace('@', '')}`}
                     target="_blank"
@@ -422,7 +423,7 @@ export default function CatalogoPublico() {
               )}
               {datos.facebook && (
                 <p style={{ margin: 0 }}>
-                  👍{' '}
+                  <Ico e="👍" style={{ color: marca }} />{' '}
                   <a href={datos.facebook} target="_blank" rel="noopener noreferrer" style={{ color: marca }}>
                     Síguenos en Facebook
                   </a>

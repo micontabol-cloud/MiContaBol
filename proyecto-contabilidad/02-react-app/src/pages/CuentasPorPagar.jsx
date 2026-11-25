@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { Fragment, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -83,7 +84,7 @@ export default function CuentasPorPagar() {
       {cargando ? (
         <p>Cargando...</p>
       ) : filas.length === 0 ? (
-        <p>No le debes nada a ningún proveedor. 🎉</p>
+        <p>No le debes nada a ningún proveedor. <Ico e="🎉" /></p>
       ) : (
         <>
           <div className="tabla-scroll"><table className="tabla-cards" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>

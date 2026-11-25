@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -170,7 +171,15 @@ export default function NuevoAsiento() {
         <p>
           Total debe: {totalDebe.toFixed(2)} — Total haber: {totalHaber.toFixed(2)}
           {' — '}
-          {balanceado ? '✅ balanceado' : '⚠️ no balanceado'}
+          {balanceado ? (
+            <>
+              <Ico e="✅" style={{ color: '#15803D' }} /> balanceado
+            </>
+          ) : (
+            <>
+              <Ico e="⚠️" style={{ color: '#B45309' }} /> no balanceado
+            </>
+          )}
         </p>
 
         {error && <p style={{ color: '#DC2626' }}>{error}</p>}

@@ -1,3 +1,4 @@
+import Ico from '../components/Ico'
 import { Fragment, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
@@ -248,7 +249,7 @@ export default function Ventas() {
           <section className="panel-card">
             <h3>Quiénes te deben</h3>
             {porCobrar.length === 0 ? (
-              <p style={{ color: '#64748B', fontSize: '0.9rem', margin: 0 }}>Nadie te debe nada. 🎉</p>
+              <p style={{ color: '#64748B', fontSize: '0.9rem', margin: 0 }}>Nadie te debe nada. <Ico e="🎉" /></p>
             ) : (
               <ul className="panel-lista">
                 {porCobrar.slice(0, 5).map((c) => (
