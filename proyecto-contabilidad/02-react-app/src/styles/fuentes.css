@@ -1,0 +1,8 @@
+/* MiContaBol · fuentes propias (sin depender de Google Fonts).
+   Inter para todo el texto, Fraunces solo para titulares de la página principal.
+   Licencias abiertas (OFL): public/fonts/Fraunces-OFL.txt */
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/inter-regular.woff') format('woff'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 500; font-display: swap; src: url('/fonts/inter-medium.woff') format('woff'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 600; font-display: swap; src: url('/fonts/inter-semibold.woff') format('woff'); }
+@font-face { font-family: 'Inter'; font-style: normal; font-weight: 700; font-display: swap; src: url('/fonts/inter-bold.woff') format('woff'); }
+@font-face { font-family: 'Fraunces'; font-style: normal; font-weight: 500 700; font-display: swap; src: url('/fonts/fraunces-600.woff2') format('woff2'); }
