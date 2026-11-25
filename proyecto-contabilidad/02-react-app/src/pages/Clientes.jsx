@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { traerTodo, leerCache, guardarCache, actualizando } from '../lib/datos'
 import PanelModulo from '../components/PanelModulo'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(2)}`
@@ -25,22 +26,35 @@ export default function Clientes() {
   const [nitCi, setNitCi] = useState('')
   const [guardando, setGuardando] = useState(false)
 
-  async function cargar() {
-    setCargando(true)
+  async function cargar(opc = {}) {
+    const clave = `clientes:${empresaId}`
+    const guardado = opc.desdeCache ? await leerCache(clave) : null
+    if (guardado) {
+      setClientes(guardado.clientes)
+      setResumen(new Map(guardado.resumen))
+      setCxc(guardado.cxc)
+      setCargando(false)
+      actualizando(true)
+    } else {
+      setCargando(true)
+    }
     const [{ data: cl, error: errCl }, { data: v }, { data: c }] = await Promise.all([
-      supabase.from('clientes').select('*').eq('empresa_id', empresaId).order('nombre'),
+      traerTodo(() => supabase.from('clientes').select('*').eq('empresa_id', empresaId).order('nombre').order('id')),
       supabase.from('vista_resumen_clientes').select('*').eq('empresa_id', empresaId),
       supabase.from('vista_cuentas_por_cobrar').select('cliente_proveedor, saldo_pendiente').eq('empresa_id', empresaId),
     ])
     if (errCl) setError(errCl.message)
-    setClientes(cl || [])
-    setResumen(new Map((v || []).map((r) => [r.cliente_id, r])))
+    if (!errCl || !guardado) setClientes(cl || [])
+    const resumenNuevo = (v || []).map((r) => [r.cliente_id, r])
+    setResumen(new Map(resumenNuevo))
     setCxc(c || [])
+    if (!errCl) guardarCache(clave, { clientes: cl || [], resumen: resumenNuevo, cxc: c || [] })
+    if (guardado) actualizando(false)
     setCargando(false)
   }
 
   useEffect(() => {
-    cargar()
+    cargar({ desdeCache: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId])
 

@@ -1317,3 +1317,25 @@ button.btn-lg {
     overflow-x: clip;
   }
 }
+
+
+/* ── Aviso "Actualizando…" ───────────────────────────────────────────────── */
+.chip-actualizando {
+  position: fixed;
+  top: 0.8rem;
+  right: 0.9rem;
+  z-index: 70;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--color-navy);
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(15, 26, 41, 0.25);
+  pointer-events: none;
+}
+@media (max-width: 860px) {
+  .chip-actualizando {
+    top: calc(3.9rem + env(safe-area-inset-top, 0px));
+  }
+}

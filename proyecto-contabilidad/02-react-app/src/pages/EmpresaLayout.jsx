@@ -1,3 +1,4 @@
+import ChipActualizando from '../components/ChipActualizando'
 import { Suspense, lazy, useEffect, useState, createContext, useContext } from 'react'
 import { NavLink, Outlet, useParams, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
@@ -390,6 +391,7 @@ function LayoutInterno() {
 
       <div className="app-content">
         <Suspense fallback={<p style={{ color: 'var(--color-text-secondary)' }}>Cargando…</p>}>
+          <ChipActualizando />
           <Outlet />
         </Suspense>
       </div>

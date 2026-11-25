@@ -2,6 +2,7 @@ import Ico from '../components/Ico'
 import { Fragment, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { traerTodo, leerCache, guardarCache, actualizando } from '../lib/datos'
 import PanelModulo from '../components/PanelModulo'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(2)}`
@@ -21,32 +22,47 @@ export default function Ventas() {
   const [verAnulacion, setVerAnulacion] = useState(null)
   const [detalleAnulacion, setDetalleAnulacion] = useState({})
 
-  useEffect(() => {
-    async function cargar() {
+  async function cargar(opc = {}) {
+      const clave = `ventas:${empresaId}`
+      const guardado = opc.desdeCache ? await leerCache(clave) : null
+      if (guardado) {
+        setVentas(guardado.ventas)
+        setPorCobrar(guardado.porCobrar)
+        setTopProductos(guardado.topProductos)
+        setCargando(false)
+        actualizando(true)
+      }
       const hoy = new Date()
       const inicioMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().slice(0, 10)
 
       const [ventasRes, cxcRes, itemsRes] = await Promise.all([
-        supabase
-          .from('comprobantes')
-          .select('*, comprobante_items(id)')
-          .eq('empresa_id', empresaId)
-          .eq('tipo', 'venta')
-          .order('fecha', { ascending: false })
-          .order('numero_interno', { ascending: false }),
+        traerTodo(() =>
+          supabase
+            .from('comprobantes')
+            .select('*, comprobante_items(id)')
+            .eq('empresa_id', empresaId)
+            .eq('tipo', 'venta')
+            .order('fecha', { ascending: false })
+            .order('numero_interno', { ascending: false })
+            .order('id', { ascending: false })
+        ),
         supabase.from('vista_cuentas_por_cobrar').select('*').eq('empresa_id', empresaId),
-        supabase
-          .from('comprobante_items')
-          .select('cantidad, precio_unitario, producto_id, productos(nombre), comprobantes!inner(fecha, tipo, empresa_id)')
-          .eq('comprobantes.empresa_id', empresaId)
-          .eq('comprobantes.tipo', 'venta')
-          .is('comprobantes.anulado_at', null)
-          .gte('comprobantes.fecha', inicioMes),
+        traerTodo(() =>
+          supabase
+            .from('comprobante_items')
+            .select('cantidad, precio_unitario, producto_id, productos(nombre), comprobantes!inner(fecha, tipo, empresa_id)')
+            .eq('comprobantes.empresa_id', empresaId)
+            .eq('comprobantes.tipo', 'venta')
+            .is('comprobantes.anulado_at', null)
+            .gte('comprobantes.fecha', inicioMes)
+            .order('id', { ascending: true })
+        ),
       ])
 
       if (ventasRes.error) setError(ventasRes.error.message)
-      setVentas(ventasRes.data || [])
-      setPorCobrar((cxcRes.data || []).filter((c) => Number(c.saldo_pendiente) > 0.005))
+      const porCobrarNuevo = (cxcRes.data || []).filter((c) => Number(c.saldo_pendiente) > 0.005)
+      if (!ventasRes.error || !guardado) setVentas(ventasRes.data || [])
+      setPorCobrar(porCobrarNuevo)
 
       // Producto más vendido del mes, por unidades
       const porProducto = new Map()
@@ -56,11 +72,17 @@ export default function Ventas() {
         prev.monto += Number(it.cantidad) * Number(it.precio_unitario)
         porProducto.set(it.producto_id, prev)
       })
-      setTopProductos([...porProducto.values()].sort((a, b) => b.unidades - a.unidades).slice(0, 5))
+      const topNuevo = [...porProducto.values()].sort((a, b) => b.unidades - a.unidades).slice(0, 5)
+      setTopProductos(topNuevo)
 
+      if (!ventasRes.error) guardarCache(clave, { ventas: ventasRes.data || [], porCobrar: porCobrarNuevo, topProductos: topNuevo })
+      if (guardado) actualizando(false)
       setCargando(false)
-    }
-    cargar()
+  }
+
+  useEffect(() => {
+    cargar({ desdeCache: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId])
 
   const hoyStr = new Date().toISOString().slice(0, 10)

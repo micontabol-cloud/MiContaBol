@@ -2,6 +2,7 @@ import Ico from '../components/Ico'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { traerTodo, leerCache, guardarCache, actualizando } from '../lib/datos'
 import BoliMascot from '../components/BoliMascot'
 import EscanerCodigo from '../components/EscanerCodigo'
 
@@ -66,10 +67,33 @@ export default function Productos() {
   const [motivoEliminar, setMotivoEliminar] = useState('')
   const [procesandoEliminar, setProcesandoEliminar] = useState(false)
 
-  async function cargar() {
-    setCargando(true)
+  function aplicarEmpresa(e) {
+    if (!e) return
+    setCuentaVentas(e.cuenta_ventas_id || '')
+    setCuentaCosto(e.cuenta_costo_ventas_id || '')
+    setCuentaInventario(e.cuenta_inventario_id || '')
+    setCuentaCxc(e.cuenta_cxc_id || '')
+    setCuentaCxp(e.cuenta_cxp_id || '')
+    setEdRubro(e.rubro || 'otro')
+    setEdUsaVenc(!!e.usa_vencimiento)
+  }
+
+  async function cargar(opc = {}) {
+    const clave = `productos:${empresaId}`
+    const guardado = opc.desdeCache ? await leerCache(clave) : null
+    if (guardado) {
+      setProductos(guardado.productos)
+      setCategorias(guardado.categorias)
+      setCuentas(guardado.cuentas)
+      setEmpresa(guardado.empresa)
+      aplicarEmpresa(guardado.empresa)
+      setCargando(false)
+      actualizando(true)
+    } else {
+      setCargando(true)
+    }
     const [prodRes, catRes, ctasRes, empRes, varRes] = await Promise.all([
-      supabase.from('productos').select('*').eq('empresa_id', empresaId).is('eliminado_at', null).order('codigo'),
+      traerTodo(() => supabase.from('productos').select('*').eq('empresa_id', empresaId).is('eliminado_at', null).order('codigo').order('id')),
       supabase.from('categorias_producto').select('*').eq('empresa_id', empresaId).order('nombre'),
       supabase
         .from('plan_cuentas')
@@ -93,31 +117,24 @@ export default function Productos() {
       stockPorProducto.set(s.producto_id, prev)
     })
 
-    setProductos(
-      (prodRes.data || []).map((p) => ({
-        ...p,
-        stock_total: stockPorProducto.get(p.id)?.stock ?? Number(p.stock_actual),
-        tiene_stock_bajo: stockPorProducto.get(p.id)?.bajo ?? false,
-      }))
-    )
+    const productosNuevos = (prodRes.data || []).map((p) => ({
+      ...p,
+      stock_total: stockPorProducto.get(p.id)?.stock ?? Number(p.stock_actual),
+      tiene_stock_bajo: stockPorProducto.get(p.id)?.bajo ?? false,
+    }))
+    if (!prodRes.error || !guardado) setProductos(productosNuevos)
     setCategorias(catRes.data || [])
     setCuentas(ctasRes.data || [])
     setEmpresa(empRes.data)
     supabase.rpc('uso_inventario', { p_empresa_id: empresaId }).then(({ data }) => setUso(data))
-    if (empRes.data) {
-      setCuentaVentas(empRes.data.cuenta_ventas_id || '')
-      setCuentaCosto(empRes.data.cuenta_costo_ventas_id || '')
-      setCuentaInventario(empRes.data.cuenta_inventario_id || '')
-      setCuentaCxc(empRes.data.cuenta_cxc_id || '')
-      setCuentaCxp(empRes.data.cuenta_cxp_id || '')
-      setEdRubro(empRes.data.rubro || 'otro')
-      setEdUsaVenc(!!empRes.data.usa_vencimiento)
-    }
+    aplicarEmpresa(empRes.data)
+    if (!prodRes.error) guardarCache(clave, { productos: productosNuevos, categorias: catRes.data || [], cuentas: ctasRes.data || [], empresa: empRes.data })
+    if (guardado) actualizando(false)
     setCargando(false)
   }
 
   useEffect(() => {
-    cargar()
+    cargar({ desdeCache: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId])
 

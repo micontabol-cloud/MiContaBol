@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { traerTodo, leerCache, guardarCache, actualizando } from '../lib/datos'
 import BoliMascot from '../components/BoliMascot'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(2)}`
@@ -33,7 +34,18 @@ export default function Inventario() {
 
   useEffect(() => {
     async function cargar() {
-      setCargando(true)
+      const clave = `inventario:${empresaId}`
+      const guardado = await leerCache(clave)
+      if (guardado) {
+        setStock(guardado.stock)
+        setActividad(new Map(guardado.actividad))
+        setNumCategorias(guardado.numCategorias)
+        setRecientes(guardado.recientes)
+        setCargando(false)
+        actualizando(true)
+      } else {
+        setCargando(true)
+      }
       const [stockRes, actRes, catRes, recRes] = await Promise.all([
         supabase.from('vista_stock').select('*').eq('empresa_id', empresaId).eq('activo', true),
         supabase.from('vista_producto_actividad').select('*').eq('empresa_id', empresaId),
@@ -53,10 +65,13 @@ export default function Inventario() {
 
       if (stockRes.error) setError(stockRes.error.message)
 
-      setStock(stockRes.data || [])
-      setActividad(new Map((actRes.data || []).map((a) => [a.producto_id, a])))
+      const actividadNueva = (actRes.data || []).map((a) => [a.producto_id, a])
+      if (!stockRes.error || !guardado) setStock(stockRes.data || [])
+      setActividad(new Map(actividadNueva))
       setNumCategorias(catRes.count || 0)
       setRecientes(recRes.data || [])
+      if (!stockRes.error) guardarCache(clave, { stock: stockRes.data || [], actividad: actividadNueva, numCategorias: catRes.count || 0, recientes: recRes.data || [] })
+      if (guardado) actualizando(false)
       setCargando(false)
     }
     cargar()
