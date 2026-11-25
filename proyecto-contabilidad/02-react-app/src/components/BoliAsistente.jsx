@@ -217,7 +217,7 @@ export default function BoliAsistente({ empresaId }) {
 
       let respuesta
       try {
-        const { data, error } = await supabase.functions.invoke('boli', {
+        const { data, error } = await supabase.functions.invoke('hyper-endpoint', {
           body: { empresa_id: empresaId, mensajes: historial },
         })
         respuesta = error ? { ok: false, motivo: 'error' } : data
