@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
 import { useAuth } from '../contexts/AuthContext'
+import { leerCache, guardarCache } from '../lib/datos'
 
 export default function MisEmpresas() {
   const { session } = useAuth()
@@ -11,6 +12,15 @@ export default function MisEmpresas() {
   const [pagosPendientes, setPagosPendientes] = useState(0)
   const [cargando, setCargando] = useState(true)
 
+  // Mientras eliges tu negocio se baja en silencio la pantalla de Inicio y su gráfico.
+  useEffect(() => {
+    const t = setTimeout(() => {
+      import('./EmpresaDashboard')
+      import('../components/GraficoVentas')
+    }, 600)
+    return () => clearTimeout(t)
+  }, [])
+
   useEffect(() => {
     if (!session) return
 
@@ -18,27 +28,33 @@ export default function MisEmpresas() {
       // Filtramos explícitamente por membresía: ahora que el super admin
       // puede VER todas las empresas (vía RLS), esta pantalla debe seguir
       // mostrando solo las que son realmente "mías" (donde soy miembro).
-      const { data, error } = await supabase
-        .from('miembros_empresa')
-        .select('rol, empresas(*)')
-        .eq('usuario_id', session.user.id)
-
-      if (!error) {
-        setEmpresas(data.map((m) => ({ ...m.empresas, rol: m.rol })))
+      // Lo último que viste sale al instante y se actualiza por detrás.
+      const clave = 'misEmpresas'
+      const guardado = await leerCache(clave)
+      if (guardado) {
+        setEmpresas(guardado.empresas)
+        setEsAdmin(guardado.esAdmin)
+        setCupo(guardado.cupo)
+        setCargando(false)
       }
 
-      const { data: admin } = await supabase.rpc('soy_super_admin')
-      setEsAdmin(!!admin)
+      // Las tres cosas se piden a la vez (antes eran una detrás de otra).
+      const [miembrosRes, adminRes, cupoRes] = await Promise.all([
+        supabase.from('miembros_empresa').select('rol, empresas(*)').eq('usuario_id', session.user.id),
+        supabase.rpc('soy_super_admin'),
+        supabase.rpc('mi_cupo_empresas'),
+      ])
 
-      const { data: c } = await supabase.rpc('mi_cupo_empresas')
-      setCupo(c)
-
-      if (admin) {
-        const { data: n } = await supabase.rpc('contar_pagos_pendientes')
-        setPagosPendientes(n || 0)
-      }
-
+      const nuevas = miembrosRes.error ? null : miembrosRes.data.map((m) => ({ ...m.empresas, rol: m.rol }))
+      const admin = !!adminRes.data
+      if (nuevas) setEmpresas(nuevas)
+      setEsAdmin(admin)
+      setCupo(cupoRes.data)
+      if (nuevas) guardarCache(clave, { empresas: nuevas, esAdmin: admin, cupo: cupoRes.data })
       setCargando(false)
+
+      // El contador de pagos pendientes llega cuando llegue: ya no hace esperar a nadie.
+      if (admin) supabase.rpc('contar_pagos_pendientes').then(({ data: n }) => setPagosPendientes(n || 0))
     }
     cargar()
   }, [session])

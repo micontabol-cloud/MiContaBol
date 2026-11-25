@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../supabaseClient'
+import { leerCache, guardarCache } from '../lib/datos'
 
 const RolContext = createContext({ rol: null, cargando: true })
 
@@ -11,12 +12,22 @@ export function RolProvider({ empresaId, children }) {
     let cancelado = false
 
     async function cargar() {
-      setCargando(true)
+      // El rol casi nunca cambia: se recuerda para que el menú salga completo al instante.
+      const clave = `rol:${empresaId}`
+      const guardado = await leerCache(clave)
+      if (cancelado) return
+      if (guardado && guardado.rol) {
+        setRol(guardado.rol)
+        setCargando(false)
+      } else {
+        setCargando(true)
+      }
       const { data } = await supabase.rpc('rol_en_empresa', { p_empresa_id: empresaId })
       if (!cancelado) {
         setRol(data || null)
         setCargando(false)
       }
+      if (data) guardarCache(clave, { rol: data })
     }
 
     if (empresaId) cargar()

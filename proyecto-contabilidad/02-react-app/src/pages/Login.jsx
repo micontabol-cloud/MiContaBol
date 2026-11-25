@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { MailCheck, ArrowLeft } from 'lucide-react'
 import { supabase } from '../supabaseClient'
@@ -14,6 +14,12 @@ export default function Login() {
   const [reenviando, setReenviando] = useState(false)
   const [aviso, setAviso] = useState(null)
   const navigate = useNavigate()
+
+  // Mientras escribes tu clave, se baja en silencio la pantalla que sigue.
+  useEffect(() => {
+    const t = setTimeout(() => import('./MisEmpresas'), 300)
+    return () => clearTimeout(t)
+  }, [])
 
   const registrando = modo === 'registrar'
 
