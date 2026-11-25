@@ -193,7 +193,7 @@ function LayoutInterno() {
 
   return (
     <BarraLateral.Provider value={{ colapsado }}>
-    <div className="app-shell">
+    <div className={'app-shell' + (colapsado ? ' menu-min' : '')}>
       <header className="topbar-movil">
         <Logo to="/empresas" dark iconSize={30} textSize="1.05rem" />
         <span style={{ fontSize: '0.82rem', color: '#93A5C4', maxWidth: 140, textAlign: 'right' }}>
@@ -439,7 +439,7 @@ function LayoutInterno() {
         <button
           type="button"
           className={'barra-movil-item' + (menuAbierto ? ' activo' : '')}
-          onClick={() => setMenuAbierto(true)}
+          onClick={() => (window.matchMedia('(min-width: 861px)').matches ? alternarMenu() : setMenuAbierto(true))}
           aria-label="Abrir menú"
         >
           <MoreHorizontal size={21} strokeWidth={1.9} />
