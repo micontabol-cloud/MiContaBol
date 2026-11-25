@@ -144,7 +144,7 @@ export default function PromotorVender() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.98rem' }}>
               <span style={{ color: '#64748B' }}>Le debes al negocio</span>
-              <strong style={{ color: '#F59E0B' }}>{fmt(resultado.debes)}</strong>
+              <strong style={{ color: '#B45309' }}>{fmt(resultado.debes)}</strong>
             </div>
             <div
               style={{
@@ -156,7 +156,7 @@ export default function PromotorVender() {
               }}
             >
               <span style={{ fontWeight: 700, color: '#15803D' }}>Tu ganancia</span>
-              <strong style={{ color: '#22C55E', fontSize: '1.3rem' }}>{fmt(resultado.tu_ganancia)}</strong>
+              <strong style={{ color: '#15803D', fontSize: '1.3rem' }}>{fmt(resultado.tu_ganancia)}</strong>
             </div>
           </div>
 
@@ -304,7 +304,7 @@ export default function PromotorVender() {
                   {p && cant > 0 && (
                     <p style={{ margin: '0.7rem 0 0', fontSize: '0.88rem', color: '#64748B' }}>
                       Le pagas <strong>{fmt(cant * Number(p.precio_mayorista))}</strong> al negocio · te quedas con{' '}
-                      <strong style={{ color: '#22C55E' }}>
+                      <strong style={{ color: '#15803D' }}>
                         {fmt(cant * precio - cant * Number(p.precio_mayorista))}
                       </strong>
                     </p>
@@ -340,7 +340,7 @@ export default function PromotorVender() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span style={{ color: '#64748B' }}>Le pagas al negocio</span>
-                  <strong style={{ color: '#F59E0B' }}>{fmt(totales.debes)}</strong>
+                  <strong style={{ color: '#B45309' }}>{fmt(totales.debes)}</strong>
                 </div>
                 <div
                   style={{
@@ -351,7 +351,7 @@ export default function PromotorVender() {
                   }}
                 >
                   <strong style={{ color: '#15803D' }}>Tu ganancia</strong>
-                  <strong style={{ color: '#22C55E', fontSize: '1.15rem' }}>{fmt(ganancia)}</strong>
+                  <strong style={{ color: '#15803D', fontSize: '1.15rem' }}>{fmt(ganancia)}</strong>
                 </div>
               </div>
             </div>
@@ -363,7 +363,7 @@ export default function PromotorVender() {
             <input value={nota} onChange={(e) => setNota(e.target.value)} style={{ width: '100%', maxWidth: 400 }} />
           </label>
 
-          {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+          {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
           <button
             className="btn-hero"

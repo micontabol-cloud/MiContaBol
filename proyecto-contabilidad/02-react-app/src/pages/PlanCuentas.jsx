@@ -239,7 +239,7 @@ export default function PlanCuentas() {
         Mostrar cuentas desactivadas
       </label>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>

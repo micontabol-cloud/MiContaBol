@@ -102,8 +102,8 @@ export default function PerfilEmpresa() {
         Los datos de tu negocio y su imagen. Se usan en tus catálogos y reportes.
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
-      {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
+      {aviso && <p style={{ color: '#15803D', fontWeight: 600 }}>{aviso}</p>}
 
       {/* Logo */}
       <SelectorImagen

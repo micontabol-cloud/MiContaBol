@@ -128,7 +128,7 @@ export default function MetodosPago() {
         </p>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cuentas.filter((c) => /banco/i.test(c.nombre)).length === 0 && (
         <p
@@ -182,7 +182,7 @@ export default function MetodosPago() {
                     </select>
                   )}
                   {!m.es_credito && !m.cuenta_id && (
-                    <span style={{ color: '#F59E0B', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
+                    <span style={{ color: '#B45309', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
                       ⚠️ sin configurar
                     </span>
                   )}
@@ -199,14 +199,14 @@ export default function MetodosPago() {
 
                     if (esEfectivo && cuentaEsBanco) {
                       return (
-                        <span style={{ color: '#F59E0B', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
+                        <span style={{ color: '#B45309', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
                           ⚠️ el efectivo suele ir a caja, no al banco
                         </span>
                       )
                     }
                     if (esDigital && cuentaEsCaja) {
                       return (
-                        <span style={{ color: '#F59E0B', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
+                        <span style={{ color: '#B45309', fontSize: '0.78rem', marginLeft: '0.4rem' }}>
                           ⚠️ esto llega al banco, no a la caja
                         </span>
                       )

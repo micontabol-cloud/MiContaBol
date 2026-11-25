@@ -173,7 +173,7 @@ export default function NuevoAsiento() {
           {balanceado ? '✅ balanceado' : '⚠️ no balanceado'}
         </p>
 
-        {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+        {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
         <button type="submit" disabled={guardando || !balanceado}>
           Confirmar asiento

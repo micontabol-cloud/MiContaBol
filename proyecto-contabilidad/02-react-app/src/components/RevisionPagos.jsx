@@ -104,7 +104,7 @@ export default function RevisionPagos() {
         </select>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -128,13 +128,13 @@ export default function RevisionPagos() {
                 <div style={{ flex: 1, minWidth: 220 }}>
                   <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F' }}>
                     {s.nombre || s.email}
-                    {s.nombre && <span style={{ color: '#A3AFBF', fontWeight: 400 }}> · {s.email}</span>}
+                    {s.nombre && <span style={{ color: '#64748B', fontWeight: 400 }}> · {s.email}</span>}
                   </p>
                   <p style={{ margin: '0.25rem 0 0', color: '#64748B', fontSize: '0.9rem' }}>
                     Plan <strong>{s.plan_nombre}</strong> · {s.ciclo} ·{' '}
                     <strong style={{ color: '#1F3A5F' }}>{fmt(s.monto)}</strong>
                   </p>
-                  <p style={{ margin: '0.2rem 0 0', color: '#A3AFBF', fontSize: '0.82rem' }}>
+                  <p style={{ margin: '0.2rem 0 0', color: '#64748B', fontSize: '0.82rem' }}>
                     Enviado el {new Date(s.created_at).toLocaleString('es-BO')}
                     {s.referencia && ` · Ref: ${s.referencia}`}
                   </p>
@@ -168,7 +168,7 @@ export default function RevisionPagos() {
                           setRechazando(rechazando === s.id ? null : s.id)
                           setMotivo('')
                         }}
-                        style={{ color: '#EF4444', borderColor: '#EF4444' }}
+                        style={{ color: '#DC2626', borderColor: '#EF4444' }}
                       >
                         Rechazar
                       </button>

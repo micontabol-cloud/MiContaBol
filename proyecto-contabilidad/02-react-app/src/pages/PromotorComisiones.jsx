@@ -31,7 +31,7 @@ export default function PromotorComisiones() {
   if (error) {
     return (
       <main style={{ maxWidth: 800, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error}</p>
+        <p style={{ color: '#DC2626' }}>{error}</p>
       </main>
     )
   }
@@ -84,7 +84,7 @@ export default function PromotorComisiones() {
             textAlign: 'center',
           }}
         >
-          <EyeOff size={32} strokeWidth={1.5} style={{ color: '#A3AFBF' }} />
+          <EyeOff size={32} strokeWidth={1.5} style={{ color: '#64748B' }} />
           <p style={{ color: '#64748B', marginTop: '0.75rem', maxWidth: 340, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
             Tus números están ocultos. Toca <strong>Mostrar</strong> cuando estés en un lugar donde nadie más vea
             la pantalla.
@@ -103,11 +103,11 @@ export default function PromotorComisiones() {
               marginTop: '1.5rem',
             }}
           >
-            <TrendingUp size={28} strokeWidth={1.8} style={{ color: '#22C55E' }} />
+            <TrendingUp size={28} strokeWidth={1.8} style={{ color: '#15803D' }} />
             <p style={{ margin: '0.6rem 0 0', color: '#64748B', fontSize: '0.95rem' }}>
               Ganaste en total, desde que empezaste
             </p>
-            <p style={{ margin: '0.25rem 0 0', fontSize: '2.2rem', fontWeight: 800, color: '#22C55E' }}>
+            <p style={{ margin: '0.25rem 0 0', fontSize: '2.2rem', fontWeight: 800, color: '#15803D' }}>
               {fmt(datos?.total_historico)}
             </p>
             <p style={{ margin: '0.5rem 0 0', fontSize: '0.88rem', color: '#64748B' }}>
@@ -206,7 +206,7 @@ export default function PromotorComisiones() {
                         <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F', textTransform: 'capitalize' }}>
                           {m.etiqueta}
                         </p>
-                        <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#22C55E' }}>
+                        <p style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#15803D' }}>
                           {fmt(m.comision)}
                         </p>
                       </div>

@@ -304,7 +304,7 @@ export default function CatalogoEditor() {
   if (!catalogo) {
     return (
       <main style={{ maxWidth: 950, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error || 'Catálogo no encontrado.'}</p>
+        <p style={{ color: '#DC2626' }}>{error || 'Catálogo no encontrado.'}</p>
       </main>
     )
   }
@@ -355,7 +355,7 @@ export default function CatalogoEditor() {
         </div>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {editandoDatos && (
         <form
@@ -477,7 +477,7 @@ export default function CatalogoEditor() {
                   Cancelar
                 </button>
               </div>
-              <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: '#A3AFBF' }}>
+              <p style={{ margin: '0.5rem 0 0', fontSize: '0.8rem', color: '#64748B' }}>
                 Si ya compartiste el enlace anterior, dejará de funcionar al cambiarlo.
               </p>
             </div>
@@ -737,7 +737,7 @@ export default function CatalogoEditor() {
                       <p style={{ margin: 0, fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.3 }}>{p.nombre}</p>
 
                       {(p.categoria || p.observaciones) && (
-                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#64748B' }}>
                           {[p.categoria, p.observaciones].filter(Boolean).join(' · ')}
                         </p>
                       )}
@@ -760,7 +760,7 @@ export default function CatalogoEditor() {
                       </p>
 
                       {Number(p.stock) <= 0 && (
-                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#EF4444' }}>Agotado</p>
+                        <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#DC2626' }}>Agotado</p>
                       )}
                     </div>
                   </div>
@@ -882,7 +882,7 @@ export default function CatalogoEditor() {
           />
           <span>
             Mostrar quién atiende, con tu foto y nombre de perfil
-            <span style={{ display: 'block', fontSize: '0.82rem', color: '#A3AFBF', marginTop: '0.15rem' }}>
+            <span style={{ display: 'block', fontSize: '0.82rem', color: '#64748B', marginTop: '0.15rem' }}>
               En un negocio chico, ver la cara de quien atiende da confianza. Ten en cuenta que el catálogo es
               público: tu foto la verá cualquiera que abra el enlace.
             </span>
@@ -956,7 +956,7 @@ export default function CatalogoEditor() {
                         <span>
                           {s.nombre_completo}
                           {(s.categoria_nombre || s.observaciones) && (
-                            <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                            <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B' }}>
                               {[s.categoria_nombre, s.observaciones].filter(Boolean).join(' · ')}
                             </span>
                           )}
@@ -978,7 +978,7 @@ export default function CatalogoEditor() {
                           style={{ width: 100, textAlign: 'right' }}
                         />
                       ) : (
-                        <span style={{ color: '#A3AFBF' }}>—</span>
+                        <span style={{ color: '#64748B' }}>—</span>
                       )}
                     </td>
                     <td style={{ padding: '6px 8px', whiteSpace: 'nowrap' }}>
@@ -1011,7 +1011,7 @@ export default function CatalogoEditor() {
         </div>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.85rem', marginTop: '0.75rem' }}>
+      <p style={{ color: '#64748B', fontSize: '0.85rem', marginTop: '0.75rem' }}>
         Deja el precio del catálogo vacío para usar el precio normal. Si pones uno menor, el catálogo muestra el
         precio tachado y el porcentaje de descuento. Usa las flechas para poner arriba lo que más quieras vender.
       </p>
@@ -1037,7 +1037,7 @@ export default function CatalogoEditor() {
             <button
               type="button"
               onClick={() => setConfirmarBorrar(true)}
-              style={{ color: '#EF4444', borderColor: '#EF4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+              style={{ color: '#DC2626', borderColor: '#EF4444', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
             >
               <Trash2 size={16} strokeWidth={1.8} />
               Eliminar catálogo

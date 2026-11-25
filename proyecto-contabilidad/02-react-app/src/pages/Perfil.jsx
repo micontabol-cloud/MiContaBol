@@ -76,8 +76,8 @@ export default function Perfil() {
         todas.
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
-      {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
+      {aviso && <p style={{ color: '#15803D', fontWeight: 600 }}>{aviso}</p>}
 
       <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'flex-start', flexWrap: 'wrap', margin: '1.5rem 0' }}>
         <div>
@@ -118,7 +118,7 @@ export default function Perfil() {
           )}
         </div>
 
-        <p style={{ fontSize: '0.85rem', color: '#A3AFBF', margin: 0, alignSelf: 'center' }}>
+        <p style={{ fontSize: '0.85rem', color: '#64748B', margin: 0, alignSelf: 'center' }}>
           {session?.user?.email}
         </p>
       </div>
@@ -133,7 +133,7 @@ export default function Perfil() {
             placeholder="Pepe Severiche"
             style={{ width: '100%' }}
           />
-          <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+          <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>
             Boli te va a saludar por tu nombre al entrar.
           </span>
         </label>
@@ -147,7 +147,7 @@ export default function Perfil() {
             placeholder="70000000"
             style={{ width: '100%' }}
           />
-          <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+          <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>
             Personal. El del negocio se configura aparte, en la imagen de tu negocio.
           </span>
         </label>
@@ -190,7 +190,7 @@ export default function Perfil() {
         </button>
       </form>
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.82rem', marginTop: '1.5rem' }}>
+      <p style={{ color: '#64748B', fontSize: '0.82rem', marginTop: '1.5rem' }}>
         Solo tú puedes ver estos datos. Ni los otros miembros de tus empresas ni el soporte de MiContaBol tienen
         acceso a tu fecha de nacimiento.
       </p>

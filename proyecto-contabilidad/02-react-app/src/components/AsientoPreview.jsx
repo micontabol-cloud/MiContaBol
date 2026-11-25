@@ -151,7 +151,7 @@ export default function AsientoPreview({
               {lineas.map((l, i) => (
                 <tr key={i} style={{ borderBottom: '1px solid #E6ECF3' }}>
                   <td style={{ padding: '3px 6px' }}>
-                    {l.cuenta ? `${l.cuenta.codigo} — ${l.cuenta.nombre}` : <em style={{ color: '#A3AFBF' }}>sin definir</em>}
+                    {l.cuenta ? `${l.cuenta.codigo} — ${l.cuenta.nombre}` : <em style={{ color: '#64748B' }}>sin definir</em>}
                   </td>
                   <td style={{ padding: '3px 6px', textAlign: 'right' }}>
                     {Number(l.debe) > 0 ? Number(l.debe).toFixed(2) : ''}

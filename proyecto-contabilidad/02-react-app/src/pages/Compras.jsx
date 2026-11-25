@@ -173,7 +173,7 @@ export default function Compras() {
                 ))}
               </ul>
               {reponer.length > 6 && (
-                <p style={{ margin: '0.6rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
+                <p style={{ margin: '0.6rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
                   y {reponer.length - 6} más...
                 </p>
               )}
@@ -190,7 +190,7 @@ export default function Compras() {
               {porPagar.slice(0, 5).map((c) => (
                 <li key={c.comprobante_id}>
                   <span>{c.cliente_proveedor || c.numero_interno}</span>
-                  <span style={{ color: '#EF4444', fontWeight: 600 }}>{fmt(c.saldo_pendiente)}</span>
+                  <span style={{ color: '#DC2626', fontWeight: 600 }}>{fmt(c.saldo_pendiente)}</span>
                 </li>
               ))}
             </ul>
@@ -200,13 +200,13 @@ export default function Compras() {
 
       <h2 style={{ marginTop: '2rem' }}>Todas las compras</h2>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {compras.length === 0 ? (
         <p style={{ color: '#64748B' }}>Todavía no hay compras registradas.</p>
       ) : (
         <div style={{ background: '#FFFFFF', border: '1px solid #E6ECF3', borderRadius: 16, padding: '1rem' }}>
-          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="tabla-scroll"><table className="tabla-cards" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px' }}>N°</th>

@@ -142,7 +142,7 @@ export default function Login() {
                   marginBottom: '1.25rem',
                 }}
               >
-                <MailCheck size={30} strokeWidth={1.8} style={{ color: '#22C55E' }} />
+                <MailCheck size={30} strokeWidth={1.8} style={{ color: '#15803D' }} />
               </div>
 
               <h1 style={{ fontSize: '1.6rem', margin: '0 0 0.5rem' }}>Confirma tu correo</h1>
@@ -195,7 +195,7 @@ export default function Login() {
                 </p>
               )}
 
-              {mensaje && <p style={{ color: '#EF4444', fontSize: '0.9rem' }}>{mensaje.texto}</p>}
+              {mensaje && <p style={{ color: '#DC2626', fontSize: '0.9rem' }}>{mensaje.texto}</p>}
 
               <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <button className="btn-hero" type="button" onClick={() => cambiarModo('ingresar')}>
@@ -243,7 +243,7 @@ export default function Login() {
                     style={{ width: '100%' }}
                   />
                   {registrando && (
-                    <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.25rem' }}>
+                    <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.25rem' }}>
                       Al menos 6 caracteres.
                     </span>
                   )}
@@ -251,7 +251,7 @@ export default function Login() {
 
                 {mensaje && (
                   <div>
-                    <p style={{ color: '#EF4444', margin: '0.25rem 0 0', fontSize: '0.92rem', lineHeight: 1.5 }}>
+                    <p style={{ color: '#DC2626', margin: '0.25rem 0 0', fontSize: '0.92rem', lineHeight: 1.5 }}>
                       {mensaje.texto}
                     </p>
 

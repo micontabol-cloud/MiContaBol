@@ -59,7 +59,7 @@ export default function Asientos() {
         </Link>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -88,11 +88,11 @@ export default function Asientos() {
                   <td style={{ padding: '4px 8px' }}>{a.fecha}</td>
                   <td style={{ padding: '4px 8px' }}>
                     {a.glosa}
-                    {esReversion && <span style={{ color: '#A3AFBF' }}> (reversión)</span>}
+                    {esReversion && <span style={{ color: '#64748B' }}> (reversión)</span>}
                   </td>
                   <td style={{ padding: '4px 8px' }}>
                     {a.estado}
-                    {yaRevertido && <span style={{ color: '#A3AFBF' }}> (revertido)</span>}
+                    {yaRevertido && <span style={{ color: '#64748B' }}> (revertido)</span>}
                   </td>
                   <td style={{ padding: '4px 8px' }}>
                     {puedeRevertir && (

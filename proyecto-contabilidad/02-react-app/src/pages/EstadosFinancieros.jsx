@@ -9,7 +9,7 @@ function Tabla({ titulo, filas }) {
     <div style={{ marginBottom: '1rem' }}>
       <h3 style={{ marginBottom: '0.25rem' }}>{titulo}</h3>
       {filas.length === 0 ? (
-        <p style={{ color: '#A3AFBF' }}>Sin movimientos</p>
+        <p style={{ color: '#64748B' }}>Sin movimientos</p>
       ) : (
         <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <tbody>
@@ -190,7 +190,7 @@ export default function EstadosFinancieros() {
         )}
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -225,9 +225,9 @@ export default function EstadosFinancieros() {
 
             <p style={{ marginTop: '1rem' }}>
               {cuadra ? (
-                <span style={{ color: '#22C55E' }}>✅ Activo = Pasivo + Patrimonio. La ecuación contable cuadra.</span>
+                <span style={{ color: '#15803D' }}>✅ Activo = Pasivo + Patrimonio. La ecuación contable cuadra.</span>
               ) : (
-                <span style={{ color: '#EF4444' }}>
+                <span style={{ color: '#DC2626' }}>
                   ⚠️ No cuadra (diferencia: {(totalActivo - totalPasivoMasPatrimonio).toFixed(2)}).
                 </span>
               )}
@@ -235,7 +235,7 @@ export default function EstadosFinancieros() {
           </section>
 
           {(desde || hasta) && (
-            <p style={{ color: '#A3AFBF', fontSize: '0.85em', marginTop: '1.5rem' }}>
+            <p style={{ color: '#64748B', fontSize: '0.85em', marginTop: '1.5rem' }}>
               Nota: con un filtro de fechas activo, el Balance General muestra solo el movimiento del período
               elegido, no los saldos acumulados desde el inicio — útil para ver la actividad de un mes, pero para
               un balance general "real" a una fecha de corte, lo correcto es dejar "Desde" vacío y solo poner

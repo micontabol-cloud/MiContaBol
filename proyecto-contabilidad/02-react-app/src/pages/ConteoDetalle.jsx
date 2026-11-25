@@ -148,7 +148,7 @@ export default function ConteoDetalle() {
   if (!conteo) {
     return (
       <main style={{ maxWidth: 900, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error || 'Conteo no encontrado.'}</p>
+        <p style={{ color: '#DC2626' }}>{error || 'Conteo no encontrado.'}</p>
       </main>
     )
   }
@@ -167,15 +167,15 @@ export default function ConteoDetalle() {
         {cerrado ? (conteo.estado === 'cerrado' ? 'Cerrado' : 'Cancelado') : 'En curso'}
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
-      {aviso && <p style={{ color: '#F59E0B' }}>{aviso}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
+      {aviso && <p style={{ color: '#B45309' }}>{aviso}</p>}
 
       <div className="stat-grid" style={{ margin: '1.25rem 0' }}>
         <div className="stat-card">
           <p className="stat-label">Contados</p>
           <p className="stat-value">
             {contados.length}
-            <span style={{ fontSize: '1rem', color: '#A3AFBF' }}> / {items.length}</span>
+            <span style={{ fontSize: '1rem', color: '#64748B' }}> / {items.length}</span>
           </p>
         </div>
         <div className="stat-card">
@@ -256,7 +256,7 @@ export default function ConteoDetalle() {
                   >
                     <td style={{ padding: '6px 8px' }}>
                       {i.nombre_completo}
-                      <div style={{ color: '#A3AFBF', fontSize: '0.78rem' }}>
+                      <div style={{ color: '#64748B', fontSize: '0.78rem' }}>
                         {i.codigo}
                         {i.codigo_barras && ` · ${i.codigo_barras}`}
                       </div>
@@ -323,7 +323,7 @@ export default function ConteoDetalle() {
               </p>
 
               {conDiferencia.length === 0 ? (
-                <p style={{ color: '#22C55E', fontWeight: 600 }}>
+                <p style={{ color: '#15803D', fontWeight: 600 }}>
                   ✓ Todo cuadra perfecto. No hay nada que ajustar.
                 </p>
               ) : (
@@ -340,7 +340,7 @@ export default function ConteoDetalle() {
                     )
                   })}
                   {conDiferencia.length > 10 && (
-                    <li style={{ color: '#A3AFBF' }}>y {conDiferencia.length - 10} más...</li>
+                    <li style={{ color: '#64748B' }}>y {conDiferencia.length - 10} más...</li>
                   )}
                 </ul>
               )}
@@ -358,7 +358,7 @@ export default function ConteoDetalle() {
                       </option>
                     ))}
                 </select>
-                <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.25rem' }}>
+                <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.25rem' }}>
                   Normalmente "Mermas y Pérdidas de Inventario".
                 </span>
               </label>
@@ -375,7 +375,7 @@ export default function ConteoDetalle() {
           )}
 
           <p style={{ marginTop: '1.5rem' }}>
-            <button type="button" onClick={cancelar} style={{ color: '#EF4444', borderColor: '#EF4444' }}>
+            <button type="button" onClick={cancelar} style={{ color: '#DC2626', borderColor: '#EF4444' }}>
               Cancelar este conteo
             </button>
           </p>

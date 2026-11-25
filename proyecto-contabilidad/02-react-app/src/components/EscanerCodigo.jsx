@@ -109,7 +109,7 @@ export default function EscanerCodigo({ onCodigo, autoFocus = true, placeholder 
         </button>
       </div>
 
-      {error && <p style={{ color: '#EF4444', fontSize: '0.88rem', marginTop: '0.5rem' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626', fontSize: '0.88rem', marginTop: '0.5rem' }}>{error}</p>}
 
       {camaraActiva && (
         <div
@@ -135,7 +135,7 @@ export default function EscanerCodigo({ onCodigo, autoFocus = true, placeholder 
         </div>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+      <p style={{ color: '#64748B', fontSize: '0.8rem', marginTop: '0.5rem' }}>
         Si tienes lector láser, solo dispara: escribe el código y lo toma solo.
       </p>
     </div>

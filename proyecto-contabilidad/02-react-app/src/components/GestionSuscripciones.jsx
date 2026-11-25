@@ -124,7 +124,7 @@ export default function GestionSuscripciones() {
         </div>
         <div className="stat-card destacada-utilidad">
           <p className="stat-label">Activas</p>
-          <p className="stat-value" style={{ color: '#22C55E' }}>{resumen.activas}</p>
+          <p className="stat-value" style={{ color: '#15803D' }}>{resumen.activas}</p>
         </div>
         <div className="stat-card">
           <p className="stat-label">En prueba</p>
@@ -154,8 +154,8 @@ export default function GestionSuscripciones() {
         </select>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
-      {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
+      {aviso && <p style={{ color: '#15803D', fontWeight: 600 }}>{aviso}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -182,7 +182,7 @@ export default function GestionSuscripciones() {
                   <div style={{ flex: 1, minWidth: 230 }}>
                     <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F' }}>
                       {c.nombre || c.email}
-                      {c.nombre && <span style={{ color: '#A3AFBF', fontWeight: 400 }}> · {c.email}</span>}
+                      {c.nombre && <span style={{ color: '#64748B', fontWeight: 400 }}> · {c.email}</span>}
                     </p>
                     <p style={{ margin: '0.3rem 0 0', fontSize: '0.88rem', color: '#64748B' }}>
                       <span
@@ -194,7 +194,7 @@ export default function GestionSuscripciones() {
                       Plan <strong>{c.plan_nombre}</strong>
                       {c.ciclo && ` · ${c.ciclo}`}
                     </p>
-                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.82rem', color: '#A3AFBF' }}>
+                    <p style={{ margin: '0.25rem 0 0', fontSize: '0.82rem', color: '#64748B' }}>
                       {c.vence_el ? (
                         <>
                           {c.estado === 'vencida' ? 'Venció el' : 'Vence el'} {c.vence_el}
@@ -291,7 +291,7 @@ export default function GestionSuscripciones() {
                       </button>
                     </div>
 
-                    <p style={{ margin: '0.45rem 0 0', fontSize: '0.8rem', color: '#A3AFBF', maxWidth: 480 }}>
+                    <p style={{ margin: '0.45rem 0 0', fontSize: '0.8rem', color: '#64748B', maxWidth: 480 }}>
                       <strong>30 días gratis</strong> lo deja como cliente activo con el plan que elijas —
                       úsalo para cortesías o compensaciones. <strong>1 mes de prueba</strong> lo mantiene en
                       estado de prueba, para alguien que todavía está evaluando.

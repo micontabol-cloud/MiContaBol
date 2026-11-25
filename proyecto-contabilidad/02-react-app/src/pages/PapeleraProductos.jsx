@@ -68,8 +68,8 @@ export default function PapeleraProductos() {
         Productos eliminados. Puedes restaurarlos cuando quieras — no se pierde nada de su historial.
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
-      {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
+      {aviso && <p style={{ color: '#15803D', fontWeight: 600 }}>{aviso}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -104,11 +104,11 @@ export default function PapeleraProductos() {
 
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <p style={{ margin: 0, fontWeight: 600, color: '#64748B' }}>{p.nombre}</p>
-                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.82rem', color: '#A3AFBF' }}>
+                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.82rem', color: '#64748B' }}>
                     {p.codigo}
                     {Number(p.stock) > 0 && ` · tenía ${Number(p.stock).toFixed(0)} en stock (${fmt(p.stock * p.costo)})`}
                   </p>
-                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.82rem', color: '#A3AFBF' }}>
+                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.82rem', color: '#64748B' }}>
                     Eliminado el {new Date(p.eliminado_at).toLocaleDateString('es-BO')}
                     {p.eliminado_por && ` por ${p.eliminado_por}`}
                     {p.motivo && ` · "${p.motivo}"`}
@@ -165,7 +165,7 @@ export default function PapeleraProductos() {
         </div>
       )}
 
-      <p style={{ marginTop: '1.75rem', fontSize: '0.88rem', color: '#A3AFBF', lineHeight: 1.5 }}>
+      <p style={{ marginTop: '1.75rem', fontSize: '0.88rem', color: '#64748B', lineHeight: 1.5 }}>
         Los productos que ya se vendieron o compraron solo se pueden restaurar, no borrar del todo: sus ventas
         quedarían sin referencia y el kardex no cuadraría.
       </p>

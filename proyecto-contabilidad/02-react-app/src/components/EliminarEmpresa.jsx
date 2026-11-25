@@ -147,7 +147,7 @@ export default function EliminarEmpresa({ empresa, onCerrar, onEliminada }) {
             />
           </label>
 
-          {error && <p style={{ color: '#EF4444', margin: 0 }}>{error}</p>}
+          {error && <p style={{ color: '#DC2626', margin: 0 }}>{error}</p>}
 
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
             <button
@@ -167,7 +167,7 @@ export default function EliminarEmpresa({ empresa, onCerrar, onEliminada }) {
             </button>
           </div>
 
-          <p style={{ fontSize: '0.82rem', color: '#A3AFBF', margin: 0 }}>
+          <p style={{ fontSize: '0.82rem', color: '#64748B', margin: 0 }}>
             Las fotos de productos quedan en el almacenamiento y se limpian aparte desde Supabase.
           </p>
         </div>

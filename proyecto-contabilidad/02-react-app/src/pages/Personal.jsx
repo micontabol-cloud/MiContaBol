@@ -185,8 +185,8 @@ export default function Personal() {
         }
       />
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
-      {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
+      {aviso && <p style={{ color: '#15803D', fontWeight: 600 }}>{aviso}</p>}
 
       <p
         style={{
@@ -308,7 +308,7 @@ export default function Personal() {
                       {t.nombre}
                       {t.cargo && <span style={{ color: '#64748B', fontWeight: 400 }}> · {t.cargo}</span>}
                     </p>
-                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
                       {t.ci && `CI ${t.ci} · `}
                       {t.telefono && `${t.telefono} · `}
                       {t.fecha_ingreso && `desde ${t.fecha_ingreso}`}
@@ -319,7 +319,7 @@ export default function Personal() {
                         Sueldo: <strong>{fmt(t.sueldo)}</strong>
                       </span>
                       {anticipos > 0 && (
-                        <span style={{ fontSize: '0.9rem', color: '#F59E0B', fontWeight: 600 }}>
+                        <span style={{ fontSize: '0.9rem', color: '#B45309', fontWeight: 600 }}>
                           Anticipos por descontar: {fmt(anticipos)}
                         </span>
                       )}
@@ -404,7 +404,7 @@ export default function Personal() {
                             onChange={(e) => setForm({ ...form, descuento: e.target.value })}
                             style={{ width: 130 }}
                           />
-                          <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                          <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B' }}>
                             Tiene {fmt(anticipos)} pendientes
                           </span>
                         </label>
@@ -489,12 +489,12 @@ export default function Personal() {
                               <td style={{ padding: '3px 6px' }}>
                                 {p.tipo === 'anticipo' ? 'Anticipo' : `Sueldo ${p.periodo || ''}`}
                                 {Number(p.descuento_anticipo) > 0 && (
-                                  <span style={{ color: '#A3AFBF' }}>
+                                  <span style={{ color: '#64748B' }}>
                                     {' '}
                                     (− {fmt(p.descuento_anticipo)} de anticipos)
                                   </span>
                                 )}
-                                {p.notas && <span style={{ color: '#A3AFBF' }}> · {p.notas}</span>}
+                                {p.notas && <span style={{ color: '#64748B' }}> · {p.notas}</span>}
                               </td>
                               <td style={{ padding: '3px 6px', textAlign: 'right' }}>{fmt(p.monto)}</td>
                               <td style={{ padding: '3px 6px', textAlign: 'right', fontWeight: 600 }}>

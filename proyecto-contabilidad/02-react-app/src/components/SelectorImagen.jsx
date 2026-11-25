@@ -149,7 +149,7 @@ export default function SelectorImagen({
         )}
       </div>
 
-      {error && <p style={{ color: '#EF4444', fontSize: '0.85rem', margin: '0.4rem 0 0' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626', fontSize: '0.85rem', margin: '0.4rem 0 0' }}>{error}</p>}
 
       {/* Biblioteca */}
       {abierta && (
@@ -270,7 +270,7 @@ export default function SelectorImagen({
               </div>
             )}
 
-            <p style={{ color: '#A3AFBF', fontSize: '0.82rem', marginTop: '1rem' }}>
+            <p style={{ color: '#64748B', fontSize: '0.82rem', marginTop: '1rem' }}>
               Quitar una imagen de aquí no la borra de donde ya la estés usando.
             </p>
           </div>

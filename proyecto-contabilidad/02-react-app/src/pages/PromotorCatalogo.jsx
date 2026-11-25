@@ -65,7 +65,7 @@ export default function PromotorCatalogo() {
   if (error) {
     return (
       <main style={{ maxWidth: 950, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error}</p>
+        <p style={{ color: '#DC2626' }}>{error}</p>
       </main>
     )
   }
@@ -153,7 +153,7 @@ export default function PromotorCatalogo() {
 
       {productos.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-          <Package size={44} strokeWidth={1.4} style={{ color: '#A3AFBF' }} />
+          <Package size={44} strokeWidth={1.4} style={{ color: '#64748B' }} />
           <p style={{ color: '#64748B', marginTop: '0.75rem', maxWidth: 380, marginLeft: 'auto', marginRight: 'auto' }}>
             Todavía no tienes mercadería asignada. Pídele al dueño del negocio que te entregue productos para
             vender.
@@ -228,7 +228,7 @@ export default function PromotorCatalogo() {
                   <p style={{ margin: 0, fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.3 }}>{p.nombre}</p>
 
                   {(p.categoria || p.observaciones) && (
-                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.78rem', color: '#64748B' }}>
                       {[p.categoria, p.observaciones].filter(Boolean).join(' · ')}
                     </p>
                   )}
@@ -249,7 +249,7 @@ export default function PromotorCatalogo() {
                       <p style={{ margin: 0, color: '#64748B' }}>
                         Le pagas: <strong>{fmt(p.precio_mayorista)}</strong>
                       </p>
-                      <p style={{ margin: '0.2rem 0 0', color: '#22C55E', fontWeight: 700 }}>
+                      <p style={{ margin: '0.2rem 0 0', color: '#15803D', fontWeight: 700 }}>
                         Ganas {fmt(p.tu_ganancia)}
                       </p>
                     </div>
@@ -379,7 +379,7 @@ export default function PromotorCatalogo() {
               <p style={{ margin: '1rem 0 0', fontSize: '1.7rem', fontWeight: 800, color: '#1F3A5F' }}>
                 {fmt(detalle.precio_publico)}
               </p>
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#A3AFBF' }}>Precio sugerido</p>
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748B' }}>Precio sugerido</p>
 
               <div
                 style={{
@@ -411,7 +411,7 @@ export default function PromotorCatalogo() {
                       }}
                     >
                       <strong style={{ color: '#15803D' }}>Tu ganancia</strong>
-                      <strong style={{ color: '#22C55E', fontSize: '1.1rem' }}>{fmt(detalle.tu_ganancia)}</strong>
+                      <strong style={{ color: '#15803D', fontSize: '1.1rem' }}>{fmt(detalle.tu_ganancia)}</strong>
                     </div>
                   </>
                 )}

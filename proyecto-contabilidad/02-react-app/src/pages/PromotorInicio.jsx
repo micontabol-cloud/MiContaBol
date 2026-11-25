@@ -33,7 +33,7 @@ export default function PromotorInicio() {
   if (error) {
     return (
       <main style={{ maxWidth: 800, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error}</p>
+        <p style={{ color: '#DC2626' }}>{error}</p>
       </main>
     )
   }
@@ -50,7 +50,7 @@ export default function PromotorInicio() {
       <div className="stat-grid" style={{ marginBottom: '1.5rem' }}>
         <div className="stat-card destacada-utilidad">
           <p className="stat-label">Tu ganancia del mes</p>
-          <p className="stat-value" style={{ color: '#22C55E' }}>
+          <p className="stat-value" style={{ color: '#15803D' }}>
             {fmt(ganancia)}
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function PromotorInicio() {
         }}
       >
         <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
-          <TrendingUp size={22} strokeWidth={1.8} style={{ color: '#22C55E', flexShrink: 0, marginTop: 2 }} />
+          <TrendingUp size={22} strokeWidth={1.8} style={{ color: '#15803D', flexShrink: 0, marginTop: 2 }} />
           <div>
             <p style={{ margin: 0, fontWeight: 700, color: '#15803D' }}>
               Ganas el {datos?.descuento}% de cada venta
@@ -163,7 +163,7 @@ export default function PromotorInicio() {
           }}
         >
           <div style={{ display: 'flex', gap: '0.85rem', alignItems: 'flex-start' }}>
-            <Wallet size={22} strokeWidth={1.8} style={{ color: '#F59E0B', flexShrink: 0, marginTop: 2 }} />
+            <Wallet size={22} strokeWidth={1.8} style={{ color: '#B45309', flexShrink: 0, marginTop: 2 }} />
             <div style={{ flex: 1 }}>
               <p style={{ margin: 0, fontWeight: 700, color: '#8a5a00' }}>
                 Tienes que entregar {fmt(debe)}

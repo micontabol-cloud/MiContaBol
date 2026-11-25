@@ -51,7 +51,7 @@ export default function PromotorVentas() {
       <h1 style={{ margin: 0 }}>Mis ventas</h1>
       <p style={{ color: '#64748B', margin: '0.25rem 0 1.5rem' }}>Lo que llevas vendido este mes.</p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {ventas.length > 0 && (
         <div className="stat-grid" style={{ marginBottom: '1.5rem' }}>
@@ -61,7 +61,7 @@ export default function PromotorVentas() {
           </div>
           <div className="stat-card destacada-utilidad">
             <p className="stat-label">Tu ganancia</p>
-            <p className="stat-value" style={{ color: '#22C55E' }}>
+            <p className="stat-value" style={{ color: '#15803D' }}>
               {fmt(totalGanancia)}
             </p>
           </div>
@@ -74,7 +74,7 @@ export default function PromotorVentas() {
 
       {ventas.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-          <ShoppingCart size={44} strokeWidth={1.4} style={{ color: '#A3AFBF' }} />
+          <ShoppingCart size={44} strokeWidth={1.4} style={{ color: '#64748B' }} />
           <p style={{ color: '#64748B', marginTop: '0.75rem' }}>Todavía no registraste ninguna venta este mes.</p>
 
           <Link to={`/empresas/${empresaId}/promotor/vender`}>
@@ -100,7 +100,7 @@ export default function PromotorVentas() {
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <p style={{ margin: 0, fontWeight: 600, fontSize: '0.95rem' }}>
                       {v.cliente || 'Cliente'}
-                      <span style={{ color: '#A3AFBF', fontWeight: 400, marginLeft: '0.5rem', fontSize: '0.85rem' }}>
+                      <span style={{ color: '#64748B', fontWeight: 400, marginLeft: '0.5rem', fontSize: '0.85rem' }}>
                         {fechaCorta(v.fecha)}
                       </span>
                     </p>
@@ -112,7 +112,7 @@ export default function PromotorVentas() {
 
                   <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                     <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F' }}>{fmt(v.cobraste)}</p>
-                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#22C55E', fontWeight: 600 }}>
+                    <p style={{ margin: 0, fontSize: '0.82rem', color: '#15803D', fontWeight: 600 }}>
                       ganaste {fmt(v.tu_ganancia)}
                     </p>
                   </div>

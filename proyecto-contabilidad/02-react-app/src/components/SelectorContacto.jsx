@@ -159,7 +159,7 @@ export default function SelectorContacto({
           }}
         >
           {filtrados.length === 0 && !q && (
-            <p style={{ margin: 0, padding: '0.7rem 0.85rem', color: '#A3AFBF', fontSize: '0.88rem' }}>
+            <p style={{ margin: 0, padding: '0.7rem 0.85rem', color: '#64748B', fontSize: '0.88rem' }}>
               Todavía no tienes {tipo === 'cliente' ? 'clientes' : 'proveedores'}. Escribe un nombre para crear el
               primero.
             </p>
@@ -188,7 +188,7 @@ export default function SelectorContacto({
               }}
             >
               {c.nombre}
-              {c.telefono && <span style={{ color: '#A3AFBF', marginLeft: '0.5rem' }}>{c.telefono}</span>}
+              {c.telefono && <span style={{ color: '#64748B', marginLeft: '0.5rem' }}>{c.telefono}</span>}
             </button>
           ))}
 
@@ -216,7 +216,7 @@ export default function SelectorContacto({
         </div>
       )}
 
-      {error && <p style={{ color: '#EF4444', fontSize: '0.85rem', margin: '0.3rem 0 0' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626', fontSize: '0.85rem', margin: '0.3rem 0 0' }}>{error}</p>}
     </div>
   )
 }

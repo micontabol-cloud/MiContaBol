@@ -74,7 +74,7 @@ export default function Admin() {
       <h1>Panel de administrador</h1>
       <p style={{ color: '#64748B' }}>Vista de solo lectura de todas las empresas de la plataforma.</p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && (
         <p
           style={{

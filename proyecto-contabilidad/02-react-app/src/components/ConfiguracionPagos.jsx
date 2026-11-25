@@ -118,7 +118,7 @@ export default function ConfiguracionPagos() {
         Un QR para cada plan, con su monto exacto. El cliente escanea y no puede equivocarse de importe.
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && (
         <p
           style={{

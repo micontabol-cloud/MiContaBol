@@ -78,7 +78,7 @@ export default function CuentasPorCobrar() {
       </p>
       <h1>Cuentas por cobrar</h1>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -86,7 +86,7 @@ export default function CuentasPorCobrar() {
         <p>No hay saldos pendientes por cobrar. 🎉</p>
       ) : (
         <>
-          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+          <div className="tabla-scroll"><table className="tabla-cards" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px' }}>N°</th>

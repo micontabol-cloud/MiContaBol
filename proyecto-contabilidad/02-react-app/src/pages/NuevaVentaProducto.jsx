@@ -406,7 +406,7 @@ export default function NuevaVentaProducto() {
             </div>
           </details>
 
-          {avisoEscaneo && <p style={{ color: '#F59E0B', fontSize: '0.88rem', margin: 0 }}>{avisoEscaneo}</p>}
+          {avisoEscaneo && <p style={{ color: '#B45309', fontSize: '0.88rem', margin: 0 }}>{avisoEscaneo}</p>}
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
@@ -471,7 +471,7 @@ export default function NuevaVentaProducto() {
                           </span>
                         )}
                         {prod.observaciones && (
-                          <span style={{ color: '#A3AFBF', alignSelf: 'center' }}>{prod.observaciones}</span>
+                          <span style={{ color: '#64748B', alignSelf: 'center' }}>{prod.observaciones}</span>
                         )}
                       </div>
                     )}
@@ -581,7 +581,7 @@ export default function NuevaVentaProducto() {
               <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 400, color: '#64748B' }}>
                 Bruto Bs {bruto.toFixed(2)} · descuentos Bs {descuentoTotal.toFixed(2)}
                 {descLineas > 0 && descuentoNum > 0 && (
-                  <span style={{ color: '#A3AFBF' }}>
+                  <span style={{ color: '#64748B' }}>
                     {' '}
                     (Bs {descLineas.toFixed(2)} por producto + Bs {descuentoNum.toFixed(2)} general)
                   </span>
@@ -637,7 +637,7 @@ export default function NuevaVentaProducto() {
             </label>
 
             {cuentaMetodo ? (
-              <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.25rem' }}>
+              <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.25rem' }}>
                 Viene la de siempre. Cámbiala solo si este cobro llegó a otra cuenta.
               </span>
             ) : (
@@ -727,7 +727,7 @@ export default function NuevaVentaProducto() {
           />
         )}
 
-        {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+        {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
         <button type="submit" className="btn-hero" disabled={guardando} style={{ alignSelf: 'flex-start' }}>
           Registrar venta

@@ -52,7 +52,7 @@ export default function PromotorCuenta() {
         Lo que le debes al negocio por lo que vendiste.
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {/* Lo que debe */}
       <div
@@ -66,11 +66,11 @@ export default function PromotorCuenta() {
       >
         {debe > 0 ? (
           <>
-            <Wallet size={30} strokeWidth={1.8} style={{ color: '#F59E0B' }} />
+            <Wallet size={30} strokeWidth={1.8} style={{ color: '#B45309' }} />
             <p style={{ margin: '0.75rem 0 0', color: '#64748B', fontSize: '0.95rem' }}>
               Tienes que entregar
             </p>
-            <p style={{ margin: '0.25rem 0 0', fontSize: '2.2rem', fontWeight: 800, color: '#F59E0B' }}>
+            <p style={{ margin: '0.25rem 0 0', fontSize: '2.2rem', fontWeight: 800, color: '#B45309' }}>
               {fmt(debe)}
             </p>
             <p
@@ -88,7 +88,7 @@ export default function PromotorCuenta() {
           </>
         ) : (
           <>
-            <CheckCircle2 size={30} strokeWidth={1.8} style={{ color: '#22C55E' }} />
+            <CheckCircle2 size={30} strokeWidth={1.8} style={{ color: '#15803D' }} />
             <p style={{ margin: '0.75rem 0 0', fontSize: '1.2rem', fontWeight: 700, color: '#15803D' }}>
               Estás al día
             </p>
@@ -148,7 +148,7 @@ export default function PromotorCuenta() {
                   <p style={{ margin: 0, fontSize: '0.92rem', fontWeight: 500 }}>
                     {esCargo ? 'Venta registrada' : 'Pago entregado'}
                   </p>
-                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.82rem', color: '#A3AFBF' }}>
+                  <p style={{ margin: '0.15rem 0 0', fontSize: '0.82rem', color: '#64748B' }}>
                     {fechaCorta(m.fecha)}
                     {m.detalle && ` · ${m.detalle}`}
                   </p>
@@ -164,7 +164,7 @@ export default function PromotorCuenta() {
                   >
                     {esCargo ? '+' : '−'} {fmt(esCargo ? m.debe : m.haber)}
                   </p>
-                  <p style={{ margin: 0, fontSize: '0.78rem', color: '#A3AFBF' }}>
+                  <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748B' }}>
                     saldo {fmt(m.saldo)}
                   </p>
                 </div>
@@ -174,7 +174,7 @@ export default function PromotorCuenta() {
         </div>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.85rem', marginTop: '1.5rem', lineHeight: 1.55 }}>
+      <p style={{ color: '#64748B', fontSize: '0.85rem', marginTop: '1.5rem', lineHeight: 1.55 }}>
         Los pagos los registra el negocio cuando les entregas el dinero. Si entregaste algo y no aparece aquí,
         avísales.
       </p>

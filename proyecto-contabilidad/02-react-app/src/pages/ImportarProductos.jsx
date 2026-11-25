@@ -219,7 +219,7 @@ export default function ImportarProductos() {
       <input type="file" accept=".xlsx,.xls,.csv" onChange={leerArchivo} />
       {nombreArchivo && <p style={{ color: '#64748B', fontSize: '0.88rem' }}>Archivo: {nombreArchivo}</p>}
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {resultado && (
         <div
@@ -253,7 +253,7 @@ export default function ImportarProductos() {
             </div>
             <div className="stat-card destacada-utilidad">
               <p className="stat-label">Se van a importar</p>
-              <p className="stat-value" style={{ color: '#22C55E' }}>
+              <p className="stat-value" style={{ color: '#15803D' }}>
                 {validas.length}
               </p>
             </div>
@@ -339,7 +339,7 @@ export default function ImportarProductos() {
             </table></div>
           </div>
           {filas.length > 15 && (
-            <p style={{ color: '#A3AFBF', fontSize: '0.85rem' }}>Mostrando las primeras 15 de {filas.length}.</p>
+            <p style={{ color: '#64748B', fontSize: '0.85rem' }}>Mostrando las primeras 15 de {filas.length}.</p>
           )}
 
           <p

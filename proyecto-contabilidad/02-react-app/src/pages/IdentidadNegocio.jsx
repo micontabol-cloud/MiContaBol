@@ -112,8 +112,8 @@ export default function IdentidadNegocio() {
         Esto se configura una vez y se usa en todos tus catálogos.
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
-      {aviso && <p style={{ color: '#22C55E', fontWeight: 600 }}>{aviso}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
+      {aviso && <p style={{ color: '#15803D', fontWeight: 600 }}>{aviso}</p>}
 
       <h2>Tu logo</h2>
       <div style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', flexWrap: 'wrap' }}>
@@ -157,7 +157,7 @@ export default function IdentidadNegocio() {
               Quitar logo
             </button>
           )}
-          <span style={{ fontSize: '0.8rem', color: '#A3AFBF', maxWidth: 260 }}>
+          <span style={{ fontSize: '0.8rem', color: '#64748B', maxWidth: 260 }}>
             Se ve mejor con fondo transparente (PNG) o blanco.
           </span>
         </div>

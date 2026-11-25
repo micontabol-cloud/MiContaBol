@@ -149,7 +149,7 @@ export default function Inventario() {
             <ul className="lista-check" style={{ marginTop: '0.9rem' }}>
               {pocoStock.length > 0 && (
                 <li>
-                  <span style={{ color: '#F59E0B', fontWeight: 700 }}>●</span>
+                  <span style={{ color: '#B45309', fontWeight: 700 }}>●</span>
                   <span>
                     <strong>{pocoStock.length}</strong> {pocoStock.length === 1 ? 'producto está' : 'productos están'}{' '}
                     por acabarse.
@@ -158,7 +158,7 @@ export default function Inventario() {
               )}
               {sinStock.length > 0 && (
                 <li>
-                  <span style={{ color: '#EF4444', fontWeight: 700 }}>●</span>
+                  <span style={{ color: '#DC2626', fontWeight: 700 }}>●</span>
                   <span>
                     <strong>{sinStock.length}</strong> {sinStock.length === 1 ? 'está agotado' : 'están agotados'} — no
                     puedes venderlos.
@@ -176,7 +176,7 @@ export default function Inventario() {
               )}
             </ul>
           ) : (
-            <p style={{ marginTop: '0.9rem', color: '#22C55E', fontWeight: 600 }}>
+            <p style={{ marginTop: '0.9rem', color: '#15803D', fontWeight: 600 }}>
               Todo en orden — nada por acabarse ni agotado.
             </p>
           )}
@@ -225,7 +225,7 @@ export default function Inventario() {
             <p style={{ margin: '0.15rem 0 0', fontSize: '1.55rem', fontWeight: 800, color: '#1F3A5F' }}>
               {fmt(valorInventario)}
             </p>
-            <p style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: '#A3AFBF' }}>
+            <p style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: '#64748B' }}>
               Lo que pagaste por lo que tienes
             </p>
           </div>
@@ -235,7 +235,7 @@ export default function Inventario() {
             <p style={{ margin: '0.15rem 0 0', fontSize: '1.55rem', fontWeight: 800, color: '#1F3A5F' }}>
               {fmt(valorVenta)}
             </p>
-            <p style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: '#A3AFBF' }}>
+            <p style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: '#64748B' }}>
               A tus precios de venta actuales
             </p>
           </div>
@@ -250,7 +250,7 @@ export default function Inventario() {
             }}
           >
             <p className="stat-label">Ganarías</p>
-            <p style={{ margin: '0.15rem 0 0', fontSize: '1.55rem', fontWeight: 800, color: '#22C55E' }}>
+            <p style={{ margin: '0.15rem 0 0', fontSize: '1.55rem', fontWeight: 800, color: '#15803D' }}>
               {fmt(gananciaPotencial)}
             </p>
             <p style={{ margin: '0.15rem 0 0', fontSize: '0.8rem', color: '#64748B' }}>
@@ -275,7 +275,7 @@ export default function Inventario() {
               {pocoStock.slice(0, 5).map((s) => (
                 <li key={`${s.producto_id}-${s.variante_id || ''}`}>
                   <span>{s.nombre_completo}</span>
-                  <span style={{ color: '#F59E0B', fontWeight: 600 }}>
+                  <span style={{ color: '#B45309', fontWeight: 600 }}>
                     {Number(s.stock_actual).toFixed(0)} {s.unidad_medida}
                   </span>
                 </li>
@@ -313,7 +313,7 @@ export default function Inventario() {
               {masRentables.map((a) => (
                 <li key={a.producto_id}>
                   <span>{a.nombre}</span>
-                  <span style={{ color: '#22C55E', fontWeight: 600 }}>{fmt(a.utilidad_generada)}</span>
+                  <span style={{ color: '#15803D', fontWeight: 600 }}>{fmt(a.utilidad_generada)}</span>
                 </li>
               ))}
             </ul>
@@ -329,7 +329,7 @@ export default function Inventario() {
               {recientes.map((p) => (
                 <li key={p.id}>
                   <Link to={`/empresas/${empresaId}/inventario/productos/${p.id}`}>{p.nombre}</Link>
-                  <span style={{ color: '#A3AFBF', fontSize: '0.82rem' }}>{p.codigo}</span>
+                  <span style={{ color: '#64748B', fontSize: '0.82rem' }}>{p.codigo}</span>
                 </li>
               ))}
             </ul>

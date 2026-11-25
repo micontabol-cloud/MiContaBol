@@ -352,7 +352,7 @@ export default function Productos() {
         >
           <span style={{ flex: 1, minWidth: 200 }}>
             Usas <strong>{uso.usados}</strong> de <strong>{uso.limite}</strong> productos del plan {uso.plan}.
-            <span style={{ color: '#A3AFBF' }}> Cada talla y color cuenta como uno.</span>
+            <span style={{ color: '#64748B' }}> Cada talla y color cuenta como uno.</span>
           </span>
           <div style={{ flex: 1, minWidth: 140, height: 6, background: '#E6ECF3', borderRadius: 999, overflow: 'hidden' }}>
             <div
@@ -651,7 +651,7 @@ export default function Productos() {
         </button>
 
         {(codigo.trim() || nombre.trim()) && !parseFloat(precioVenta) && (
-          <p style={{ width: '100%', margin: '0.4rem 0 0', fontSize: '0.85rem', color: '#F59E0B' }}>
+          <p style={{ width: '100%', margin: '0.4rem 0 0', fontSize: '0.85rem', color: '#B45309' }}>
             Le falta el precio de venta. Puedes agregarlo igual y completarlo después.
           </p>
         )}
@@ -687,7 +687,7 @@ export default function Productos() {
         </label>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -743,7 +743,7 @@ export default function Productos() {
                     <Link to={`/empresas/${empresaId}/inventario/productos/${p.id}`} style={{ fontWeight: 600 }}>
                       {p.nombre}
                     </Link>
-                    <div style={{ color: '#A3AFBF', fontSize: '0.78rem' }}>
+                    <div style={{ color: '#64748B', fontSize: '0.78rem' }}>
                       {p.codigo}
                       {p.tiene_variantes && ' · con variantes'}
                     </div>
@@ -793,19 +793,19 @@ export default function Productos() {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Costo</div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Costo</div>
                     <div style={{ fontWeight: 600 }}>{Number(p.costo_fijo).toFixed(2)}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Precio</div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Precio</div>
                     <div style={{ fontWeight: 600 }}>{Number(p.precio_venta).toFixed(2)}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Margen</div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Margen</div>
                     <div style={{ fontWeight: 600, color: colorMargen(m) }}>{m === null ? '—' : `${m.toFixed(0)}%`}</div>
                   </div>
                   <div>
-                    <div style={{ fontSize: '0.72rem', color: '#A3AFBF' }}>Stock</div>
+                    <div style={{ fontSize: '0.72rem', color: '#64748B' }}>Stock</div>
                     <div style={{ fontWeight: 600 }}>
                       {p.stock_total.toFixed(2)} {p.unidad_medida}
                     </div>

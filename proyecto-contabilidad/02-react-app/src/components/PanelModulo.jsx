@@ -29,7 +29,7 @@ export default function PanelModulo({ titulo, pregunta, pose = 'hola', hallazgos
           </ul>
         ) : (
           mensajeVacio && (
-            <p style={{ marginTop: '0.9rem', color: '#22C55E', fontWeight: 600 }}>{mensajeVacio}</p>
+            <p style={{ marginTop: '0.9rem', color: '#15803D', fontWeight: 600 }}>{mensajeVacio}</p>
           )
         )}
 

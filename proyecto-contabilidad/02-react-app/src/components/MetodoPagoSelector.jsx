@@ -30,7 +30,7 @@ export default function MetodoPagoSelector({ metodos, valor, onChange, etiqueta 
             >
               <span style={{ fontSize: '1.3rem' }}>{m.icono || '💰'}</span>
               <span>{m.nombre}</span>
-              {sinCuenta && <span style={{ fontSize: '0.68rem', color: '#F59E0B' }}>sin configurar</span>}
+              {sinCuenta && <span style={{ fontSize: '0.68rem', color: '#B45309' }}>sin configurar</span>}
             </button>
           )
         })}

@@ -142,7 +142,7 @@ export default function Proveedores() {
         Mostrar proveedores desactivados
       </label>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -190,7 +190,7 @@ export default function Proveedores() {
         </table></div>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.8rem', marginTop: '1.5rem' }}>
+      <p style={{ color: '#64748B', fontSize: '0.8rem', marginTop: '1.5rem' }}>
         Los totales agrupan solo las compras donde elegiste a este proveedor de la lista. Las compras viejas,
         donde el nombre se escribía a mano, quedaron enlazadas automáticamente si el nombre coincidía.
       </p>

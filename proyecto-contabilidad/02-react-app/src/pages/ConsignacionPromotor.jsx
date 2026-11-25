@@ -141,7 +141,7 @@ export default function ConsignacionPromotor() {
   if (!promotor) {
     return (
       <main style={{ maxWidth: 950, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>No encontré ese promotor.</p>
+        <p style={{ color: '#DC2626' }}>No encontré ese promotor.</p>
       </main>
     )
   }
@@ -168,7 +168,7 @@ export default function ConsignacionPromotor() {
           : 'solo puede vender lo que le entregues'}
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && (
         <p
           style={{
@@ -206,7 +206,7 @@ export default function ConsignacionPromotor() {
       {enMano.length > 0 && (
         <section style={{ marginBottom: '2rem' }}>
           <h2 style={{ marginTop: 0 }}>
-            Lo que tiene ahora <span style={{ color: '#A3AFBF', fontWeight: 400 }}>({totalEnMano} unidades)</span>
+            Lo que tiene ahora <span style={{ color: '#64748B', fontWeight: 400 }}>({totalEnMano} unidades)</span>
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
@@ -241,7 +241,7 @@ export default function ConsignacionPromotor() {
                     )}
                     <div>
                       <p style={{ margin: 0, fontWeight: 600, fontSize: '0.92rem' }}>{p.nombre}</p>
-                      <p style={{ margin: 0, fontSize: '0.8rem', color: '#A3AFBF' }}>
+                      <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748B' }}>
                         {[p.categoria, p.observaciones].filter(Boolean).join(' · ')}
                       </p>
                     </div>
@@ -252,7 +252,7 @@ export default function ConsignacionPromotor() {
                       Tiene: <strong style={{ color: '#1F3A5F' }}>{p.en_mano}</strong>
                     </span>
                     {Number(p.vendido) > 0 && (
-                      <span style={{ color: '#22C55E' }}>Vendió: {p.vendido}</span>
+                      <span style={{ color: '#15803D' }}>Vendió: {p.vendido}</span>
                     )}
                     <button
                       type="button"
@@ -328,7 +328,7 @@ export default function ConsignacionPromotor() {
 
       {stock.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-          <Package size={40} strokeWidth={1.4} style={{ color: '#A3AFBF' }} />
+          <Package size={40} strokeWidth={1.4} style={{ color: '#64748B' }} />
           <p style={{ color: '#64748B', marginTop: '0.75rem' }}>No tienes productos con stock disponible.</p>
         </div>
       ) : (
@@ -380,7 +380,7 @@ export default function ConsignacionPromotor() {
                           <span>
                             {s.nombre_completo}
                             {(s.categoria_nombre || s.observaciones) && (
-                              <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                              <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B' }}>
                                 {[s.categoria_nombre, s.observaciones].filter(Boolean).join(' · ')}
                               </span>
                             )}
@@ -396,7 +396,7 @@ export default function ConsignacionPromotor() {
 
                       <td style={{ padding: '6px 8px', textAlign: 'right' }}>
                         <span style={{ fontWeight: 600, color: '#1F3A5F' }}>{fmt(mayorista)}</span>
-                        <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                        <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B' }}>
                           público {fmt(s.precio_venta)}
                         </span>
                       </td>

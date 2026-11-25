@@ -209,7 +209,7 @@ export default function Promotores() {
         </div>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && (
         <p
           style={{
@@ -360,7 +360,7 @@ export default function Promotores() {
                 placeholder="promotor@correo.com"
                 style={{ width: 230 }}
               />
-              <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+              <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
                 Con esto entra al sistema.
               </span>
             </label>
@@ -376,7 +376,7 @@ export default function Promotores() {
                 placeholder="mínimo 6 caracteres"
                 style={{ width: 190 }}
               />
-              <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+              <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
                 Se la pasas por WhatsApp.
               </span>
             </label>
@@ -493,7 +493,7 @@ export default function Promotores() {
           </div>
           <div className="stat-card destacada-utilidad">
             <p className="stat-label">Tu ganancia</p>
-            <p className="stat-value" style={{ color: '#22C55E' }}>
+            <p className="stat-value" style={{ color: '#15803D' }}>
               {fmt(totalGanancia)}
             </p>
           </div>
@@ -510,7 +510,7 @@ export default function Promotores() {
 
       {lista.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-          <Handshake size={44} strokeWidth={1.4} style={{ color: '#A3AFBF' }} />
+          <Handshake size={44} strokeWidth={1.4} style={{ color: '#64748B' }} />
           <p style={{ color: '#64748B', marginTop: '0.75rem' }}>
             Todavía no diste de alta a nadie. El promotor necesita tener su propia cuenta en MiContaBol antes.
           </p>
@@ -538,7 +538,7 @@ export default function Promotores() {
                       </span>
                     )}
                   </p>
-                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
                     {p.descuento}% de descuento ·{' '}
                     {p.tipo_acceso === 'total' ? 've todo el inventario' : 'solo lo consignado'}
                     {p.zona && ` · ${p.zona}`}
@@ -549,7 +549,7 @@ export default function Promotores() {
                     <span>
                       Vendió: <strong>{fmt(p.vendido)}</strong>
                     </span>
-                    <span style={{ color: '#22C55E' }}>
+                    <span style={{ color: '#15803D' }}>
                       Te dejó: <strong>{fmt(p.ganancia_empresa)}</strong>
                     </span>
                     <span style={{ color: Number(p.debe) > 0 ? '#F59E0B' : '#A3AFBF' }}>

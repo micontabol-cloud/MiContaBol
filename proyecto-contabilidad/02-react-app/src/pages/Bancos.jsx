@@ -174,7 +174,7 @@ export default function Bancos() {
         }
       />
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {mostrarForm && (
         <form
@@ -229,7 +229,7 @@ export default function Bancos() {
           <button className="btn-hero" type="submit" disabled={creando}>
             Agregar
           </button>
-          <p style={{ width: '100%', margin: 0, fontSize: '0.82rem', color: '#A3AFBF' }}>
+          <p style={{ width: '100%', margin: 0, fontSize: '0.82rem', color: '#64748B' }}>
             Se le crea automáticamente su propia cuenta contable, para poder ver y conciliar cada banco por separado.
           </p>
         </form>
@@ -259,13 +259,13 @@ export default function Bancos() {
                     {c.banco}
                     {c.alias && <span style={{ color: '#64748B', fontWeight: 400 }}> · {c.alias}</span>}
                   </p>
-                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
                     {c.numero && `N° ${c.numero} · `}
                     {c.tipo === 'corriente' ? 'Corriente' : c.tipo === 'ahorro' ? 'Caja de ahorro' : 'Otra'} ·{' '}
                     {c.cuenta_codigo} · {c.movimientos} movimientos
                   </p>
                   {!c.tiene_apertura && (
-                    <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: '#F59E0B', fontWeight: 600 }}>
+                    <p style={{ margin: '0.3rem 0 0', fontSize: '0.85rem', color: '#B45309', fontWeight: 600 }}>
                       Falta cargar el saldo inicial
                     </p>
                   )}
@@ -275,7 +275,7 @@ export default function Bancos() {
                   <p style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: Number(c.saldo) >= 0 ? '#1F3A5F' : '#EF4444' }}>
                     {fmt(c.saldo)}
                   </p>
-                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#A3AFBF' }}>según tus libros</p>
+                  <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748B' }}>según tus libros</p>
                 </div>
               </div>
 

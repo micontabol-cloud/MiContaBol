@@ -266,7 +266,7 @@ export default function Caja() {
         </button>
       </form>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       <h2>Movimientos recientes</h2>
       {cargando ? (
@@ -274,7 +274,7 @@ export default function Caja() {
       ) : movimientos.length === 0 ? (
         <p style={{ color: '#64748B' }}>Todavía no hay movimientos.</p>
       ) : (
-        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table className="tabla-cards" style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Fecha</th>

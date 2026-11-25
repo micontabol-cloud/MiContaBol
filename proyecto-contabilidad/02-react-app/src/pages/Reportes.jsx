@@ -164,7 +164,7 @@ export default function Reportes() {
         mensajeVacio="Cuando registres ventas, aquí verás cómo evoluciona tu negocio mes a mes."
       />
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       <div className="stat-grid" style={{ marginTop: '2rem' }}>
         <div className="stat-card destacada-ventas">
@@ -194,7 +194,7 @@ export default function Reportes() {
           <p className="stat-label">Plata en inventario</p>
           <p className="stat-value">{fmt(inventario.costo)}</p>
           {inventario.venta > 0 && (
-            <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', color: '#22C55E', fontWeight: 600 }}>
+            <p style={{ margin: '0.2rem 0 0', fontSize: '0.8rem', color: '#15803D', fontWeight: 600 }}>
               Vale {fmt(inventario.venta)} vendido
             </p>
           )}
@@ -239,7 +239,7 @@ export default function Reportes() {
               {topProductos.map((p) => (
                 <li key={p.producto_id}>
                   <span>{p.unidades_vendidas} u vendidas</span>
-                  <span style={{ color: '#22C55E', fontWeight: 600 }}>{fmt(p.utilidad_generada)}</span>
+                  <span style={{ color: '#15803D', fontWeight: 600 }}>{fmt(p.utilidad_generada)}</span>
                 </li>
               ))}
             </ul>
@@ -263,18 +263,18 @@ export default function Reportes() {
                   <li key={c.id}>
                     <span>
                       {c.nombre}
-                      {!c.publicado && <span style={{ color: '#A3AFBF', fontSize: '0.8rem' }}> · borrador</span>}
+                      {!c.publicado && <span style={{ color: '#64748B', fontSize: '0.8rem' }}> · borrador</span>}
                     </span>
                     <span style={{ color: c.visitas > 0 ? '#1F3A5F' : '#A3AFBF', fontWeight: c.visitas > 0 ? 600 : 400 }}>
                       {c.visitas} {c.visitas === 1 ? 'visita' : 'visitas'}
                       {c.consultas > 0 && (
-                        <span style={{ color: '#22C55E' }}> · {c.consultas} consultas</span>
+                        <span style={{ color: '#15803D' }}> · {c.consultas} consultas</span>
                       )}
                     </span>
                   </li>
                 ))}
               </ul>
-              <p style={{ margin: '0.7rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
+              <p style={{ margin: '0.7rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
                 "Consultas" son las veces que alguien tocó un producto para escribirte.
               </p>
               <p style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
@@ -363,7 +363,7 @@ export default function Reportes() {
                       <td style={{ padding: '5px 4px', whiteSpace: 'nowrap' }}>{a.numero}</td>
                       <td style={{ padding: '5px 4px' }}>
                         {a.motivo}
-                        <span style={{ display: 'block', color: '#A3AFBF', fontSize: '0.78rem' }}>
+                        <span style={{ display: 'block', color: '#64748B', fontSize: '0.78rem' }}>
                           {a.anulado_por} ·{' '}
                           {a.dias_despues === 0
                             ? 'el mismo día'

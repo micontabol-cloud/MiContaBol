@@ -248,7 +248,7 @@ export default function EmpresaDashboard() {
         </Link>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -342,7 +342,7 @@ export default function EmpresaDashboard() {
                       }}
                     >
                       <span>{p.nombre_completo}</span>
-                      <span style={{ color: '#EF4444', fontWeight: 600 }}>
+                      <span style={{ color: '#DC2626', fontWeight: 600 }}>
                         {Number(p.stock_actual).toFixed(0)} {p.unidad_medida}
                       </span>
                     </li>
@@ -375,7 +375,7 @@ export default function EmpresaDashboard() {
                       <span>
                         {l.producto_nombre}
                         {l.variante_nombre ? ` — ${l.variante_nombre}` : ''}
-                        <span style={{ color: '#A3AFBF', fontSize: '0.8rem' }}>
+                        <span style={{ color: '#64748B', fontSize: '0.8rem' }}>
                           {' '}
                           · {Number(l.stock_actual).toFixed(0)} {l.unidad_medida}
                         </span>

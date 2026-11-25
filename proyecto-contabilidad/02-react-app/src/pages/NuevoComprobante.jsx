@@ -328,7 +328,7 @@ export default function NuevoComprobante() {
               ))}
             </select>
             {cuentasPrincipales.length === 0 && (
-              <span style={{ color: '#EF4444', fontSize: '0.85em' }}>
+              <span style={{ color: '#DC2626', fontSize: '0.85em' }}>
                 No tienes cuentas de gasto todavía — agrega una en Plan de cuentas primero.
               </span>
             )}
@@ -344,7 +344,7 @@ export default function NuevoComprobante() {
 
         {preview && <AsientoPreview lineas={preview.lineas} aviso={preview.aviso} />}
 
-        {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+        {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
         <button type="submit" disabled={guardando}>
           Registrar {tipo === 'venta' ? 'venta' : 'compra'}

@@ -146,7 +146,7 @@ export default function Clientes() {
               {mejores.map((c) => (
                 <li key={c.id}>
                   <span>{c.nombre}</span>
-                  <span style={{ color: '#22C55E', fontWeight: 600 }}>{fmt(c.total)}</span>
+                  <span style={{ color: '#15803D', fontWeight: 600 }}>{fmt(c.total)}</span>
                 </li>
               ))}
             </ul>
@@ -161,7 +161,7 @@ export default function Clientes() {
                 {deudores.map((c) => (
                   <li key={c.id}>
                     <span>{c.nombre}</span>
-                    <span style={{ color: '#F59E0B', fontWeight: 600 }}>{fmt(c.pendiente)}</span>
+                    <span style={{ color: '#B45309', fontWeight: 600 }}>{fmt(c.pendiente)}</span>
                   </li>
                 ))}
               </ul>
@@ -218,14 +218,14 @@ export default function Clientes() {
         Mostrar clientes desactivados
       </label>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
       ) : clientesVisibles.length === 0 ? (
         <p>Todavía no tienes clientes registrados. Agrega el primero arriba.</p>
       ) : (
-        <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div className="tabla-scroll"><table className="tabla-cards" style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
               <th style={{ padding: '4px 8px' }}>Nombre</th>
@@ -266,7 +266,7 @@ export default function Clientes() {
         </table></div>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.8rem', marginTop: '1.5rem' }}>
+      <p style={{ color: '#64748B', fontSize: '0.8rem', marginTop: '1.5rem' }}>
         Nota: el total comprado y el saldo pendiente se calculan comparando este nombre con el que escribiste en
         cada venta. Si lo escribes distinto entre ventas (mayúsculas/espacios no importan, pero errores de tipeo
         sí), esa venta no se va a agrupar automáticamente con este cliente.

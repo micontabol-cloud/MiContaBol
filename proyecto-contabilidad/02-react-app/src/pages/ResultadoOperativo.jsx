@@ -33,11 +33,11 @@ function Linea({ etiqueta, monto, margen, resta, fuerte, destacada, nota }) {
             fontSize: destacada ? '1.02rem' : '0.95rem',
           }}
         >
-          {resta && <span style={{ color: '#A3AFBF' }}>(−) </span>}
+          {resta && <span style={{ color: '#64748B' }}>(−) </span>}
           {etiqueta}
         </span>
         {nota && (
-          <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.15rem' }}>{nota}</span>
+          <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.15rem' }}>{nota}</span>
         )}
       </div>
 
@@ -117,7 +117,7 @@ export default function ResultadoOperativo() {
   if (!datos) {
     return (
       <main style={{ maxWidth: 850, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error || 'No se pudo cargar el reporte.'}</p>
+        <p style={{ color: '#DC2626' }}>{error || 'No se pudo cargar el reporte.'}</p>
       </main>
     )
   }
@@ -190,7 +190,7 @@ export default function ResultadoOperativo() {
         </button>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {sinMovimientos ? (
         <p
@@ -443,7 +443,7 @@ export default function ResultadoOperativo() {
         </section>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.85rem', marginTop: '1.75rem', lineHeight: 1.55 }}>
+      <p style={{ color: '#64748B', fontSize: '0.85rem', marginTop: '1.75rem', lineHeight: 1.55 }}>
         Este reporte agrupa tus cuentas de gasto automáticamente. Si alguna quedó en el grupo equivocado, tu
         contador puede ajustarla desde el plan de cuentas.
       </p>

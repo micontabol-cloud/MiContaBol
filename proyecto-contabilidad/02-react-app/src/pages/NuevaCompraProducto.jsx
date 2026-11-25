@@ -403,7 +403,7 @@ export default function NuevaCompraProducto() {
 
         {preview && <AsientoPreview lineas={preview.lineas} aviso={preview.aviso} />}
 
-        {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+        {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
         <button type="submit" className="btn-hero" disabled={guardando} style={{ alignSelf: 'flex-start' }}>
           Registrar compra

@@ -474,7 +474,7 @@ export default function Suscripcion() {
                 <span style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1F3A5F' }}>{fmt(precio)}</span>
                 <span style={{ color: '#64748B', fontSize: '0.9rem' }}>{CICLOS[ciclo].sufijo}</span>
               </p>
-              <p style={{ margin: '0 0 0.9rem', fontSize: '0.82rem', color: '#22C55E', fontWeight: 600 }}>
+              <p style={{ margin: '0 0 0.9rem', fontSize: '0.82rem', color: '#15803D', fontWeight: 600 }}>
                 Equivale a {fmt(precio / meses)}/mes
               </p>
 
@@ -521,7 +521,7 @@ export default function Suscripcion() {
               >
                 <li style={{ fontSize: '0.88rem' }}>
                   <strong>{p.limite_productos ? `${p.limite_productos} productos` : 'Productos ilimitados'}</strong>
-                  {p.limite_productos && <span style={{ color: '#A3AFBF' }}> (tallas y colores cuentan)</span>}
+                  {p.limite_productos && <span style={{ color: '#64748B' }}> (tallas y colores cuentan)</span>}
                 </li>
                 <li style={{ fontSize: '0.88rem' }}>
                   {p.limite_negocios === 1 ? '1 negocio' : `Hasta ${p.limite_negocios} negocios`} ·{' '}
@@ -553,7 +553,7 @@ export default function Suscripcion() {
                   <li
                     style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem', fontWeight: 600, color: '#1F3A5F' }}
                   >
-                    <span style={{ color: '#22C55E' }}>
+                    <span style={{ color: '#15803D' }}>
                       <Check size={15} strokeWidth={2.5} />
                     </span>
                     {p.asesorias_mes} {p.asesorias_mes === 1 ? 'asesoría' : 'asesorías'} al mes
@@ -561,7 +561,7 @@ export default function Suscripcion() {
                 )}
                 {p.soporte && (
                   <li style={{ display: 'flex', gap: '0.5rem', fontSize: '0.88rem' }}>
-                    <span style={{ color: '#22C55E' }}>
+                    <span style={{ color: '#15803D' }}>
                       <Check size={15} strokeWidth={2.5} />
                     </span>
                     Soporte por {p.soporte}
@@ -571,7 +571,7 @@ export default function Suscripcion() {
 
               <div style={{ marginTop: '1.1rem' }}>
                 {actual ? (
-                  <span style={{ color: '#22C55E', fontWeight: 700, fontSize: '0.9rem' }}>✓ Tu plan actual</span>
+                  <span style={{ color: '#15803D', fontWeight: 700, fontSize: '0.9rem' }}>✓ Tu plan actual</span>
                 ) : (
                   <button
                     className={recomendado ? 'btn-hero' : undefined}
@@ -717,7 +717,7 @@ export default function Suscripcion() {
                     accept="image/*,application/pdf"
                     onChange={(e) => setArchivo(e.target.files?.[0] || null)}
                   />
-                  <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+                  <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>
                     Foto, captura o PDF. Solo lo vemos nosotros.
                   </span>
                 </label>
@@ -742,7 +742,7 @@ export default function Suscripcion() {
                         gap: '0.45rem',
                       }}
                     >
-                      <CalendarClock size={18} strokeWidth={1.9} style={{ color: '#22C55E' }} />
+                      <CalendarClock size={18} strokeWidth={1.9} style={{ color: '#15803D' }} />
                       Agenda tu sesión de arranque
                     </p>
                     <p style={{ margin: '0 0 0.9rem', fontSize: '0.86rem', color: '#64748B', lineHeight: 1.5 }}>
@@ -798,7 +798,7 @@ export default function Suscripcion() {
                         placeholder="70000000"
                         style={{ width: '100%' }}
                       />
-                      <span style={{ display: 'block', fontSize: '0.8rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+                      <span style={{ display: 'block', fontSize: '0.8rem', color: '#64748B', marginTop: '0.2rem' }}>
                         Te escribimos por aquí para confirmar la reunión.
                       </span>
                     </label>
@@ -843,7 +843,7 @@ export default function Suscripcion() {
                   <input value={nota} onChange={(e) => setNota(e.target.value)} style={{ width: '100%' }} />
                 </label>
 
-                {error && <p style={{ color: '#EF4444', margin: 0 }}>{error}</p>}
+                {error && <p style={{ color: '#DC2626', margin: 0 }}>{error}</p>}
 
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   <button className="btn-hero" type="submit" disabled={enviando}>

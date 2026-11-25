@@ -86,7 +86,7 @@ export default function AnalisisCosto() {
         ningún asiento.
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>

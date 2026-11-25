@@ -111,7 +111,7 @@ export default function BuscadorProductos({ productos, onElegir, placeholder = '
         <Search
           size={17}
           strokeWidth={1.8}
-          style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#A3AFBF' }}
+          style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#64748B' }}
         />
         <input
           value={texto}
@@ -144,7 +144,7 @@ export default function BuscadorProductos({ productos, onElegir, placeholder = '
           }}
         >
           {visibles.length === 0 ? (
-            <p style={{ margin: 0, padding: '0.85rem', color: '#A3AFBF', fontSize: '0.9rem' }}>
+            <p style={{ margin: 0, padding: '0.85rem', color: '#64748B', fontSize: '0.9rem' }}>
               No encontré nada con "{texto.trim()}".
             </p>
           ) : (

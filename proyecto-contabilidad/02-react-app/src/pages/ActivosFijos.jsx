@@ -214,7 +214,7 @@ export default function ActivosFijos() {
         }
       />
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && (
         <p
           style={{
@@ -439,13 +439,13 @@ export default function ActivosFijos() {
             </div>
             <div className="stat-card">
               <p className="stat-label">Se han desgastado</p>
-              <p className="stat-value" style={{ color: '#F59E0B' }}>
+              <p className="stat-value" style={{ color: '#B45309' }}>
                 {fmt(datos.depreciacion_acumulada)}
               </p>
             </div>
             <div className="stat-card destacada-utilidad">
               <p className="stat-label">Valen hoy</p>
-              <p className="stat-value" style={{ color: '#22C55E' }}>
+              <p className="stat-value" style={{ color: '#15803D' }}>
                 {fmt(datos.valor_actual)}
               </p>
             </div>
@@ -462,7 +462,7 @@ export default function ActivosFijos() {
             }}
           >
             <div style={{ display: 'flex', gap: '0.9rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-              <TrendingDown size={22} strokeWidth={1.8} style={{ color: '#F59E0B', marginTop: 3, flexShrink: 0 }} />
+              <TrendingDown size={22} strokeWidth={1.8} style={{ color: '#B45309', marginTop: 3, flexShrink: 0 }} />
 
               <div style={{ flex: 1, minWidth: 260 }}>
                 <p style={{ margin: 0, fontWeight: 700, color: '#1F3A5F' }}>Registrar el desgaste del mes</p>
@@ -509,7 +509,7 @@ export default function ActivosFijos() {
 
       {activos.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-          <Building2 size={44} strokeWidth={1.4} style={{ color: '#A3AFBF' }} />
+          <Building2 size={44} strokeWidth={1.4} style={{ color: '#64748B' }} />
           <p style={{ color: '#64748B', marginTop: '0.75rem' }}>
             Todavía no registraste ningún bien. Empieza con lo más grande: tu vitrina, tu computadora, tu vehículo.
           </p>
@@ -542,7 +542,7 @@ export default function ActivosFijos() {
                         </span>
                       )}
                     </p>
-                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
                       {a.categoria_nombre} · comprado el {a.fecha_compra} · {a.anos_vida} años de vida
                     </p>
 
@@ -552,10 +552,10 @@ export default function ActivosFijos() {
                           <span>
                             Costó: <strong>{fmt(a.valor_compra)}</strong>
                           </span>
-                          <span style={{ color: '#F59E0B' }}>
+                          <span style={{ color: '#B45309' }}>
                             Desgastado: <strong>{fmt(a.depreciacion_acumulada)}</strong>
                           </span>
-                          <span style={{ color: '#22C55E', fontWeight: 600 }}>
+                          <span style={{ color: '#15803D', fontWeight: 600 }}>
                             Vale hoy: {fmt(a.valor_actual)}
                           </span>
                         </div>
@@ -578,7 +578,7 @@ export default function ActivosFijos() {
                             }}
                           />
                         </div>
-                        <p style={{ margin: '0.3rem 0 0', fontSize: '0.8rem', color: '#A3AFBF' }}>
+                        <p style={{ margin: '0.3rem 0 0', fontSize: '0.8rem', color: '#64748B' }}>
                           {avance >= 100
                             ? 'Ya terminó su vida útil contable'
                             : `${Math.round(avance)}% de su vida útil · ${fmt(a.depreciacion_mensual)} al mes`}
@@ -691,7 +691,7 @@ export default function ActivosFijos() {
         </div>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.85rem', marginTop: '1.5rem', lineHeight: 1.55 }}>
+      <p style={{ color: '#64748B', fontSize: '0.85rem', marginTop: '1.5rem', lineHeight: 1.55 }}>
         Los años de vida útil siguen la norma tributaria boliviana, pero los puedes ajustar. Si tienes contador,
         vale la pena confirmarlos con él.
       </p>

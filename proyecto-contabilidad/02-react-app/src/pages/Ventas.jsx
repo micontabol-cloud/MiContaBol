@@ -254,7 +254,7 @@ export default function Ventas() {
                 {porCobrar.slice(0, 5).map((c) => (
                   <li key={c.comprobante_id}>
                     <span>{c.cliente_proveedor || c.numero_interno}</span>
-                    <span style={{ color: '#F59E0B', fontWeight: 600 }}>{fmt(c.saldo_pendiente)}</span>
+                    <span style={{ color: '#B45309', fontWeight: 600 }}>{fmt(c.saldo_pendiente)}</span>
                   </li>
                 ))}
               </ul>
@@ -265,7 +265,7 @@ export default function Ventas() {
 
       <h2 style={{ marginTop: '2rem' }}>Todas las ventas</h2>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && (
         <p
           style={{
@@ -285,7 +285,7 @@ export default function Ventas() {
         <p style={{ color: '#64748B' }}>Todavía no hay ventas registradas.</p>
       ) : (
         <div style={{ background: '#FFFFFF', border: '1px solid #E6ECF3', borderRadius: 16, padding: '1rem' }}>
-          <div className="tabla-scroll"><table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="tabla-scroll"><table className="tabla-cards" style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '1px solid #E6ECF3' }}>
                 <th style={{ padding: '4px 8px' }}>N°</th>
@@ -373,7 +373,7 @@ export default function Ventas() {
                             Anulada por <strong>{detalleAnulacion[v.id].por_nombre || detalleAnulacion[v.id].por_email}</strong>{' '}
                             el {new Date(detalleAnulacion[v.id].fecha).toLocaleString('es-BO')}
                           </p>
-                          <p style={{ margin: '0.3rem 0 0', color: '#A3AFBF', fontSize: '0.85rem' }}>
+                          <p style={{ margin: '0.3rem 0 0', color: '#64748B', fontSize: '0.85rem' }}>
                             Los productos volvieron al inventario y se generó el asiento que cancela esta venta.
                           </p>
                         </div>

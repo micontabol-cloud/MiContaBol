@@ -203,7 +203,7 @@ export default function OnboardingChecklist({ empresa, onOcultar }) {
           <Fragment key={p.titulo}>
           {i === esenciales.length && (
             <li style={{ listStyle: 'none', marginTop: '0.5rem' }}>
-              <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#A3AFBF', letterSpacing: '0.03em' }}>
+              <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: 700, color: '#64748B', letterSpacing: '0.03em' }}>
                 CUANDO LO NECESITES
               </p>
             </li>

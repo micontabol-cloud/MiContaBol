@@ -119,7 +119,7 @@ export default function BalanceComprobacion() {
         )}
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -162,9 +162,9 @@ export default function BalanceComprobacion() {
 
           <p style={{ marginTop: '1rem' }}>
             {Math.abs(totalDebe - totalHaber) < 0.005 ? (
-              <span style={{ color: '#22C55E' }}>✅ El total debe y el total haber cuadran.</span>
+              <span style={{ color: '#15803D' }}>✅ El total debe y el total haber cuadran.</span>
             ) : (
-              <span style={{ color: '#EF4444' }}>
+              <span style={{ color: '#DC2626' }}>
                 ⚠️ No cuadran (diferencia: {(totalDebe - totalHaber).toFixed(2)}).
               </span>
             )}

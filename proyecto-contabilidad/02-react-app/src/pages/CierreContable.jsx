@@ -206,7 +206,7 @@ export default function CierreContable() {
         </button>
       </div>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && <p style={{ color: '#3B82F6' }}>{aviso}</p>}
 
       {previa && (

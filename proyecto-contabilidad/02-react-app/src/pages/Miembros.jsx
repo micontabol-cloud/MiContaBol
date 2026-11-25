@@ -80,7 +80,7 @@ export default function Miembros() {
       </p>
       <h1>Miembros de la empresa</h1>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {cargando ? (
         <p>Cargando...</p>
@@ -142,7 +142,7 @@ export default function Miembros() {
         <p style={{ color: '#64748B', marginTop: '1rem' }}>Solo un admin de la empresa puede agregar o quitar miembros.</p>
       )}
 
-      <p style={{ color: '#A3AFBF', fontSize: '0.85em', marginTop: '1rem' }}>
+      <p style={{ color: '#64748B', fontSize: '0.85em', marginTop: '1rem' }}>
         Nota: la persona que agregues debe tener ya una cuenta creada (registrada antes en la pantalla de login)
         para poder vincularla.
       </p>

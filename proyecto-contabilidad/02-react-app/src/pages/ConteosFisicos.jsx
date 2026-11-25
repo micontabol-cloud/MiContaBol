@@ -85,7 +85,7 @@ export default function ConteosFisicos() {
         }
       />
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {!abierto && (
         <>

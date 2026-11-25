@@ -541,14 +541,14 @@ button.sidebar-group-toggle:hover {
 }
 
 .stat-delta-up {
-  color: var(--color-success);
+  color: #15803D;
   font-size: 0.82rem;
   font-weight: 600;
   margin: 0.3rem 0 0;
 }
 
 .stat-delta-down {
-  color: var(--color-error);
+  color: #DC2626;
   font-size: 0.82rem;
   font-weight: 600;
   margin: 0.3rem 0 0;
@@ -1124,4 +1124,121 @@ button.btn-lg {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+}
+
+/* ── Tablas como tarjetas en el celular (tabla-cards) ─────────────────────── */
+@media (max-width: 640px) {
+  table.tabla-cards,
+  table.tabla-cards tbody { display: block; width: 100%; }
+  table.tabla-cards thead { display: none; }
+
+  table.tabla-cards tr {
+    display: block;
+    background: #FFFFFF;
+    border: 1px solid #E6ECF3 !important;
+    border-radius: 12px;
+    padding: 0.35rem 0.6rem;
+    margin: 0 0 0.6rem;
+  }
+  table.tabla-cards td {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.2rem 0 !important;
+    text-align: right !important;
+    border: 0;
+    min-height: 28px;
+    overflow-wrap: anywhere;
+  }
+  table.tabla-cards td[data-label]:not([data-label=""])::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    color: #64748B;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: left;
+  }
+  /* celda sin título = botones de acción: ocupa todo el ancho, a la derecha */
+  table.tabla-cards td[data-label=""] {
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    border-top: 1px solid #F0F3F8;
+    margin-top: 0.2rem;
+    padding-top: 0.5rem !important;
+  }
+  /* fila de detalle que se abre debajo de una tarjeta */
+  table.tabla-cards tr:has(> td[colspan]) {
+    margin-top: -0.4rem;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    background: #F7F9FC;
+  }
+  table.tabla-cards td[colspan] { display: block !important; text-align: left !important; }
+}
+
+/* ── Menú lateral minimizable (computador) ────────────────────────────────── */
+.sidebar-colapsar {
+  display: none !important;
+}
+@media (min-width: 861px) {
+  .app-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    align-self: flex-start;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: width 0.2s ease;
+  }
+  .app-sidebar > * { flex-shrink: 0; }
+  button.sidebar-colapsar {
+    display: flex !important;
+    align-items: center;
+    gap: 0.6rem;
+    align-self: flex-start;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    color: #C7D2E0 !important;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.4rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button.sidebar-colapsar:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #FFFFFF !important;
+  }
+  .app-sidebar.colapsado {
+    width: 68px;
+    padding: 1.1rem 0.5rem;
+    align-items: center;
+  }
+  .app-sidebar.colapsado .sidebar-colapsar { align-self: center; }
+  .app-sidebar.colapsado .sidebar-logo-bloque p,
+  .app-sidebar.colapsado .sidebar-empresa-chip { display: none; }
+  .app-sidebar.colapsado .sidebar-nav { width: 100%; }
+  .app-sidebar.colapsado .sidebar-link,
+  .app-sidebar.colapsado button.sidebar-group-toggle {
+    font-size: 0;
+    gap: 0;
+    justify-content: center;
+    padding: 0.7rem 0;
+  }
+  .app-sidebar.colapsado button.sidebar-group-toggle > svg { display: none; }
+  .app-sidebar.colapsado button.sidebar-group-toggle > span { gap: 0 !important; }
+  .app-sidebar.colapsado .sidebar-subnav { display: none; }
+  .app-sidebar.colapsado button.sidebar-group-toggle.active {
+    background: rgba(255, 255, 255, 0.14);
+    color: #FFFFFF;
+  }
+  .app-sidebar.colapsado .sidebar-volver { font-size: 0 !important; text-align: center; }
+  .app-sidebar.colapsado .sidebar-volver::before { content: '\2190'; font-size: 1.2rem; color: #93A5C4; }
+}
+
+/* ── Celular: escala general un poco menor (todo lo escrito en rem se achica parejo) ── */
+@media (max-width: 860px) {
+  html { font-size: 14.5px; }
 }

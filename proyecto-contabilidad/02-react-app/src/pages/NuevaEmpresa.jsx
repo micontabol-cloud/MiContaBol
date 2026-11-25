@@ -65,7 +65,7 @@ export default function NuevaEmpresa() {
             <option value="farmacia">Farmacia</option>
             <option value="otro">Otro</option>
           </select>
-          <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+          <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
             Prepara tus categorías y activa solo las funciones que tu rubro necesita.
           </span>
         </label>
@@ -78,7 +78,7 @@ export default function NuevaEmpresa() {
             <option value="otro">Otro</option>
           </select>
         </label>
-        {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+        {error && <p style={{ color: '#DC2626' }}>{error}</p>}
         <button type="submit" disabled={cargando}>
           Crear empresa
         </button>

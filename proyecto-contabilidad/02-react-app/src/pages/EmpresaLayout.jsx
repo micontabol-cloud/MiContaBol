@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState, createContext, useContext } from 'react'
 import { NavLink, Outlet, useParams, useLocation, Link, useNavigate } from 'react-router-dom'
 import {
   Home,
@@ -25,6 +25,8 @@ import {
   X,
   Plus,
   MoreHorizontal,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
 import Logo from '../components/Logo'
@@ -37,6 +39,9 @@ const BoliAsistente = lazy(() => import('../components/BoliAsistente'))
 // Un solo estilo de iconos en toda la app (Lucide, outline, mismo
 // grosor) en vez de mezclar emojis con símbolos.
 const ICONO = { size: 17, strokeWidth: 1.8 }
+
+// Si el menú lateral está minimizado (solo íconos)
+const BarraLateral = createContext({ colapsado: false })
 
 const principal = [
   { to: '', label: 'Inicio', Icon: Home, end: true },
@@ -99,10 +104,16 @@ const barraMovilPromotor = [
 function GrupoColapsable({ titulo, Icon, items, empresaId, pathname }) {
   const estaEnGrupo = items.some((it) => pathname.startsWith(`/empresas/${empresaId}${it.to}`))
   const [abierto, setAbierto] = useState(estaEnGrupo)
+  const { colapsado } = useContext(BarraLateral)
+  const irA = useNavigate()
 
   return (
     <div>
-      <button type="button" className="sidebar-group-toggle" onClick={() => setAbierto(!abierto)}>
+      <button
+        type="button"
+        className={'sidebar-group-toggle' + (colapsado && estaEnGrupo ? ' active' : '')}
+        onClick={() => (colapsado ? irA(`/empresas/${empresaId}${items[0].to}`) : setAbierto(!abierto))}
+      >
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
           <Icon {...ICONO} />
           {titulo}
@@ -134,6 +145,30 @@ function LayoutInterno() {
   const navigate = useNavigate()
   const [empresa, setEmpresa] = useState(null)
   const [menuAbierto, setMenuAbierto] = useState(false)
+  const [colapsado, setColapsado] = useState(() => {
+    try {
+      return localStorage.getItem('mcb_menu_min') === '1'
+    } catch {
+      return false
+    }
+  })
+  const alternarMenu = () =>
+    setColapsado((v) => {
+      try {
+        localStorage.setItem('mcb_menu_min', v ? '0' : '1')
+      } catch {
+        /* sin almacenamiento: queda solo en esta sesión */
+      }
+      return !v
+    })
+
+  // Con el menú minimizado, cada ícono muestra su nombre al pasar el mouse
+  useEffect(() => {
+    document.querySelectorAll('.app-sidebar .sidebar-link, .app-sidebar .sidebar-group-toggle').forEach((el) => {
+      if (colapsado) el.setAttribute('title', (el.textContent || '').trim())
+      else el.removeAttribute('title')
+    })
+  }, [colapsado, location.pathname, rol])
 
   const promotor = rol === 'promotor'
 
@@ -157,6 +192,7 @@ function LayoutInterno() {
   const barra = promotor ? barraMovilPromotor : barraMovil
 
   return (
+    <BarraLateral.Provider value={{ colapsado }}>
     <div className="app-shell">
       <header className="topbar-movil">
         <Logo to="/empresas" dark iconSize={30} textSize="1.05rem" />
@@ -171,7 +207,7 @@ function LayoutInterno() {
         aria-hidden="true"
       />
 
-      <aside className={'app-sidebar' + (menuAbierto ? ' abierto' : '')}>
+      <aside className={'app-sidebar' + (menuAbierto ? ' abierto' : '') + (colapsado ? ' colapsado' : '')}>
         <button
           type="button"
           className="boton-menu"
@@ -182,8 +218,19 @@ function LayoutInterno() {
           <X size={20} strokeWidth={2} />
         </button>
 
-        <div>
-          <Logo to="/empresas" dark iconSize={38} textSize="1.15rem" />
+        <button
+          type="button"
+          className="sidebar-colapsar"
+          onClick={alternarMenu}
+          aria-label={colapsado ? 'Mostrar el menú completo' : 'Minimizar el menú'}
+          title={colapsado ? 'Mostrar el menú completo' : 'Minimizar el menú'}
+        >
+          {colapsado ? <PanelLeftOpen size={18} strokeWidth={1.9} /> : <PanelLeftClose size={18} strokeWidth={1.9} />}
+          {!colapsado && <span>Minimizar</span>}
+        </button>
+
+        <div className="sidebar-logo-bloque">
+          <Logo to="/empresas" dark iconSize={colapsado ? 26 : 38} textSize="1.15rem" showText={!colapsado} />
           <p style={{ color: '#93A5C4', fontSize: '0.72rem', margin: '0.4rem 0 0', lineHeight: 1.35 }}>
             Mi contabilidad
             <br />
@@ -336,7 +383,7 @@ function LayoutInterno() {
           )}
         </nav>
 
-        <Link to="/empresas" style={{ color: '#93A5C4', fontSize: '0.8rem', marginTop: 'auto' }}>
+        <Link to="/empresas" className="sidebar-volver" style={{ color: '#93A5C4', fontSize: '0.8rem', marginTop: 'auto' }}>
           &larr; Mis empresas
         </Link>
       </aside>
@@ -406,6 +453,7 @@ function LayoutInterno() {
         </Suspense>
       )}
     </div>
+    </BarraLateral.Provider>
   )
 }
 

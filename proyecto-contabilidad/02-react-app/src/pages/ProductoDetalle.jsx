@@ -257,7 +257,7 @@ export default function ProductoDetalle() {
   if (!producto) {
     return (
       <main style={{ maxWidth: 900, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error || 'Producto no encontrado.'}</p>
+        <p style={{ color: '#DC2626' }}>{error || 'Producto no encontrado.'}</p>
         <Link to={`/empresas/${empresaId}/inventario/productos`}>&larr; Volver a productos</Link>
       </main>
     )
@@ -277,7 +277,7 @@ export default function ProductoDetalle() {
         Código {producto.codigo} · Stock total: {stockTotal.toFixed(2)} {producto.unidad_medida}
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
       {aviso && <p style={{ color: '#3B82F6' }}>{aviso}</p>}
 
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
@@ -594,10 +594,10 @@ export default function ProductoDetalle() {
                     {m.comprobante_numero || '—'}
                     {m.cliente_proveedor ? ` · ${m.cliente_proveedor}` : ''}
                   </td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right', color: '#22C55E' }}>
+                  <td style={{ padding: '4px 8px', textAlign: 'right', color: '#15803D' }}>
                     {cant > 0 ? cant.toFixed(2) : ''}
                   </td>
-                  <td style={{ padding: '4px 8px', textAlign: 'right', color: '#EF4444' }}>
+                  <td style={{ padding: '4px 8px', textAlign: 'right', color: '#DC2626' }}>
                     {cant < 0 ? Math.abs(cant).toFixed(2) : ''}
                   </td>
                   <td style={{ padding: '4px 8px', textAlign: 'right' }}>{Number(m.costo_unitario).toFixed(2)}</td>
@@ -659,7 +659,7 @@ export default function ProductoDetalle() {
             <button
               type="button"
               onClick={() => setAccionPeligro('eliminar')}
-              style={{ color: '#EF4444', borderColor: '#EF4444' }}
+              style={{ color: '#DC2626', borderColor: '#EF4444' }}
             >
               Enviar a la papelera
             </button>
@@ -741,7 +741,7 @@ export default function ProductoDetalle() {
           )}
 
           {tieneMovimientos && (
-            <p style={{ margin: '0.9rem 0 0', fontSize: '0.85rem', color: '#A3AFBF' }}>
+            <p style={{ margin: '0.9rem 0 0', fontSize: '0.85rem', color: '#64748B' }}>
               Este producto tiene ventas o compras registradas, así que no se puede borrar del todo: sus movimientos
               quedarían sin referencia y el kardex no cuadraría.
             </p>

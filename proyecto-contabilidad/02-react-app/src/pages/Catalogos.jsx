@@ -119,7 +119,7 @@ export default function Catalogos() {
         mensajeVacio="Arma tu primer catálogo y compártelo por WhatsApp."
       />
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       <div
         style={{
@@ -165,7 +165,7 @@ export default function Catalogos() {
               </option>
             ))}
           </select>
-          <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF', marginTop: '0.2rem' }}>
+          <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B', marginTop: '0.2rem' }}>
             {TIPOS.find((t) => t.valor === tipo)?.ayuda}
           </span>
         </label>

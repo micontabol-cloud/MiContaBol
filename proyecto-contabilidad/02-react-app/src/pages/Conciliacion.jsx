@@ -117,7 +117,7 @@ export default function Conciliacion() {
   if (!datos) {
     return (
       <main style={{ maxWidth: 950, fontFamily: 'sans-serif' }}>
-        <p style={{ color: '#EF4444' }}>{error || 'Conciliación no encontrada.'}</p>
+        <p style={{ color: '#DC2626' }}>{error || 'Conciliación no encontrada.'}</p>
       </main>
     )
   }
@@ -143,7 +143,7 @@ export default function Conciliacion() {
         {cerrada && ' · Cerrada'}
       </p>
 
-      {error && <p style={{ color: '#EF4444' }}>{error}</p>}
+      {error && <p style={{ color: '#DC2626' }}>{error}</p>}
 
       {/* El resultado, arriba de todo */}
       <div
@@ -260,12 +260,12 @@ export default function Conciliacion() {
                   <td style={{ padding: '6px 8px', whiteSpace: 'nowrap' }}>{m.fecha}</td>
                   <td style={{ padding: '6px 8px' }}>
                     {m.glosa}
-                    <span style={{ color: '#A3AFBF', fontSize: '0.8rem' }}> · #{m.numero}</span>
+                    <span style={{ color: '#64748B', fontSize: '0.8rem' }}> · #{m.numero}</span>
                   </td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#22C55E' }}>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#15803D' }}>
                     {Number(m.debe) > 0 ? Number(m.debe).toFixed(2) : ''}
                   </td>
-                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#EF4444' }}>
+                  <td style={{ padding: '6px 8px', textAlign: 'right', color: '#DC2626' }}>
                     {Number(m.haber) > 0 ? Number(m.haber).toFixed(2) : ''}
                   </td>
                 </tr>
@@ -334,7 +334,7 @@ export default function Conciliacion() {
                   placeholder="-25"
                   style={{ width: 110 }}
                 />
-                <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B' }}>
                   Negativo si te cobraron
                 </span>
               </label>
@@ -351,7 +351,7 @@ export default function Conciliacion() {
                       </option>
                     ))}
                 </select>
-                <span style={{ display: 'block', fontSize: '0.78rem', color: '#A3AFBF' }}>
+                <span style={{ display: 'block', fontSize: '0.78rem', color: '#64748B' }}>
                   Normalmente "Gastos Bancarios"
                 </span>
               </label>
