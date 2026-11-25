@@ -2,6 +2,7 @@ import Ico from '../components/Ico'
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { traerTodo, leerCache, guardarCache, actualizando } from '../lib/datos'
 import PanelModulo from '../components/PanelModulo'
 
 const fmt = (n) => `Bs ${Number(n || 0).toFixed(2)}`
@@ -16,23 +17,38 @@ export default function Compras() {
 
   useEffect(() => {
     async function cargar() {
+      const clave = `compras:${empresaId}`
+      const guardado = await leerCache(clave)
+      if (guardado) {
+        setCompras(guardado.compras)
+        setPorPagar(guardado.porPagar)
+        setStock(guardado.stock)
+        setCargando(false)
+        actualizando(true)
+      }
       const [comprasRes, cxpRes, stockRes] = await Promise.all([
-        supabase
-          .from('comprobantes')
-          .select('*, comprobante_items(id)')
-          .eq('empresa_id', empresaId)
-          .is('anulado_at', null)
-          .eq('tipo', 'compra')
-          .order('fecha', { ascending: false })
-          .order('numero_interno', { ascending: false }),
+        traerTodo(() =>
+          supabase
+            .from('comprobantes')
+            .select('*, comprobante_items(id)')
+            .eq('empresa_id', empresaId)
+            .is('anulado_at', null)
+            .eq('tipo', 'compra')
+            .order('fecha', { ascending: false })
+            .order('numero_interno', { ascending: false })
+            .order('id', { ascending: false })
+        ),
         supabase.from('vista_cuentas_por_pagar').select('*').eq('empresa_id', empresaId),
         supabase.from('vista_stock').select('*').eq('empresa_id', empresaId).eq('activo', true),
       ])
 
       if (comprasRes.error) setError(comprasRes.error.message)
-      setCompras(comprasRes.data || [])
-      setPorPagar((cxpRes.data || []).filter((c) => Number(c.saldo_pendiente) > 0.005))
+      const porPagarNuevo = (cxpRes.data || []).filter((c) => Number(c.saldo_pendiente) > 0.005)
+      if (!comprasRes.error || !guardado) setCompras(comprasRes.data || [])
+      setPorPagar(porPagarNuevo)
       setStock(stockRes.data || [])
+      if (!comprasRes.error) guardarCache(clave, { compras: comprasRes.data || [], porPagar: porPagarNuevo, stock: stockRes.data || [] })
+      if (guardado) actualizando(false)
       setCargando(false)
     }
     cargar()

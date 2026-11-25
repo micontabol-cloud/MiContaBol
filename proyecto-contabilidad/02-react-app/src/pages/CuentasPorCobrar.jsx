@@ -2,6 +2,7 @@ import Ico from '../components/Ico'
 import { Fragment, useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { leerCache, guardarCache, actualizando } from '../lib/datos'
 
 export default function CuentasPorCobrar() {
   const { id: empresaId } = useParams()
@@ -16,8 +17,17 @@ export default function CuentasPorCobrar() {
   const [cuentaCobroId, setCuentaCobroId] = useState('')
   const [guardando, setGuardando] = useState(false)
 
-  async function cargar() {
-    setCargando(true)
+  async function cargar(opc = {}) {
+    const clave = `cxc:${empresaId}`
+    const guardado = opc.desdeCache ? await leerCache(clave) : null
+    if (guardado) {
+      setFilas(guardado.filas)
+      setCuentas(guardado.cuentas)
+      setCargando(false)
+      actualizando(true)
+    } else {
+      setCargando(true)
+    }
     const [{ data: cxc, error: errCxc }, { data: cts }] = await Promise.all([
       supabase.from('vista_cuentas_por_cobrar').select('*').eq('empresa_id', empresaId).order('fecha'),
       supabase
@@ -29,13 +39,17 @@ export default function CuentasPorCobrar() {
         .order('codigo'),
     ])
     if (errCxc) setError(errCxc.message)
-    setFilas((cxc || []).filter((f) => f.saldo_pendiente > 0.005))
-    setCuentas((cts || []).filter((c) => c.tipo === 'activo'))
+    const filasNuevas = (cxc || []).filter((f) => f.saldo_pendiente > 0.005)
+    const cuentasNuevas = (cts || []).filter((c) => c.tipo === 'activo')
+    if (!errCxc || !guardado) setFilas(filasNuevas)
+    setCuentas(cuentasNuevas)
+    if (!errCxc) guardarCache(clave, { filas: filasNuevas, cuentas: cuentasNuevas })
+    if (guardado) actualizando(false)
     setCargando(false)
   }
 
   useEffect(() => {
-    cargar()
+    cargar({ desdeCache: true })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [empresaId])
 
