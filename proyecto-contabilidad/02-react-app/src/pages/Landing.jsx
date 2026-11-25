@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Check,
@@ -18,15 +18,23 @@ import {
   Download,
 } from 'lucide-react'
 import { supabase } from '../supabaseClient'
-import Logo from '../components/Logo'
+import { ES_APP } from '../lib/plataforma'
+import { Wordmark, LogoIsotipo } from '../components/Logo'
 import BoliMascot from '../components/BoliMascot'
+import '../styles/landing.css'
+
+/*
+  Página principal de MiContaBol — Design System 2.0 (el de LecheTrack)
+  con la marca MiContaBol: navy + coral + Boli.
+
+  Dentro de la app del celular (ES_APP) NO se muestran precios, planes,
+  mes gratis ni registro: solo la página y el botón para entrar.
+*/
 
 const fmt = (n) => `Bs ${Number(n).toLocaleString('es-BO', { maximumFractionDigits: 0 })}`
 
 const rubros = ['Zapaterías', 'Boutiques', 'Minimarkets', 'Ferreterías', 'Joyerías', 'Farmacias']
 
-// Ventas reales del gráfico: con montos por mes se lee como producto,
-// no como wireframe.
 const ventasMeses = [
   { mes: 'Mar', valor: 7800 },
   { mes: 'Abr', valor: 9100 },
@@ -81,24 +89,28 @@ const preguntas = [
     r: 'Sí, y está pensado para eso: buscas el producto, tocas cómo te pagaron y listo. También funciona en computadora y tablet.',
   },
   {
+    // Habla de pagos: solo en la web.
+    soloWeb: true,
     p: '¿Qué pasa si dejo de pagar?',
     r: 'Tu información no se borra. La cuenta queda en modo lectura: puedes ver todo tu historial, pero no registrar movimientos nuevos hasta que renueves.',
   },
-]
+].filter((q) => !(ES_APP && q.soloWeb))
 
-/* ---------- Piezas visuales ---------- */
+/* ---------- Piezas visuales (pantallas de ejemplo) ---------- */
 
 function Ventana({ children, ancho = 'auto' }) {
   return (
     <div
       style={{
         background: '#FFFFFF',
+        color: 'var(--color-text)',
         borderRadius: 14,
         boxShadow: '0 24px 60px rgba(15, 26, 41, 0.22)',
         overflow: 'hidden',
         border: '1px solid rgba(15,26,41,0.08)',
         width: ancho,
         maxWidth: '100%',
+        textAlign: 'left',
       }}
     >
       <div
@@ -118,7 +130,7 @@ function Ventana({ children, ancho = 'auto' }) {
           style={{
             marginLeft: '0.5rem',
             fontSize: '0.7rem',
-            color: 'var(--color-text-disabled)',
+            color: '#64748B',
             background: '#FFFFFF',
             border: '1px solid var(--color-border)',
             borderRadius: 999,
@@ -146,13 +158,21 @@ function Telefono({ children, alto = 400, etiqueta }) {
           margin: '0 auto',
         }}
       >
-        <div style={{ background: '#FFFFFF', borderRadius: 22, height: alto, overflow: 'hidden', position: 'relative' }}>
+        <div
+          style={{
+            background: '#FFFFFF',
+            color: 'var(--color-text)',
+            borderRadius: 22,
+            height: alto,
+            overflow: 'hidden',
+            position: 'relative',
+            textAlign: 'left',
+          }}
+        >
           {children}
         </div>
       </div>
-      {etiqueta && (
-        <p style={{ margin: '0.75rem 0 0', fontSize: '0.85rem', fontWeight: 600, opacity: 0.85 }}>{etiqueta}</p>
-      )}
+      {etiqueta && <p style={{ margin: '0.85rem 0 0', fontSize: '0.9rem', fontWeight: 600 }}>{etiqueta}</p>}
     </div>
   )
 }
@@ -181,23 +201,33 @@ function PantallaVenta({ compacta = false }) {
         ))}
 
         <div style={{ borderTop: '1px solid var(--color-border)', marginTop: '0.7rem', paddingTop: '0.7rem' }}>
-          <p style={{ margin: 0, fontWeight: 800, color: 'var(--color-success)', fontSize: '1rem' }}>
-            Tu ganancia: Bs 233,00
-          </p>
+          <p style={{ margin: 0, fontWeight: 800, color: '#15803D', fontSize: '1rem' }}>Tu ganancia: Bs 233,00</p>
           <p style={{ margin: '0.1rem 0 0', fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>
             Margen del 40%
           </p>
         </div>
       </div>
 
-      <button className="btn-hero" type="button" style={{ width: '100%', marginTop: '0.9rem', fontSize: '0.85rem' }}>
+      {/* Es una imagen de ejemplo: un div, no un botón de verdad */}
+      <div
+        style={{
+          width: '100%',
+          marginTop: '0.9rem',
+          fontSize: '0.85rem',
+          fontWeight: 600,
+          textAlign: 'center',
+          background: 'var(--color-coral)',
+          color: '#FFFFFF',
+          borderRadius: 12,
+          padding: '0.6rem 1.2rem',
+        }}
+      >
         Registrar venta
-      </button>
+      </div>
     </div>
   )
 }
 
-/* Dashboard con el gráfico real: montos por mes y la variación */
 function PantallaDashboard() {
   const max = Math.max(...ventasMeses.map((m) => m.valor))
   const ultimo = ventasMeses[ventasMeses.length - 1].valor
@@ -216,16 +246,14 @@ function PantallaDashboard() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.9rem' }}>
         <BoliMascot pose="hola" size={34} />
         <div>
-          <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)', fontSize: '0.95rem' }}>
-            Calzados Patito
-          </p>
+          <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)', fontSize: '0.95rem' }}>Calzados Patito</p>
           <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
             ¡Buen inicio de semana! Aquí está tu resumen.
           </p>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.6rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.6rem' }}>
         {kpis.map((k) => (
           <div
             key={k.label}
@@ -247,13 +275,13 @@ function PantallaDashboard() {
               padding: '0.6rem 0.7rem',
             }}
           >
-            <p style={{ margin: 0, fontSize: '0.65rem', color: 'var(--color-text-secondary)' }}>{k.label}</p>
+            <p style={{ margin: 0, fontSize: '0.68rem', color: 'var(--color-text-secondary)' }}>{k.label}</p>
             <p
               style={{
                 margin: '0.15rem 0 0',
-                fontSize: '0.95rem',
+                fontSize: '0.98rem',
                 fontWeight: 800,
-                color: k.destacado === 'utilidad' ? 'var(--color-success)' : 'var(--color-navy)',
+                color: k.destacado === 'utilidad' ? '#15803D' : 'var(--color-navy)',
               }}
             >
               {k.valor}
@@ -271,13 +299,20 @@ function PantallaDashboard() {
           marginTop: '0.7rem',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.8rem' }}>
-          <p style={{ margin: 0, fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-navy)' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'baseline',
+            flexWrap: 'wrap',
+            gap: '0.3rem',
+            marginBottom: '0.8rem',
+          }}
+        >
+          <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-navy)' }}>
             Ventas de los últimos 6 meses
           </p>
-          <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-success)' }}>
-            ↑ {variacion}% vs. mes anterior
-          </p>
+          <p style={{ margin: 0, fontSize: '0.74rem', fontWeight: 700, color: '#15803D' }}>↑ {variacion}% vs. mes anterior</p>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '0.6rem', height: 78 }}>
@@ -287,9 +322,9 @@ function PantallaDashboard() {
               <div key={m.mes} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <span
                   style={{
-                    fontSize: '0.58rem',
+                    fontSize: '0.62rem',
                     fontWeight: 700,
-                    color: esUltimo ? 'var(--color-coral)' : 'var(--color-text-disabled)',
+                    color: esUltimo ? '#D63A41' : '#64748B',
                     marginBottom: '0.2rem',
                   }}
                 >
@@ -303,7 +338,7 @@ function PantallaDashboard() {
                     borderRadius: '4px 4px 0 0',
                   }}
                 />
-                <span style={{ fontSize: '0.6rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
+                <span style={{ fontSize: '0.64rem', color: 'var(--color-text-secondary)', marginTop: '0.25rem' }}>
                   {m.mes}
                 </span>
               </div>
@@ -315,14 +350,15 @@ function PantallaDashboard() {
   )
 }
 
-/* Captura real del catálogo funcionando. Una foto del producto de
-   verdad convence más que cualquier mockup: se nota que existe y que
-   alguien lo usó. */
 function PantallaCatalogo() {
   return (
     <img
-      src="/demo/catalogo-movil.png"
+      src="/demo/catalogo-movil.webp"
       alt="Catálogo público de Calzados Patito visto desde un celular"
+      width="480"
+      height="1043"
+      loading="lazy"
+      decoding="async"
       style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top', display: 'block' }}
     />
   )
@@ -374,21 +410,49 @@ function PantallaWhatsapp() {
           <p style={{ margin: 0, fontSize: '0.74rem', lineHeight: 1.45, color: '#111B21' }}>
             Hola 👋 Vi el <strong>Modelo Roma</strong> en su catálogo a Bs 450 y me interesa. ¿Tienen talla 38?
           </p>
-          <p style={{ margin: '0.3rem 0 0', fontSize: '0.6rem', color: '#667781', textAlign: 'right' }}>14:32</p>
+          <p style={{ margin: '0.3rem 0 0', fontSize: '0.62rem', color: '#667781', textAlign: 'right' }}>14:32</p>
         </div>
       </div>
     </div>
   )
 }
 
+/* Etiqueta pequeña + titular con palabras clave en degradado + subtítulo */
+function Encabezado({ etiqueta, children, sub, alineado = 'center' }) {
+  return (
+    <div className="lg-rev" style={{ textAlign: alineado, marginBottom: 40 }}>
+      <span className="lg-eyebrow">{etiqueta}</span>
+      <h2 className="lg-h2" style={{ margin: '16px 0 0' }}>
+        {children}
+      </h2>
+      {sub && (
+        <p className="lg-sub" style={{ margin: '14px auto 0', maxWidth: 640 }}>
+          {sub}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function Flecha() {
+  return (
+    <span className="lg-flecha" aria-hidden="true">
+      <ArrowRight size={22} strokeWidth={2} />
+    </span>
+  )
+}
+
 /* ---------- La página ---------- */
 
 export default function Landing() {
+  const raiz = useRef(null)
   const [planes, setPlanes] = useState([])
   const [ciclo, setCiclo] = useState('trimestral')
-  const [abierta, setAbierta] = useState(null)
+  const [abierta, setAbierta] = useState(0)
 
+  // Los planes y precios solo se piden (y se muestran) en la web
   useEffect(() => {
+    if (ES_APP) return
     supabase
       .from('planes')
       .select('*')
@@ -397,163 +461,161 @@ export default function Landing() {
       .then(({ data }) => setPlanes(data || []))
   }, [])
 
+  // Aparición suave al hacer scroll. Si algo falla, todo queda visible.
+  useEffect(() => {
+    const el = raiz.current
+    if (!el) return
+    const reducido = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reducido || !('IntersectionObserver' in window)) return
+    el.classList.add('lg-js')
+    const io = new IntersectionObserver(
+      (entradas) => {
+        entradas.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('lg-in')
+            io.unobserve(e.target)
+          }
+        })
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -6% 0px' }
+    )
+    el.querySelectorAll('.lg-rev').forEach((n) => io.observe(n))
+    const seguro = setTimeout(() => el.querySelectorAll('.lg-rev').forEach((n) => n.classList.add('lg-in')), 3500)
+    return () => {
+      clearTimeout(seguro)
+      io.disconnect()
+    }
+  }, [planes.length])
+
+  // Brillo que sigue al mouse sobre las tarjetas
+  function brillo(e) {
+    const c = e.target.closest?.('.lg-card')
+    if (!c) return
+    const r = c.getBoundingClientRect()
+    c.style.setProperty('--mx', `${e.clientX - r.left}px`)
+    c.style.setProperty('--my', `${e.clientY - r.top}px`)
+  }
+
+  const textoEntrar = ES_APP ? 'Iniciar sesión' : 'Probar gratis'
+
   return (
-    <main
-      style={{
-        maxWidth: 'none',
-        margin: 0,
-        background: 'transparent',
-        border: 'none',
-        boxShadow: 'none',
-        padding: 0,
-        fontFamily: 'sans-serif',
-      }}
-    >
-      <header className="landing-header">
-        <div className="landing-container landing-header-inner">
-          <Logo iconSize={36} textSize="1.2rem" />
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <div className="landing-header-nav-links" style={{ display: 'flex', gap: '0.75rem' }}>
-              <a href="#producto" style={{ fontSize: '0.92rem' }}>Producto</a>
-              <a href="#precios" style={{ fontSize: '0.92rem' }}>Precios</a>
-              <a href="#preguntas" style={{ fontSize: '0.92rem' }}>Preguntas</a>
-            </div>
-            <Link to="/login">
-              <button type="button">Iniciar sesión</button>
+    <div className="lg" ref={raiz} onMouseMove={brillo}>
+      {/* ── Barra flotante en píldora ── */}
+      <header className={`lg-pill ${ES_APP ? '' : 'lg-pill-dos'}`}>
+        <Link to="/" className="lg-pill-logo" aria-label="MiContaBol, inicio">
+          <LogoIsotipo size={30} />
+          <span className="lg-pill-nombre">
+            <Wordmark size="1.15rem" />
+          </span>
+        </Link>
+        <nav className="lg-pill-nav">
+          <a className="lg-enlace lg-pill-link" href="#producto">
+            Producto
+          </a>
+          {!ES_APP && (
+            <a className="lg-enlace lg-pill-link" href="#precios">
+              Precios
+            </a>
+          )}
+          <a className="lg-enlace lg-pill-link" href="#preguntas">
+            Preguntas
+          </a>
+          {!ES_APP && (
+            <Link className="lg-pill-link" to="/login">
+              <span className="lg-largo">Iniciar sesión</span>
+              <span className="lg-corto">Entrar</span>
             </Link>
-            <Link to="/login">
-              <button className="btn-hero">Probar gratis</button>
-            </Link>
-          </div>
-        </div>
+          )}
+          <Link className="lg-pill-cta" to="/login">
+            {ES_APP ? (
+              <>
+                <span className="lg-largo">Iniciar sesión</span>
+                <span className="lg-corto">Entrar</span>
+              </>
+            ) : (
+              textoEntrar
+            )}
+          </Link>
+        </nav>
       </header>
 
-      {/* 1 — HERO */}
-      <section className="landing-hero">
-        <div className="landing-container landing-hero-grid">
-          <div>
-            <span
-              style={{
-                display: 'inline-block',
-                background: 'rgba(255,255,255,0.14)',
-                border: '1px solid rgba(255,255,255,0.3)',
-                color: '#FFFFFF',
-                fontSize: '0.8rem',
-                fontWeight: 600,
-                padding: '0.3rem 0.85rem',
-                borderRadius: 999,
-                marginBottom: '1.1rem',
-              }}
-            >
-              🇧🇴 Hecho para comerciantes bolivianos
-            </span>
+      {/* ── 1 · Hero oscuro ── */}
+      <section className="lg-hero">
+        <div className="lg-vid lg-hero-fondo">
+          <div className="lg-vid-tinte" />
+        </div>
+        <div className="lg-grid" />
+        <div className="lg-hero-cont">
+          <span className="lg-badge lg-badge-grande lg-badge-boli">
+            <img src="/boli/boli-hola.webp" alt="Boli, la mascota de MiContaBol" width="84" height="84" fetchpriority="high" />
+          </span>
 
-            <h1 className="landing-h1">Controla tu negocio sin saber contabilidad.</h1>
+          <span className="lg-eyebrow" style={{ marginTop: 26 }}>
+            🇧🇴 Hecho para comerciantes bolivianos
+          </span>
 
-            <p className="landing-subtitle">
-              Registra tus ventas, controla tu inventario y descubre cuánto ganas de verdad. MiContaBol arma la
-              contabilidad por detrás.
-            </p>
+          <h1 className="lg-hero-h1" style={{ marginTop: 22 }}>
+            Controla tu negocio <b>sin saber contabilidad.</b>
+          </h1>
 
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1.75rem' }}>
-              <Link to="/login">
-                <button className="btn-hero btn-lg">Probar gratis 1 mes</button>
-              </Link>
-              <a href="#producto">
-                <button
-                  type="button"
-                  className="btn-lg"
-                  style={{ background: 'transparent', color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.5)' }}
-                >
-                  Ver cómo funciona
-                </button>
-              </a>
-            </div>
+          <p className="lg-hero-p">
+            Registra tus ventas, controla tu inventario y descubre cuánto ganas de verdad. MiContaBol arma la
+            contabilidad por detrás.
+          </p>
 
-            <div
-              style={{
-                display: 'flex',
-                gap: '1.25rem',
-                flexWrap: 'wrap',
-                marginTop: '1.5rem',
-                color: '#D5DEEA',
-                fontSize: '0.88rem',
-              }}
-            >
-              <span>✓ Sin tarjeta</span>
-              <span>✓ Tu mes empieza con tu primera venta</span>
-              <span>✓ Desde el celular</span>
-            </div>
+          <div className="lg-acciones">
+            <Link className="lg-btn lg-btn-hay lg-btn-lg" to="/login">
+              {ES_APP ? 'Iniciar sesión' : 'Probar gratis 1 mes'}
+            </Link>
+            <a className="lg-btn lg-btn-vidrio lg-btn-lg" href="#producto">
+              Ver cómo funciona
+            </a>
           </div>
 
-          <div style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}>
-            <Ventana ancho={360}>
-              <PantallaVenta />
-            </Ventana>
+          {!ES_APP && (
+            <p className="lg-hero-nota">Sin tarjeta · Tu mes empieza con tu primera venta · Desde el celular</p>
+          )}
 
-            {[
-              { texto: '+ Bs 580 a caja', color: 'var(--color-navy)', top: '6%', left: '-14%' },
-              { texto: '− Bs 347 inventario', color: 'var(--color-text-secondary)', top: '46%', right: '-13%' },
-              { texto: '+ Bs 233 ganancia', color: 'var(--color-success)', bottom: '13%', left: '-11%', fuerte: true },
-            ].map((c) => (
-              <span
-                key={c.texto}
-                style={{
-                  position: 'absolute',
-                  top: c.top,
-                  left: c.left,
-                  right: c.right,
-                  bottom: c.bottom,
-                  background: '#FFFFFF',
-                  border: c.fuerte ? '1px solid rgba(34,197,94,0.4)' : '1px solid var(--color-border)',
-                  borderRadius: 999,
-                  padding: '0.35rem 0.8rem',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  color: c.color,
-                  boxShadow: '0 6px 18px rgba(15,26,41,0.16)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {c.texto}
-              </span>
-            ))}
-
-            <BoliMascot
-              pose="hola"
-              size={78}
-              style={{ position: 'absolute', bottom: -26, right: -8, filter: 'drop-shadow(0 6px 14px rgba(15,26,41,0.35))' }}
-            />
+          <div className="lg-stats">
+            <div className="lg-stat">
+              <b>3 pasos</b>
+              <span>buscas, cobras y listo</span>
+            </div>
+            <div className="lg-stat">
+              <b>0</b>
+              <span>palabras de contabilidad</span>
+            </div>
+            <div className="lg-stat">
+              <b>1</b>
+              <span>lugar para todo tu negocio</span>
+            </div>
           </div>
         </div>
+        <span className="lg-mouse" aria-hidden="true" />
       </section>
 
       {/* Franja de rubros */}
-      <div className="trust-strip">
-        <div className="landing-container">
-          <p style={{ textAlign: 'center', color: '#FFFFFF', fontWeight: 600, margin: '0 0 0.7rem', fontSize: '0.95rem' }}>
-            Hecho para negocios como el tuyo
-          </p>
-          <div className="trust-items">
-            {rubros.map((r, i) => (
-              <span key={r}>
-                {r}
-                {i < rubros.length - 1 && <span style={{ opacity: 0.4, marginLeft: '1.5rem' }}>·</span>}
-              </span>
-            ))}
-          </div>
+      <div className="lg-oscuro lg-rubros">
+        <p>Hecho para negocios como el tuyo</p>
+        <div className="lg-rubros-fila">
+          {rubros.map((r) => (
+            <span key={r} className="lg-rubro">
+              {r}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* 2 — DASHBOARD */}
-      <section className="landing-section" id="producto">
-        <div className="landing-container" style={{ textAlign: 'center' }}>
-          <h2 className="landing-h2">Abres MiContaBol y sabes cómo está tu negocio.</h2>
-          <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
-            Lo que vendiste, lo que ganaste y lo que tienes en inventario. Sin buscar nada.
-          </p>
-
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2.25rem' }}>
+      {/* ── 2 · Dashboard (claro) ── */}
+      <section id="producto" className="lg-claro lg-sec">
+        <div className="lg-sec-in">
+          <Encabezado
+            etiqueta="Tu resumen"
+            sub="Lo que vendiste, lo que ganaste y lo que tienes en inventario. Sin buscar nada."
+          >
+            Abres MiContaBol y sabes <span className="lg-grad">cómo está tu negocio.</span>
+          </Encabezado>
+          <div className="lg-rev" style={{ display: 'flex', justifyContent: 'center' }}>
             <Ventana ancho={840}>
               <PantallaDashboard />
             </Ventana>
@@ -561,141 +623,69 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 3 — LA VENTA */}
-      <section className="landing-section bg-tint">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-            Antes de confirmar una venta, ya sabes cuánto ganaste.
-          </h2>
+      {/* ── 3 · La venta (oscuro) ── */}
+      <section className="lg-oscuro lg-sec">
+        <div className="lg-orb lg-orb-c" style={{ left: '-12%', bottom: 'auto', top: -200 }} />
+        <div className="lg-orb lg-orb-d" style={{ top: 'auto', bottom: -160 }} />
+        <div className="lg-sec-in">
+          <Encabezado etiqueta="La venta">
+            Antes de confirmar una venta, ya sabes <span className="lg-grad">cuánto ganaste.</span>
+          </Encabezado>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '1rem',
-              flexWrap: 'wrap',
-              marginTop: '2.25rem',
-            }}
-          >
+          <div className="lg-flujo lg-rev">
             {[
               { titulo: 'Buscas', valor: 'Roma rojo 38', Icon: Search },
               { titulo: 'Cobras', valor: 'Bs 580', Icon: CreditCard },
-              { titulo: 'Sabes cuánto ganaste', valor: '+ Bs 233', Icon: TrendingUp, verde: true },
+              { titulo: 'Sabes cuánto ganaste', valor: '+ Bs 233', Icon: TrendingUp, ok: true },
             ].map((p, i, arr) => (
-              <div key={p.titulo} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div
-                  style={{
-                    background: '#FFFFFF',
-                    border: p.verde ? '2px solid rgba(34,197,94,0.4)' : '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-card)',
-                    padding: '1.25rem 1.4rem',
-                    width: 195,
-                    textAlign: 'center',
-                  }}
-                >
-                  <p.Icon
-                    size={26}
-                    strokeWidth={1.6}
-                    style={{ color: p.verde ? 'var(--color-success)' : 'var(--color-navy)' }}
-                  />
-                  <p style={{ margin: '0.6rem 0 0.2rem', fontSize: '0.82rem', color: 'var(--color-text-secondary)' }}>
-                    {p.titulo}
-                  </p>
+              <Fragment key={p.titulo}>
+                <div className="lg-card">
+                  <span className={`lg-ico ${p.ok ? 'lg-ico-ok' : ''}`} style={{ margin: '0 auto' }}>
+                    <p.Icon size={24} strokeWidth={1.8} />
+                  </span>
+                  <p style={{ margin: '14px 0 4px', fontSize: 14, color: 'var(--lg-soft)' }}>{p.titulo}</p>
                   <p
-                    style={{
-                      margin: 0,
-                      fontSize: '1.15rem',
-                      fontWeight: 800,
-                      color: p.verde ? 'var(--color-success)' : 'var(--color-navy)',
-                    }}
+                    className={p.ok ? 'lg-ok' : undefined}
+                    style={{ margin: 0, fontSize: 21, fontWeight: 800, fontFamily: 'var(--font-display)' }}
                   >
                     {p.valor}
                   </p>
                 </div>
-                {i < arr.length - 1 && (
-                  <ArrowRight size={22} strokeWidth={2} style={{ color: 'var(--color-text-disabled)', flexShrink: 0 }} />
-                )}
-              </div>
+                {i < arr.length - 1 && <Flecha />}
+              </Fragment>
             ))}
           </div>
 
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', marginTop: '2rem', fontSize: '1.05rem' }}>
+          <p className="lg-sub lg-rev" style={{ textAlign: 'center', marginTop: 32 }}>
             Tú registras una venta. MiContaBol hace todo lo demás.
           </p>
 
-          <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center', flexWrap: 'wrap', marginTop: '1rem' }}>
+          <div className="lg-chips lg-rev">
             {['Caja', 'Inventario', 'Kardex', 'Ganancia', 'Contabilidad'].map((t) => (
-              <span
-                key={t}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  background: '#FFFFFF',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 999,
-                  padding: '0.4rem 0.9rem',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
-                  color: 'var(--color-navy)',
-                }}
-              >
-                <Check size={14} strokeWidth={3} style={{ color: 'var(--color-success)' }} />
+              <span key={t} className="lg-chip">
+                <Check size={14} strokeWidth={3} aria-hidden="true" />
                 {t}
               </span>
             ))}
           </div>
 
-          <p
-            style={{
-              maxWidth: 560,
-              margin: '2rem auto 0',
-              padding: '1.15rem 1.3rem',
-              background: '#FFFFFF',
-              borderLeft: '3px solid var(--color-coral)',
-              borderRadius: 12,
-              fontSize: '1.05rem',
-              fontWeight: 700,
-              color: 'var(--color-navy)',
-              lineHeight: 1.5,
-              textAlign: 'center',
-            }}
-          >
-            Sin asientos. Sin debe. Sin haber.
-            <span
-              style={{
-                display: 'block',
-                fontWeight: 400,
-                color: 'var(--color-text-secondary)',
-                fontSize: '0.95rem',
-                marginTop: '0.35rem',
-              }}
-            >
+          <div className="lg-card lg-cita lg-rev">
+            <p style={{ margin: 0, fontSize: 19, fontWeight: 700, lineHeight: 1.4 }}>Sin asientos. Sin debe. Sin haber.</p>
+            <p className="lg-sub" style={{ margin: '6px 0 0', fontSize: 15.5 }}>
               MiContaBol habla como comerciante, no como contador.
-            </span>
-          </p>
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* 4 — TÚ → MICONTABOL → TU CONTADOR (subida al cuarto lugar) */}
-      <section className="landing-section">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-            Tú manejas el negocio. MiContaBol ordena los números.
-          </h2>
+      {/* ── 4 · Tú → MiContaBol → tu contador (claro) ── */}
+      <section className="lg-claro lg-sec">
+        <div className="lg-sec-in">
+          <Encabezado etiqueta="Tu contador">
+            Tú manejas el negocio. <span className="lg-grad">MiContaBol ordena los números.</span>
+          </Encabezado>
 
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '1rem',
-              flexWrap: 'wrap',
-              marginTop: '2.25rem',
-            }}
-          >
+          <div className="lg-flujo lg-rev">
             {[
               { titulo: 'Tú', items: ['Ventas', 'Compras', 'Gastos'], sub: 'en lenguaje normal' },
               { titulo: 'MiContaBol', items: ['Ordena todo', 'automáticamente'], centro: true },
@@ -705,191 +695,129 @@ export default function Landing() {
                 sub: 'todo donde corresponde',
               },
             ].map((col, i, arr) => (
-              <div key={col.titulo} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                <div
-                  style={{
-                    background: col.centro ? 'var(--color-navy)' : '#FFFFFF',
-                    border: col.centro ? 'none' : '1px solid var(--color-border)',
-                    borderRadius: 'var(--radius-lg)',
-                    boxShadow: 'var(--shadow-card)',
-                    padding: '1.3rem 1.5rem',
-                    width: 210,
-                    textAlign: 'center',
-                  }}
-                >
-                  <div style={{ marginBottom: '0.7rem', display: 'flex', justifyContent: 'center' }}>
-                    {col.centro ? (
-                      <Logo dark iconSize={26} textSize="0.95rem" />
-                    ) : (
-                      <span style={{ fontWeight: 700, color: 'var(--color-navy)', fontSize: '1rem' }}>{col.titulo}</span>
-                    )}
-                  </div>
-
+              <Fragment key={col.titulo}>
+                <div className={`lg-card ${col.centro ? 'lg-card-marca' : ''}`}>
+                  <h3 style={{ margin: '0 0 12px', fontSize: 19 }}>{col.titulo}</h3>
                   {col.items.map((it) => (
-                    <p
-                      key={it}
-                      style={{
-                        margin: '0 0 0.3rem',
-                        fontSize: '0.88rem',
-                        color: col.centro ? '#C7D2E0' : 'var(--color-text)',
-                      }}
-                    >
+                    <p key={it} style={{ margin: '0 0 6px', fontSize: 15, color: col.centro ? '#E3EBF6' : 'var(--lg-text)' }}>
                       {it}
                     </p>
                   ))}
-
-                  {col.sub && (
-                    <p style={{ margin: '0.6rem 0 0', fontSize: '0.76rem', color: 'var(--color-text-disabled)' }}>
-                      {col.sub}
-                    </p>
-                  )}
+                  {col.sub && <p style={{ margin: '12px 0 0', fontSize: 13, color: 'var(--lg-soft)' }}>{col.sub}</p>}
                 </div>
-
-                {i < arr.length - 1 && (
-                  <ArrowRight size={20} strokeWidth={2} style={{ color: 'var(--color-text-disabled)', flexShrink: 0 }} />
-                )}
-              </div>
+                {i < arr.length - 1 && <Flecha />}
+              </Fragment>
             ))}
           </div>
 
-          <p
-            style={{
-              textAlign: 'center',
-              maxWidth: 560,
-              margin: '2rem auto 0',
-              fontSize: '1rem',
-              color: 'var(--color-text-secondary)',
-              lineHeight: 1.6,
-            }}
-          >
+          <p className="lg-sub lg-rev" style={{ textAlign: 'center', maxWidth: 580, margin: '32px auto 0' }}>
             No necesitas aprender debe, haber ni partida doble.{' '}
-            <strong style={{ color: 'var(--color-navy)' }}>
+            <strong style={{ color: 'var(--lg-text)' }}>
               MiContaBol no reemplaza a tu contador: le facilita el trabajo.
             </strong>
           </p>
         </div>
       </section>
 
-      {/* 5 — INVENTARIO */}
-      <section className="landing-section bg-gris">
-        <div className="landing-container landing-grid-2">
-          <div>
-            <h2 className="landing-h2">Tu inventario también es plata.</h2>
-            <p style={{ color: 'var(--color-text-secondary)', marginTop: '0.75rem', fontSize: '1.05rem', lineHeight: 1.55 }}>
-              MiContaBol te muestra cuánto dinero tienes metido en mercadería, cuánto vale vendida y qué necesitas
-              reponer.
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.1rem', marginTop: '1.5rem' }}>
-              {[
-                ['Stock automático', 'Cada venta descuenta sola.'],
-                ['Variantes', 'Talla, color y presentación.'],
-                ['Avisos', 'Sabes qué reponer a tiempo.'],
-                ['Costo real', 'Cuánto tienes invertido de verdad.'],
-              ].map(([t, d]) => (
-                <div key={t}>
-                  <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)', fontSize: '0.95rem' }}>{t}</p>
-                  <p style={{ margin: '0.15rem 0 0', color: 'var(--color-text-secondary)', fontSize: '0.88rem' }}>{d}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div
-              style={{
-                background: '#FFFFFF',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-lg)',
-                boxShadow: 'var(--shadow-card)',
-                padding: '1.4rem',
-              }}
-            >
-              <p style={{ margin: '0 0 1.1rem', fontWeight: 700, color: 'var(--color-navy)' }}>
-                Cuánto dinero tienes parado en mercadería
+      {/* ── 5 · Inventario (oscuro) ── */}
+      <section className="lg-oscuro lg-sec">
+        <div className="lg-orb lg-orb-d" style={{ top: -100 }} />
+        <div className="lg-sec-in">
+          <div className="lg-dos lg-rev">
+            <div>
+              <span className="lg-eyebrow">Inventario</span>
+              <h2 className="lg-h2" style={{ margin: '16px 0 14px' }}>
+                Tu inventario <span className="lg-grad">también es plata.</span>
+              </h2>
+              <p className="lg-sub" style={{ margin: '0 0 22px' }}>
+                MiContaBol te muestra cuánto dinero tienes metido en mercadería, cuánto vale vendida y qué necesitas
+                reponer.
               </p>
-
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.9rem' }}>
+              <ul className="lg-lista">
                 {[
-                  { label: 'Te costó', valor: 'Bs 12.400', nota: 'Lo que pagaste' },
-                  { label: 'Si vendes todo', valor: 'Bs 24.800', nota: 'A tus precios' },
-                  { label: 'Ganarías', valor: 'Bs 12.400', nota: 'Margen del 50%', destacado: true },
-                ].map((d) => (
-                  <div
-                    key={d.label}
-                    style={
-                      d.destacado
-                        ? {
-                            background: 'rgba(34, 197, 94, 0.07)',
-                            border: '1px solid rgba(34, 197, 94, 0.28)',
-                            borderRadius: 12,
-                            padding: '0.7rem 0.8rem',
-                          }
-                        : { padding: '0.7rem 0' }
-                    }
-                  >
-                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>{d.label}</p>
-                    <p
-                      style={{
-                        margin: '0.15rem 0 0',
-                        fontSize: '1.35rem',
-                        fontWeight: 800,
-                        color: d.destacado ? 'var(--color-success)' : 'var(--color-navy)',
-                      }}
-                    >
-                      {d.valor}
-                    </p>
-                    <p style={{ margin: '0.1rem 0 0', fontSize: '0.72rem', color: 'var(--color-text-disabled)' }}>
-                      {d.nota}
-                    </p>
-                  </div>
+                  ['Stock automático', 'Cada venta descuenta sola.'],
+                  ['Variantes', 'Talla, color y presentación.'],
+                  ['Avisos', 'Sabes qué reponer a tiempo.'],
+                  ['Costo real', 'Cuánto tienes invertido de verdad.'],
+                ].map(([t, d]) => (
+                  <li key={t}>
+                    <span className="lg-check" aria-hidden="true">
+                      ✓
+                    </span>
+                    <span>
+                      <strong>{t}.</strong> <span style={{ color: 'var(--lg-soft)' }}>{d}</span>
+                    </span>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
 
-            <div
-              style={{
-                display: 'flex',
-                gap: '0.85rem',
-                alignItems: 'center',
-                background: '#FFFFFF',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius)',
-                padding: '0.85rem 1rem',
-                marginTop: '0.85rem',
-                boxShadow: 'var(--shadow-card)',
-              }}
-            >
-              <BoliMascot pose="alerta" size={44} />
-              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--color-text)', lineHeight: 1.5 }}>
-                Tienes <strong>Bs 12.400</strong> quietos en mercadería. <strong>4 productos</strong> necesitan
-                reposición.
-              </p>
+            <div>
+              <div className="lg-panel">
+                <p style={{ margin: '0 0 16px', fontWeight: 700, color: 'var(--color-navy)' }}>
+                  Cuánto dinero tienes parado en mercadería
+                </p>
+                <div className="lg-datos">
+                  {[
+                    { label: 'Te costó', valor: 'Bs 12.400', nota: 'Lo que pagaste' },
+                    { label: 'Si vendes todo', valor: 'Bs 24.800', nota: 'A tus precios' },
+                    { label: 'Ganarías', valor: 'Bs 12.400', nota: 'Margen del 50%', destacado: true },
+                  ].map((d) => (
+                    <div
+                      key={d.label}
+                      style={
+                        d.destacado
+                          ? {
+                              background: 'rgba(34, 197, 94, 0.08)',
+                              border: '1px solid rgba(34, 197, 94, 0.3)',
+                              borderRadius: 12,
+                              padding: '10px 12px',
+                            }
+                          : { padding: '10px 0' }
+                      }
+                    >
+                      <p style={{ margin: 0, fontSize: 12.5, color: '#64748B' }}>{d.label}</p>
+                      <p
+                        style={{
+                          margin: '2px 0 0',
+                          fontSize: 21,
+                          fontWeight: 800,
+                          color: d.destacado ? '#15803D' : 'var(--color-navy)',
+                        }}
+                      >
+                        {d.valor}
+                      </p>
+                      <p style={{ margin: '2px 0 0', fontSize: 12, color: '#64748B' }}>{d.nota}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="lg-panel" style={{ marginTop: 14, padding: '14px 16px', display: 'flex', gap: 14, alignItems: 'center' }}>
+                <BoliMascot pose="alerta" size={44} />
+                <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.5 }}>
+                  Tienes <strong>Bs 12.400</strong> quietos en mercadería. <strong>4 productos</strong> necesitan
+                  reposición.
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6 — CATÁLOGO */}
-      <section className="landing-section">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-            Convierte tu vitrina en un catálogo digital.
-          </h2>
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', maxWidth: 600, margin: '0.5rem auto 0' }}>
-            Tu cliente escanea el QR pegado en tu local, mira tus productos con foto y precio, y te escribe directo
-            por WhatsApp.
-          </p>
+      {/* ── 6 · Catálogo (claro) ── */}
+      <section className="lg-claro lg-sec">
+        <div className="lg-sec-in">
+          <Encabezado
+            etiqueta="Catálogo digital"
+            sub="Tu cliente escanea el QR pegado en tu local, mira tus productos con foto y precio, y te escribe directo por WhatsApp."
+          >
+            Convierte tu vitrina en un <span className="lg-grad">catálogo digital.</span>
+          </Encabezado>
 
           <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '1.5rem',
-              flexWrap: 'wrap',
-              marginTop: '2.5rem',
-            }}
+            className="lg-rev"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 22, flexWrap: 'wrap' }}
           >
             <div style={{ textAlign: 'center' }}>
               <div
@@ -910,14 +838,15 @@ export default function Landing() {
                     fontWeight: 700,
                     color: 'var(--color-navy)',
                     letterSpacing: '0.04em',
+                    lineHeight: 1.4,
                   }}
                 >
                   CONOCE NUESTROS
                   <br />
                   PRODUCTOS
                 </p>
-
                 <div
+                  aria-hidden="true"
                   style={{
                     width: 96,
                     height: 96,
@@ -938,36 +867,29 @@ export default function Landing() {
                       <span key={i} style={{ background: v === '1' ? 'var(--color-navy)' : 'transparent', borderRadius: 1 }} />
                     ))}
                 </div>
-
-                <p style={{ margin: '0.8rem 0 0', fontSize: '0.66rem', color: 'var(--color-text-secondary)' }}>
-                  Escanea con tu cámara
-                </p>
+                <p style={{ margin: '0.8rem 0 0', fontSize: '0.7rem', color: '#64748B' }}>Escanea con tu cámara</p>
               </div>
-              <p style={{ margin: '0.85rem 0 0', fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-secondary)' }}>
-                En tu vitrina
-              </p>
+              <p style={{ margin: '14px 0 0', fontSize: 14.5, fontWeight: 600, color: 'var(--lg-soft)' }}>En tu vitrina</p>
             </div>
 
-            <ArrowRight size={22} strokeWidth={2} style={{ color: 'var(--color-text-disabled)' }} />
-
+            <Flecha />
             <Telefono alto={400} etiqueta="Tu catálogo">
               <PantallaCatalogo />
             </Telefono>
-
-            <ArrowRight size={22} strokeWidth={2} style={{ color: 'var(--color-text-disabled)' }} />
-
+            <Flecha />
             <Telefono alto={400} etiqueta="Te escribe">
               <PantallaWhatsapp />
             </Telefono>
           </div>
 
           <div
+            className="lg-rev"
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(165px, 1fr))',
-              gap: '1rem',
-              marginTop: '2.5rem',
-              maxWidth: 640,
+              gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
+              gap: 16,
+              marginTop: 44,
+              maxWidth: 680,
               marginLeft: 'auto',
               marginRight: 'auto',
             }}
@@ -977,49 +899,43 @@ export default function Landing() {
               { valor: '87', label: 'consultas por WhatsApp' },
               { valor: 'Modelo Roma', label: 'el más consultado' },
             ].map((s) => (
-              <div key={s.label} className="stat-card" style={{ textAlign: 'center' }}>
-                <p style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-navy)' }}>{s.valor}</p>
-                <p className="stat-label" style={{ margin: '0.2rem 0 0' }}>{s.label}</p>
+              <div key={s.label} className="lg-card" style={{ textAlign: 'center', padding: '18px 14px' }}>
+                <p style={{ margin: 0, fontSize: 24, fontWeight: 800, fontFamily: 'var(--font-display)', color: '#1F3A5F' }}>
+                  {s.valor}
+                </p>
+                <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--lg-soft)' }}>{s.label}</p>
               </div>
             ))}
           </div>
 
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '1.25rem' }}>
-            Te dice qué productos miran y cuáles no. Si algo tiene muchas visitas y ninguna consulta, el problema es
-            el precio o la foto.
+          <p className="lg-sub lg-rev" style={{ textAlign: 'center', fontSize: 15, marginTop: 20 }}>
+            Te dice qué productos miran y cuáles no. Si algo tiene muchas visitas y ninguna consulta, el problema es el
+            precio o la foto.
           </p>
         </div>
       </section>
 
-      {/* 7 — TU NEGOCIO EN EL BOLSILLO */}
-      <section style={{ background: 'var(--color-navy)', padding: '3.5rem 0' }}>
-        <div className="landing-container" style={{ textAlign: 'center' }}>
-          <h2 className="landing-h2" style={{ color: '#FFFFFF', fontSize: '2rem' }}>
-            Tu negocio, en tu bolsillo.
-          </h2>
-          <p style={{ color: '#C7D2E0', marginTop: '0.6rem', maxWidth: 520, marginLeft: 'auto', marginRight: 'auto' }}>
-            Vende desde el mostrador. Revisa cómo va tu negocio desde tu casa. Solo necesitas internet.
-          </p>
-
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: '2rem',
-              flexWrap: 'wrap',
-              marginTop: '2.5rem',
-              color: '#C7D2E0',
-            }}
+      {/* ── 7 · Tu negocio en el bolsillo (oscuro) ── */}
+      <section className="lg-oscuro lg-sec">
+        <div className="lg-orb lg-orb-c" />
+        <div className="lg-sec-in">
+          <Encabezado
+            etiqueta="Desde el celular"
+            sub="Vende desde el mostrador. Revisa cómo va tu negocio desde tu casa. Solo necesitas internet."
           >
-            <Telefono alto={360} etiqueta="Vender">
+            Tu negocio, <span className="lg-grad">en tu bolsillo.</span>
+          </Encabezado>
+
+          <div className="lg-rev" style={{ display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap' }}>
+            <Telefono alto={450} etiqueta="Vender">
               <PantallaVenta compacta />
             </Telefono>
 
-            <Telefono alto={360} etiqueta="Tu catálogo">
+            <Telefono alto={450} etiqueta="Tu catálogo">
               <PantallaCatalogo />
             </Telefono>
 
-            <Telefono alto={360} etiqueta="Tus números">
+            <Telefono alto={450} etiqueta="Tus números">
               <div style={{ padding: '0.9rem', background: 'var(--color-bg-secondary)', height: '100%' }}>
                 {[
                   { l: 'Vendido hoy', v: 'Bs 1.840' },
@@ -1037,13 +953,13 @@ export default function Landing() {
                       marginBottom: '0.5rem',
                     }}
                   >
-                    <p style={{ margin: 0, fontSize: '0.62rem', color: 'var(--color-text-secondary)' }}>{k.l}</p>
+                    <p style={{ margin: 0, fontSize: '0.66rem', color: 'var(--color-text-secondary)' }}>{k.l}</p>
                     <p
                       style={{
                         margin: '0.1rem 0 0',
-                        fontSize: '0.95rem',
+                        fontSize: '0.98rem',
                         fontWeight: 800,
-                        color: k.verde ? 'var(--color-success)' : 'var(--color-navy)',
+                        color: k.verde ? '#15803D' : 'var(--color-navy)',
                       }}
                     >
                       {k.v}
@@ -1054,22 +970,23 @@ export default function Landing() {
             </Telefono>
           </div>
 
-          <BoliMascot pose="hola" size={90} style={{ margin: '2rem auto 0' }} />
-          <p style={{ color: '#93A5C4', fontSize: '0.88rem', margin: '0.6rem 0 0' }}>Tu negocio en el bolsillo.</p>
+          <div className="lg-rev" style={{ display: 'flex', justifyContent: 'center', marginTop: 34 }}>
+            <BoliMascot pose="hola" size={84} />
+          </div>
         </div>
       </section>
 
-      {/* 8 — VENDEDORES */}
-      <section className="landing-section">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-            Tus vendedores venden. Tus números siguen siendo tuyos.
-          </h2>
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
-            Cada persona ve solamente lo que necesita para trabajar.
-          </p>
+      {/* ── 8 · Vendedores (claro) ── */}
+      <section className="lg-claro lg-sec">
+        <div className="lg-sec-in">
+          <Encabezado etiqueta="Tu equipo" sub="Cada persona ve solamente lo que necesita para trabajar.">
+            Tus vendedores venden. <span className="lg-grad">Tus números siguen siendo tuyos.</span>
+          </Encabezado>
 
-          <div className="landing-grid-2" style={{ marginTop: '2.25rem', alignItems: 'stretch' }}>
+          <div
+            className="lg-rev"
+            style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', maxWidth: 860, margin: '0 auto' }}
+          >
             {[
               {
                 titulo: 'Lo que ve tu vendedor',
@@ -1081,50 +998,33 @@ export default function Landing() {
                 titulo: 'Lo que ves tú',
                 Icon: Eye,
                 items: ['Todo lo anterior', 'Costo de cada producto', 'Margen y ganancia', 'Reportes y contabilidad'],
-                // Azul, no coral: el coral se reserva para acciones.
                 destacado: true,
               },
             ].map((col) => (
               <div
                 key={col.titulo}
-                style={{
-                  background: '#FFFFFF',
-                  border: col.destacado ? '2px solid var(--color-navy-light)' : '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-lg)',
-                  boxShadow: 'var(--shadow-card)',
-                  padding: '1.5rem',
-                }}
+                className="lg-card"
+                style={col.destacado ? { border: '2px solid #2E5C8A' } : undefined}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1rem' }}>
-                  <col.Icon
-                    size={20}
-                    strokeWidth={1.8}
-                    style={{ color: col.destacado ? 'var(--color-navy-light)' : 'var(--color-text-secondary)' }}
-                  />
-                  <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)' }}>{col.titulo}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+                  <span className="lg-ico" style={{ width: 40, height: 40, borderRadius: 12 }}>
+                    <col.Icon size={20} strokeWidth={1.8} />
+                  </span>
+                  <h3 style={{ margin: 0, fontSize: 18 }}>{col.titulo}</h3>
                 </div>
-
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                <ul className="lg-lista">
                   {col.items.map((it) => (
-                    <li key={it} style={{ display: 'flex', gap: '0.55rem', alignItems: 'center', fontSize: '0.95rem' }}>
-                      <Check size={15} strokeWidth={2.5} style={{ color: 'var(--color-success)', flexShrink: 0 }} />
+                    <li key={it}>
+                      <Check size={17} strokeWidth={2.6} className="lg-ok" style={{ flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
                       {it}
                     </li>
                   ))}
-
                   {col.oculto?.map((it) => (
-                    <li
-                      key={it}
-                      style={{
-                        display: 'flex',
-                        gap: '0.55rem',
-                        alignItems: 'center',
-                        fontSize: '0.95rem',
-                        color: 'var(--color-text-disabled)',
-                      }}
-                    >
-                      <Lock size={15} strokeWidth={2} style={{ flexShrink: 0 }} />
-                      {it} <span style={{ fontSize: '0.8rem' }}>— oculto</span>
+                    <li key={it} style={{ color: '#6B7A90' }}>
+                      <Lock size={16} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
+                      <span>
+                        {it} <span style={{ fontSize: 13.5 }}>— oculto</span>
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -1134,88 +1034,56 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 9 — DE "MÁS O MENOS" A SABER (fusión de las dos secciones) */}
-      <section className="landing-section bg-tint">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-            De "más o menos" a saber exactamente cómo va tu negocio
-          </h2>
+      {/* ── 9 · De "más o menos" a saber (oscuro) ── */}
+      <section className="lg-oscuro lg-sec">
+        <div className="lg-orb lg-orb-d" style={{ top: 'auto', bottom: -160 }} />
+        <div className="lg-sec-in">
+          <Encabezado etiqueta="Antes y ahora">
+            De "más o menos" a saber <span className="lg-grad">exactamente cómo va tu negocio</span>
+          </Encabezado>
 
-          <div className="landing-grid-2" style={{ marginTop: '2rem', alignItems: 'stretch' }}>
-            <div
-              style={{
-                background: 'transparent',
-                border: '1px solid var(--color-border)',
-                borderRadius: 'var(--radius-lg)',
-                padding: '1.6rem',
-              }}
-            >
-              <p
-                style={{
-                  margin: '0 0 1.2rem',
-                  fontWeight: 700,
-                  color: 'var(--color-text-secondary)',
-                  fontSize: '0.9rem',
-                  letterSpacing: '0.03em',
-                }}
-              >
+          <div
+            className="lg-rev"
+            style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(290px, 1fr))', alignItems: 'stretch' }}
+          >
+            <div className="lg-card lg-antes">
+              <p style={{ margin: '0 0 18px', fontWeight: 700, color: 'var(--lg-soft)', fontSize: 14, letterSpacing: '.06em' }}>
                 ANTES
               </p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+              <ul className="lg-lista" style={{ color: 'var(--lg-soft)' }}>
                 {antes.map((a) => (
-                  <li key={a} style={{ color: 'var(--color-text-secondary)', fontSize: '0.98rem' }}>
+                  <li key={a}>
+                    <span aria-hidden="true">·</span>
                     {a}
                   </li>
                 ))}
               </ul>
-              <p style={{ margin: '1.5rem 0 0', fontSize: '1.05rem', color: 'var(--color-text-disabled)', fontStyle: 'italic' }}>
+              <p style={{ margin: '24px 0 0', fontSize: 17, color: '#8DA3C0', fontStyle: 'italic' }}>
                 "Creo que este mes me fue bien."
               </p>
             </div>
 
-            <div
-              style={{
-                background: '#FFFFFF',
-                borderRadius: 'var(--radius-lg)',
-                borderTop: '4px solid var(--color-coral)',
-                boxShadow: 'var(--shadow-card)',
-                padding: '1.6rem',
-              }}
-            >
-              <p
-                style={{
-                  margin: '0 0 1.2rem',
-                  fontWeight: 700,
-                  color: 'var(--color-coral)',
-                  fontSize: '0.9rem',
-                  letterSpacing: '0.03em',
-                }}
-              >
+            <div className="lg-card lg-con">
+              <p style={{ margin: '0 0 18px', fontWeight: 700, color: '#FF9A9D', fontSize: 14, letterSpacing: '.06em' }}>
                 CON MICONTABOL
               </p>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.9rem' }}>
+              <ul className="lg-lista">
                 {despues.map((d) => (
-                  <li
-                    key={d.texto}
-                    style={{
-                      display: 'flex',
-                      gap: '0.6rem',
-                      alignItems: 'center',
-                      color: d.fuerte ? 'var(--color-success)' : 'var(--color-text)',
-                      fontSize: '0.98rem',
-                      fontWeight: d.fuerte ? 700 : 500,
-                    }}
-                  >
-                    <d.Icon
-                      size={17}
-                      strokeWidth={1.9}
-                      style={{ color: d.fuerte ? 'var(--color-success)' : 'var(--color-navy)', flexShrink: 0 }}
-                    />
+                  <li key={d.texto} style={d.fuerte ? { color: 'var(--lg-ok)', fontWeight: 700 } : undefined}>
+                    <d.Icon size={18} strokeWidth={1.9} style={{ flexShrink: 0, marginTop: 2 }} aria-hidden="true" />
                     {d.texto}
                   </li>
                 ))}
               </ul>
-              <p style={{ margin: '1.5rem 0 0', fontSize: '1.25rem', fontWeight: 800, color: 'var(--color-success)' }}>
+              <p
+                style={{
+                  margin: '24px 0 0',
+                  fontSize: 23,
+                  fontWeight: 800,
+                  color: 'var(--lg-ok)',
+                  fontFamily: 'var(--font-display)',
+                }}
+              >
                 "Este mes gané Bs 5.430."
               </p>
             </div>
@@ -1223,488 +1091,322 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 10 — MIGRACIÓN */}
-      <section className="landing-section">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>¿Y cómo paso lo que ya tengo?</h2>
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', maxWidth: 600, margin: '0.5rem auto 0' }}>
-            Es la primera pregunta de todo el que ya tiene su negocio andando.
-          </p>
+      {/* ── 10 · Migración (claro) ── */}
+      <section className="lg-claro lg-sec">
+        <div className="lg-sec-in">
+          <Encabezado etiqueta="Empezar" sub="Es la primera pregunta de todo el que ya tiene su negocio andando.">
+            ¿Y cómo paso <span className="lg-grad">lo que ya tengo?</span>
+          </Encabezado>
 
-          <div className="landing-grid-3" style={{ marginTop: '2rem', alignItems: 'start' }}>
+          <div className="lg-rev" style={{ display: 'grid', gap: 18, gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
             {[
               {
                 Icon: FileSpreadsheet,
                 titulo: 'Si tienes un Excel',
-                texto: 'Se importa en un solo paso. Ves una vista previa antes de confirmar, así detectas si algo quedó mal antes de que entre.',
+                texto:
+                  'Se importa en un solo paso. Ves una vista previa antes de confirmar, así detectas si algo quedó mal antes de que entre.',
               },
               {
                 Icon: Notebook,
                 titulo: 'Si tienes un cuaderno',
-                texto: 'Empiezas con los veinte o treinta que más vendes. El resto los cargas cuando los vendas. Nadie carga trescientos en un día.',
+                texto:
+                  'Empiezas con los veinte o treinta que más vendes. El resto los cargas cuando los vendas. Nadie carga trescientos en un día.',
               },
               {
                 Icon: HandHeart,
                 titulo: 'No lo haces solo',
-                texto: 'En el plan Negocio nos sentamos 90 minutos contigo: cargamos tus productos, tus saldos y quién te debe.',
+                // En la app no se nombran planes
+                texto: ES_APP
+                  ? 'Podemos sentarnos contigo: cargamos tus productos, tus saldos y quién te debe.'
+                  : 'En el plan Negocio nos sentamos 90 minutos contigo: cargamos tus productos, tus saldos y quién te debe.',
               },
             ].map((c) => (
-              <div key={c.titulo} className="landing-card" style={{ textAlign: 'left' }}>
-                <c.Icon size={24} strokeWidth={1.7} style={{ color: 'var(--color-navy)' }} />
-                <p style={{ fontWeight: 700, color: 'var(--color-navy)', margin: '0.7rem 0 0.35rem' }}>{c.titulo}</p>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', margin: 0, lineHeight: 1.55 }}>
-                  {c.texto}
-                </p>
+              <div key={c.titulo} className="lg-card">
+                <span className="lg-ico">
+                  <c.Icon size={24} strokeWidth={1.7} />
+                </span>
+                <h3 style={{ fontSize: 19, margin: '16px 0 6px' }}>{c.titulo}</h3>
+                <p style={{ fontSize: 15, color: 'var(--lg-soft)', margin: 0, lineHeight: 1.55 }}>{c.texto}</p>
               </div>
             ))}
           </div>
 
           <div
+            className="lg-card lg-rev"
             style={{
-              background: 'var(--color-bg-secondary)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '1.4rem 1.6rem',
-              marginTop: '1.75rem',
-              display: 'flex',
-              gap: '1.25rem',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              maxWidth: 700,
+              marginTop: 24,
+              maxWidth: 720,
               marginLeft: 'auto',
               marginRight: 'auto',
+              display: 'flex',
+              gap: 20,
+              alignItems: 'center',
+              flexWrap: 'wrap',
             }}
           >
-            <BoliMascot pose="consejo" size={68} />
-            <p style={{ margin: 0, flex: 1, minWidth: 240, fontSize: '1rem', lineHeight: 1.6, color: 'var(--color-text)' }}>
-              <strong style={{ color: 'var(--color-navy)' }}>No tienes que dejar tu cuaderno de golpe.</strong>{' '}
-              Anota en los dos durante una semana. Cuando veas que los números cuadran, sueltas el cuaderno.
+            <BoliMascot pose="consejo" size={64} />
+            <p style={{ margin: 0, flex: 1, minWidth: 240, fontSize: 16, lineHeight: 1.6 }}>
+              <strong>No tienes que dejar tu cuaderno de golpe.</strong>{' '}
+              <span style={{ color: 'var(--lg-soft)' }}>
+                Anota en los dos durante una semana. Cuando veas que los números cuadran, sueltas el cuaderno.
+              </span>
             </p>
           </div>
         </div>
       </section>
 
-      {/* 11 — CONFIANZA
-          Va aquí, justo antes del precio: es la última barrera antes
-          de decidir. Cuando tengas testimonios reales, van encima de
-          esta sección — el bloque comentado más abajo tiene el formato. */}
-      <section className="landing-section bg-gris">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>Tus números están seguros</h2>
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', marginTop: '0.5rem' }}>
-            Le vas a confiar la información de tu negocio. Así la cuidamos.
-          </p>
+      {/* ── 11 · Confianza (oscuro) ──
+           Cuando haya testimonios reales con permiso por escrito, van en una
+           sección propia justo antes de esta. Reglas: frases textuales, nombre
+           real del negocio y autorización explícita. */}
+      <section className="lg-oscuro lg-sec">
+        <div className="lg-orb lg-orb-c" />
+        <div className="lg-sec-in">
+          <Encabezado
+            etiqueta="Confianza"
+            sub="Le vas a confiar la información de tu negocio. Así la cuidamos."
+          >
+            Tus números <span className="lg-grad">están seguros</span>
+          </Encabezado>
 
-          <div className="landing-grid-4" style={{ marginTop: '2rem' }}>
+          <div className="lg-rev" style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))' }}>
             {confianza.map((c) => (
-              <div key={c.titulo} className="landing-card" style={{ textAlign: 'left' }}>
-                <c.Icon size={22} strokeWidth={1.7} style={{ color: 'var(--color-navy)' }} />
-                <p style={{ fontWeight: 700, color: 'var(--color-navy)', margin: '0.6rem 0 0.25rem', fontSize: '0.95rem' }}>
-                  {c.titulo}
-                </p>
-                <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.88rem', margin: 0, lineHeight: 1.5 }}>
-                  {c.texto}
-                </p>
+              <div key={c.titulo} className="lg-card">
+                <span className="lg-ico">
+                  <c.Icon size={22} strokeWidth={1.7} />
+                </span>
+                <h3 style={{ fontSize: 18, margin: '16px 0 6px' }}>{c.titulo}</h3>
+                <p style={{ fontSize: 15, color: 'var(--lg-soft)', margin: 0, lineHeight: 1.55 }}>{c.texto}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/*
-        ────────────────────────────────────────────────────────────
-        TESTIMONIOS — pendiente hasta tener clientes reales.
+      {/* ── 12 · Precios (claro) — SOLO EN LA WEB ── */}
+      {!ES_APP && (
+        <section id="precios" className="lg-claro lg-sec">
+          <div className="lg-sec-in">
+            <Encabezado etiqueta="Precios">
+              Pruébalo gratis. <span className="lg-grad">Elige tu plan cuando estés listo.</span>
+            </Encabezado>
 
-        Cuando dos o tres comerciantes lleven un mes usándolo y te den
-        permiso por escrito, esta sección va JUSTO ARRIBA de "Tus
-        números están seguros".
-
-        Estructura lista para llenar:
-
-        <section className="landing-section">
-          <div className="landing-container">
-            <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-              Comerciantes que ya lo usan
-            </h2>
-            <div className="landing-grid-3" style={{ marginTop: '2rem' }}>
-              {[
-                { frase: '...', nombre: '...', negocio: '...', ciudad: '...' },
-              ].map((t) => (
-                <div key={t.nombre} className="landing-card" style={{ textAlign: 'left' }}>
-                  <p style={{ color: '#F59E0B', margin: 0 }}>★★★★★</p>
-                  <p style={{ fontSize: '1rem', lineHeight: 1.6, margin: '0.6rem 0 1rem' }}>
-                    "{t.frase}"
-                  </p>
-                  <p style={{ margin: 0, fontWeight: 700, color: 'var(--color-navy)', fontSize: '0.9rem' }}>
-                    {t.nombre}
-                  </p>
-                  <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
-                    {t.negocio} · {t.ciudad}
-                  </p>
-                </div>
-              ))}
+            <div className="lg-rev" style={{ display: 'flex', justifyContent: 'center', marginTop: -12, marginBottom: 36 }}>
+              <div className="lg-switch" role="group" aria-label="Ciclo de pago">
+                {[
+                  { valor: 'trimestral', label: 'Trimestral' },
+                  { valor: 'anual', label: 'Anual' },
+                ].map((c) => (
+                  <button key={c.valor} type="button" aria-pressed={ciclo === c.valor} onClick={() => setCiclo(c.valor)}>
+                    {c.label}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {planes.length === 0 ? (
+              <p style={{ textAlign: 'center', color: 'var(--lg-soft)' }}>Cargando planes...</p>
+            ) : (
+              <div className="lg-planes lg-rev">
+                {planes.map((p) => {
+                  const recomendado = p.codigo === 'negocio'
+                  const precio = ciclo === 'anual' ? p.precio_anual : p.precio_trimestral
+                  const meses = ciclo === 'anual' ? 12 : 3
+                  const porDia = precio / (meses * 30)
+
+                  return (
+                    <div key={p.codigo} className={`lg-card lg-plan ${recomendado ? 'lg-pro' : ''}`} style={{ textAlign: 'left' }}>
+                      {recomendado && <span className="lg-plan-etiqueta">El más elegido</span>}
+
+                      <h3 style={{ margin: recomendado ? '8px 0 4px' : '0 0 4px', fontSize: 22 }}>{p.nombre}</h3>
+                      <p style={{ color: 'var(--lg-soft)', fontSize: 14.5, margin: '0 0 16px', minHeight: 42 }}>{p.descripcion}</p>
+
+                      <p style={{ margin: 0 }}>
+                        <span style={{ fontSize: 34, fontWeight: 800, fontFamily: 'var(--font-display)' }}>{fmt(precio)}</span>
+                        <span style={{ color: 'var(--lg-soft)', fontSize: 15 }}>{ciclo === 'anual' ? ' /año' : ' /trimestre'}</span>
+                      </p>
+                      <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--lg-ok)', fontWeight: 700 }}>
+                        Equivale a {fmt(Math.round(precio / meses))} al mes
+                      </p>
+                      {recomendado ? (
+                        <p style={{ margin: '4px 0 0', fontSize: 14, color: 'var(--lg-soft)' }}>
+                          Menos de <strong style={{ color: 'var(--lg-text)' }}>Bs {porDia.toFixed(0)} al día</strong>.
+                        </p>
+                      ) : (
+                        <div style={{ height: 22 }} />
+                      )}
+
+                      <ul className="lg-plan-lista">
+                        <li>
+                          <strong>{p.limite_productos ? `${p.limite_productos} productos` : 'Productos ilimitados'}</strong>
+                        </li>
+                        <li>
+                          {p.limite_negocios === 1 ? '1 negocio' : `Hasta ${p.limite_negocios} negocios`} · {p.limite_usuarios}{' '}
+                          usuarios
+                        </li>
+                        {[
+                          { ok: true, label: 'Ventas, compras, inventario y clientes' },
+                          { ok: true, label: 'Catálogo público con código QR' },
+                          { ok: p.reportes_contables, label: 'Reportes contables formales' },
+                          { ok: p.exportar_archivos, label: 'Exportar a PDF y Excel' },
+                          { ok: p.lotes_vencimiento, label: 'Lotes y vencimientos' },
+                          { ok: p.codigo_barras, label: 'Código de barras y conteo físico' },
+                          { ok: p.incluye_kickoff, label: 'Sesión de arranque con un asesor' },
+                          {
+                            ok: p.asesorias_mes > 0,
+                            label: `${p.asesorias_mes} ${p.asesorias_mes === 1 ? 'asesoría' : 'asesorías'} al mes`,
+                          },
+                        ].map((f, i) => (
+                          <li key={i} className={f.ok ? undefined : 'lg-no'}>
+                            {f.ok ? (
+                              <Check size={17} strokeWidth={2.6} className="lg-check" style={{ flexShrink: 0, marginTop: 1 }} aria-hidden="true" />
+                            ) : (
+                              <span style={{ width: 17, textAlign: 'center', flexShrink: 0 }} aria-hidden="true">
+                                —
+                              </span>
+                            )}
+                            <span>
+                              {f.label}
+                              {!f.ok && <span className="sr-only"> (no incluido)</span>}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      <Link
+                        className={`lg-btn ${recomendado ? 'lg-btn-hay' : 'lg-btn-borde'}`}
+                        to="/login"
+                        style={{ width: '100%', marginTop: 22 }}
+                      >
+                        {recomendado ? 'Probar gratis' : `Elegir ${p.nombre}`}
+                      </Link>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {/* El mes gratis */}
+            <div className="lg-cierre lg-rev" style={{ background: '#0F2340', marginTop: 56, padding: '48px 24px' }}>
+              <h3 style={{ margin: 0, fontSize: 'clamp(22px, 3.4vw, 30px)' }}>Tu mes gratis no empieza hoy.</h3>
+              <p className="lg-sub" style={{ margin: '14px auto 0', maxWidth: 560, color: '#C9D6E8' }}>
+                Empieza cuando registres tu primera venta. Carga tus productos con calma, configura tu negocio, aprende a
+                usarlo. Cuando estés listo para vender, recién ahí corren tus 30 días.
+              </p>
+              <div style={{ marginTop: 26 }}>
+                <Link className="lg-btn lg-btn-hay lg-btn-lg" to="/login">
+                  Probar MiContaBol gratis
+                </Link>
+              </div>
+              <p className="lg-hero-nota" style={{ margin: '18px auto 0' }}>
+                Sin tarjeta · Sin cobros automáticos · Tus datos nunca se borran
+              </p>
+            </div>
+
+            <p className="lg-sub lg-rev" style={{ textAlign: 'center', fontSize: 15, marginTop: 22 }}>
+              Pagas por QR o transferencia, desde tu propio banco. Tú decides cuándo renovar.
+            </p>
           </div>
         </section>
+      )}
 
-        Tres reglas para cuando llegue el momento:
-          · Frases textuales, nunca redactadas por ti
-          · Autorización explícita del comerciante
-          · Nombre real del negocio — un testimonio anónimo no convence
-        ────────────────────────────────────────────────────────────
-      */}
+      {/* ── 13 · Preguntas frecuentes ── */}
+      <section id="preguntas" className="lg-claro lg-sec" style={ES_APP ? undefined : { paddingTop: 24 }}>
+        <div className="lg-sec-in" style={{ maxWidth: 760 }}>
+          <Encabezado etiqueta="Preguntas frecuentes">
+            Lo que <span className="lg-grad">más preguntan</span>
+          </Encabezado>
 
-      {/* 12 — PRECIOS */}
-      <section className="landing-section" id="precios">
-        <div className="landing-container">
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>
-            Pruébalo gratis. Elige tu plan cuando estés listo.
-          </h2>
-
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
-            <div
-              style={{
-                display: 'flex',
-                gap: '0.4rem',
-                background: 'var(--color-bg-secondary)',
-                padding: '0.25rem',
-                borderRadius: 999,
-                border: '1px solid var(--color-border)',
-              }}
-            >
-              {[
-                { valor: 'trimestral', label: 'Trimestral' },
-                { valor: 'anual', label: 'Anual' },
-              ].map((c) => (
-                <button
-                  key={c.valor}
-                  type="button"
-                  onClick={() => setCiclo(c.valor)}
-                  style={{
-                    border: 'none',
-                    borderRadius: 999,
-                    padding: '0.5rem 1.2rem',
-                    fontSize: '0.9rem',
-                    fontWeight: 600,
-                    background: ciclo === c.valor ? 'var(--color-navy)' : 'transparent',
-                    color: ciclo === c.valor ? '#FFFFFF' : 'var(--color-text-secondary)',
-                  }}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {planes.length === 0 ? (
-            <p style={{ textAlign: 'center', color: 'var(--color-text-disabled)', marginTop: '2rem' }}>
-              Cargando planes...
-            </p>
-          ) : (
-            <div className="landing-grid-3" style={{ marginTop: '2.5rem', alignItems: 'start' }}>
-              {planes.map((p) => {
-                const recomendado = p.codigo === 'negocio'
-                const precio = ciclo === 'anual' ? p.precio_anual : p.precio_trimestral
-                const meses = ciclo === 'anual' ? 12 : 3
-                const porDia = precio / (meses * 30)
-
-                return (
-                  <div
-                    key={p.codigo}
-                    className="landing-card"
-                    style={{
-                      textAlign: 'left',
-                      position: 'relative',
-                      border: recomendado ? '2px solid var(--color-coral)' : undefined,
-                      transform: recomendado ? 'scale(1.05)' : undefined,
-                      zIndex: recomendado ? 1 : undefined,
-                    }}
+          <div className="lg-rev" style={{ display: 'grid', gap: 12 }}>
+            {preguntas.map((q, i) => {
+              const abierto = abierta === i
+              return (
+                <div key={q.p} className="lg-faq" data-abierta={abierto ? 'si' : 'no'}>
+                  <button
+                    type="button"
+                    className="lg-faq-q"
+                    aria-expanded={abierto}
+                    aria-controls={`lg-resp-${i}`}
+                    onClick={() => setAbierta(abierto ? null : i)}
                   >
-                    {recomendado && (
-                      <span
-                        style={{
-                          position: 'absolute',
-                          top: -12,
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          background: 'var(--color-coral)',
-                          color: '#FFFFFF',
-                          fontSize: '0.72rem',
-                          fontWeight: 700,
-                          padding: '0.25rem 0.8rem',
-                          borderRadius: 999,
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        El más elegido
-                      </span>
-                    )}
-
-                    <h3
-                      style={{
-                        margin: recomendado ? '0.5rem 0 0.25rem' : '0 0 0.25rem',
-                        fontSize: '1.15rem',
-                        color: 'var(--color-navy)',
-                      }}
-                    >
-                      {p.nombre}
-                    </h3>
-                    <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.88rem', margin: '0 0 1rem', minHeight: 42 }}>
-                      {p.descripcion}
-                    </p>
-
-                    <p style={{ margin: 0 }}>
-                      <span style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--color-navy)' }}>{fmt(precio)}</span>
-                      <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>
-                        {ciclo === 'anual' ? ' /año' : ' /trimestre'}
-                      </span>
-                    </p>
-                    <p style={{ margin: '0.15rem 0 0', fontSize: '0.85rem', color: 'var(--color-success)', fontWeight: 600 }}>
-                      Equivale a {fmt(Math.round(precio / meses))} al mes
-                    </p>
-
-                    {recomendado ? (
-                      <p style={{ margin: '0.2rem 0 1.1rem', fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
-                        Menos de <strong>Bs {porDia.toFixed(0)} al día</strong>.
-                      </p>
-                    ) : (
-                      <div style={{ height: '1.1rem' }} />
-                    )}
-
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                      <li style={{ fontSize: '0.88rem' }}>
-                        <strong>{p.limite_productos ? `${p.limite_productos} productos` : 'Productos ilimitados'}</strong>
-                      </li>
-                      <li style={{ fontSize: '0.88rem' }}>
-                        {p.limite_negocios === 1 ? '1 negocio' : `Hasta ${p.limite_negocios} negocios`} ·{' '}
-                        {p.limite_usuarios} usuarios
-                      </li>
-
-                      {[
-                        { ok: true, label: 'Ventas, compras, inventario y clientes' },
-                        { ok: true, label: 'Catálogo público con código QR' },
-                        { ok: p.reportes_contables, label: 'Reportes contables formales' },
-                        { ok: p.exportar_archivos, label: 'Exportar a PDF y Excel' },
-                        { ok: p.lotes_vencimiento, label: 'Lotes y vencimientos' },
-                        { ok: p.codigo_barras, label: 'Código de barras y conteo físico' },
-                        { ok: p.incluye_kickoff, label: 'Sesión de arranque con un asesor' },
-                        {
-                          ok: p.asesorias_mes > 0,
-                          label: `${p.asesorias_mes} ${p.asesorias_mes === 1 ? 'asesoría' : 'asesorías'} al mes`,
-                        },
-                      ].map((f, i) => (
-                        <li
-                          key={i}
-                          style={{
-                            display: 'flex',
-                            gap: '0.5rem',
-                            alignItems: 'flex-start',
-                            fontSize: '0.88rem',
-                            color: f.ok ? 'var(--color-text)' : '#C4CCD8',
-                          }}
-                        >
-                          <span style={{ color: f.ok ? 'var(--color-success)' : 'var(--color-border)', flexShrink: 0, marginTop: 2 }}>
-                            {f.ok ? <Check size={15} strokeWidth={2.5} /> : '—'}
-                          </span>
-                          {f.label}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Link to="/login" style={{ display: 'block', marginTop: '1.25rem' }}>
-                      <button className={recomendado ? 'btn-hero' : undefined} type="button" style={{ width: '100%' }}>
-                        {recomendado ? 'Probar gratis' : `Elegir ${p.nombre}`}
-                      </button>
-                    </Link>
+                    {q.p}
+                    <span className="lg-mas" aria-hidden="true">
+                      +
+                    </span>
+                  </button>
+                  <div className="lg-faq-p" id={`lg-resp-${i}`} role="region" aria-hidden={!abierto}>
+                    <div>
+                      <p>{q.r}</p>
+                    </div>
                   </div>
-                )
-              })}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── 14 · Cierre ── */}
+      <section className="lg-oscuro" style={{ padding: '84px 24px' }}>
+        <div className="lg-orb lg-orb-c" />
+        <div className="lg-orb lg-orb-d" />
+        <div className="lg-sec-in" style={{ maxWidth: 900 }}>
+          <div className="lg-cierre lg-rev" style={{ background: '#0F2340' }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <BoliMascot pose="agradecido" size={104} />
             </div>
-          )}
-
-          {/* El trial, con su propio CTA */}
-          <div
-            style={{
-              background: 'var(--color-navy)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '2.25rem 2rem',
-              marginTop: '2.75rem',
-              textAlign: 'center',
-              color: '#FFFFFF',
-            }}
-          >
-            <h3 style={{ color: '#FFFFFF', fontSize: '1.5rem', margin: 0 }}>Tu mes gratis no empieza hoy.</h3>
-            <p style={{ color: '#D5DEEA', margin: '0.75rem auto 0', maxWidth: 540, lineHeight: 1.6 }}>
-              Empieza cuando registres tu primera venta. Carga tus productos con calma, configura tu negocio,
-              aprende a usarlo. Cuando estés listo para vender, recién ahí corren tus 30 días.
-            </p>
-
-            <Link to="/login">
-              <button className="btn-hero btn-lg" style={{ marginTop: '1.5rem' }}>
-                Probar MiContaBol gratis
-              </button>
-            </Link>
-
-            <div
-              style={{
-                display: 'flex',
-                gap: '1.5rem',
-                justifyContent: 'center',
-                flexWrap: 'wrap',
-                marginTop: '1.25rem',
-                color: '#C7D2E0',
-                fontSize: '0.88rem',
-              }}
-            >
-              <span>✓ Sin tarjeta</span>
-              <span>✓ Sin cobros automáticos</span>
-              <span>✓ Tus datos nunca se borran</span>
+            <h2 className="lg-h2" style={{ marginTop: 18 }}>
+              Deja de adivinar cómo está tu negocio. Empieza a verlo en <span className="lg-grad">números.</span>
+            </h2>
+            <div style={{ marginTop: 28 }}>
+              <Link className="lg-btn lg-btn-hay lg-btn-lg" to="/login">
+                {ES_APP ? 'Iniciar sesión' : 'Probar MiContaBol gratis'}
+              </Link>
             </div>
-          </div>
-
-          <p style={{ textAlign: 'center', color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '1.5rem' }}>
-            Pagas por QR o transferencia, desde tu propio banco. Tú decides cuándo renovar.
-          </p>
-        </div>
-      </section>
-
-      {/* 13 — PREGUNTAS */}
-      <section className="landing-section bg-gris" id="preguntas">
-        <div className="landing-container" style={{ maxWidth: 760 }}>
-          <h2 className="landing-h2" style={{ textAlign: 'center' }}>Preguntas frecuentes</h2>
-
-          <div style={{ marginTop: '1.75rem', display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-            {preguntas.map((q, i) => (
-              <div
-                key={q.p}
-                style={{
-                  background: '#FFFFFF',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius)',
-                  overflow: 'hidden',
-                }}
-              >
-                <button
-                  type="button"
-                  onClick={() => setAbierta(abierta === i ? null : i)}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    gap: '1rem',
-                    background: 'transparent',
-                    border: 'none',
-                    padding: '1rem 1.15rem',
-                    textAlign: 'left',
-                    fontSize: '0.98rem',
-                    fontWeight: 600,
-                    color: 'var(--color-navy)',
-                  }}
-                >
-                  {q.p}
-                  <span style={{ color: 'var(--color-text-disabled)', fontSize: '1.2rem', flexShrink: 0 }}>
-                    {abierta === i ? '−' : '+'}
-                  </span>
-                </button>
-
-                {abierta === i && (
-                  <p
-                    style={{
-                      margin: 0,
-                      padding: '0 1.15rem 1.15rem',
-                      color: 'var(--color-text-secondary)',
-                      fontSize: '0.95rem',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    {q.r}
-                  </p>
-                )}
-              </div>
-            ))}
+            {!ES_APP && <p className="lg-hero-nota" style={{ margin: '18px auto 0' }}>Sin tarjeta · 30 días · Empiezan con tu primera venta</p>}
           </div>
         </div>
       </section>
 
-      {/* 14 — CTA FINAL */}
-      <section style={{ background: 'var(--color-navy)', padding: '4rem 0' }}>
-        <div className="landing-container" style={{ textAlign: 'center' }}>
-          <BoliMascot pose="agradecido" size={120} style={{ margin: '0 auto 1.5rem' }} />
-
-          <h2 className="landing-h2" style={{ color: '#FFFFFF', fontSize: '2.2rem', lineHeight: 1.25 }}>
-            Deja de adivinar cómo está tu negocio.
-            <br />
-            Empieza a verlo en números.
-          </h2>
-
-          <Link to="/login">
-            <button className="btn-hero btn-lg" style={{ marginTop: '1.75rem' }}>
-              Probar MiContaBol gratis
-            </button>
-          </Link>
-
-          <div
-            style={{
-              display: 'flex',
-              gap: '1.5rem',
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginTop: '1.25rem',
-              color: '#C7D2E0',
-              fontSize: '0.9rem',
-            }}
-          >
-            <span>✓ Sin tarjeta</span>
-            <span>✓ 30 días</span>
-            <span>✓ Empiezan con tu primera venta</span>
-          </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer className="landing-footer">
-        <div className="landing-container landing-footer-grid">
+      {/* ── Pie de página ── */}
+      <footer className="lg-footer">
+        <div className="lg-footer-in">
           <div>
-            <Logo dark iconSize={28} textSize="1rem" />
-            <p style={{ color: '#93A5C4', fontSize: '0.85rem', margin: '0.6rem 0 0', lineHeight: 1.5 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+              <LogoIsotipo size={26} dark />
+              <Wordmark size="1.05rem" dark />
+            </span>
+            <p style={{ margin: '12px 0 0', fontSize: 14, lineHeight: 1.55, color: '#A9BDD6' }}>
               Tu negocio en orden.
               <br />
               Tu contabilidad se arma sola.
             </p>
-            <p style={{ color: '#64748B', fontSize: '0.8rem', margin: '0.9rem 0 0' }}>🇧🇴 Santa Cruz, Bolivia</p>
+            <p style={{ margin: '12px 0 0', fontSize: 13.5, color: '#8DA3C0' }}>🇧🇴 Santa Cruz, Bolivia</p>
           </div>
 
           <div>
-            <p className="landing-footer-heading">Producto</p>
+            <p className="lg-footer-t">Producto</p>
             <a href="#producto">Cómo funciona</a>
-            <a href="#precios">Precios</a>
+            {!ES_APP && <a href="#precios">Precios</a>}
             <a href="#preguntas">Preguntas</a>
           </div>
 
           <div>
-            <p className="landing-footer-heading">Empresa</p>
-            <a href="#">Contacto</a>
-            <a href="#">Soporte</a>
+            <p className="lg-footer-t">Ayuda</p>
+            <Link to="/soporte">Soporte</Link>
+            <Link to="/eliminar-cuenta">Eliminar mi cuenta</Link>
           </div>
 
           <div>
-            <p className="landing-footer-heading">Legal</p>
+            <p className="lg-footer-t">Legal</p>
             <Link to="/privacidad">Privacidad</Link>
             <Link to="/terminos">Términos</Link>
-          </div>
-
-          <div>
-            <p className="landing-footer-heading">Acceso</p>
             <Link to="/login">Iniciar sesión</Link>
-            <Link to="/login">Probar gratis</Link>
           </div>
         </div>
 
-        <p style={{ textAlign: 'center', color: '#64748B', fontSize: '0.8rem', marginTop: '2rem' }}>
-          © {new Date().getFullYear()} MiContaBol. Todos los derechos reservados.
-        </p>
+        <p className="lg-footer-copy">© {new Date().getFullYear()} MiContaBol. Todos los derechos reservados.</p>
       </footer>
-    </main>
+    </div>
   )
 }
